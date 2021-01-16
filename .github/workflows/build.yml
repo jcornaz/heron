@@ -35,7 +35,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Format check
-        run: cargo fmt -- --check
+        run: cargo fmt --all -- --check
 
       - name: Static analysis
         run: cargo clippy
@@ -87,8 +87,14 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
-      - name: Run tests
+      - name: Run tests with default features
         run: cargo test --workspace
+
+      - name: Run tests 3d only
+        run: cargo test --workspace --no-default-features --features "3d"
+
+      - name: Run tests 2d only
+        run: cargo test --workspace --no-default-features --features "2d"
 
   wasm-check:
     needs: check-style
