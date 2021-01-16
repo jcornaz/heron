@@ -2,19 +2,26 @@
 
 ![Build](https://github.com/jcornaz/heron/workflows/Build/badge.svg)
 
-An ergonomic API to physics in [bevy] games. (powered by [rapier])
+An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 
 ## Design principles
 
 * Don't mirror rapier's API. Simplify what can be simplified. Use bevy idoms when possible. Don't expect users to know how [rapier] works.
   * [rapier]'s API targets physics simulation for rust, where Heron targets [bevy] *games*. It is "similar", yes, but it isn't "the same".
   * When designing the API, only usage in [bevy] *games* matters. How the rapier's API looks like doesn't matter.
-* Use [bevy] types and components when possible (`Vec2`, `Vec3`, `Quat`, `Transform`, etc.)
+* Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
+* Provide a single API that works for both 2d and 3d. (Like bevy does)
 * Data oriented. Using this lib should look like if it was part of [bevy].
 * Data is accessible and modifiable directly in components. (Use global resouce only for global config)
 * Hide the actual physics engine. This is an implementation detail, the user shouldn't have to care about.
-* Split concerns in multiple small components/resources
+* Split concerns in multiple small components/resources.
 * Require only the actually *necessary* components. For instance `Velocity` only requires a `Transform`, no need to create a rigid body to apply velocity.
+
+
+## Features
+
+* `3d` Enable simulation using the 3 dimensions x, y, and z. (Enabled by default)
+* `2d` Enable simulation using only the first 2 dimensions x and y. Requires to disable the default features.
 
 
 ## Motivation
