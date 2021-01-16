@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "jcornaz"
+    assignees:
+      - "jcornaz"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "jcornaz"
+    assignees:
+      - "jcornaz"

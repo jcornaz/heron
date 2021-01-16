@@ -1,0 +1,25 @@
+# Reference: https://github.com/sunng87/cargo-release/blob/master/docs/reference.md
+
+consolidate-commits = true
+dev-version-ext = "dev"
+tag-prefix = ""
+pre-release-commit-message = "Release"
+post-release-commit-message = "Start next iteration"
+
+[[pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "## \\[Unreleased\\]"
+replace = "## [Unreleased]\n\n\n\n## [{{version}}] - {{date}}"
+max = 1
+
+[[pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "\\.\\.\\.HEAD"
+replace = "...{{tag_name}}"
+max = 1
+
+[[pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "\\[Unreleased\\]: "
+replace = "[Unreleased]: ../../compare/{{tag_name}}...HEAD\n[{{version}}]: "
+max = 1
