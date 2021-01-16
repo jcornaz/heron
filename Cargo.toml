@@ -1,10 +1,17 @@
+[workspace]
+members = ["core", "rapier"]
+
 [package]
-name = "rust-template"
+name = "heron"
 version = "0.1.0-dev"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 
-[profile.release]
-lto = true
-panic = 'abort'
-codegen-units = 1
+[features]
+default = ["3d"]
+2d = ["heron_rapier/2d"]
+3d = ["heron_rapier/3d"]
+
+[dependencies]
+heron_core = { path = "core" }
+heron_rapier = { path = "rapier" }
