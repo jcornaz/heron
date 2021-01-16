@@ -1,36 +1,29 @@
-# rust-template
+# Heron
 
-Add badges to quickly give hints to the user/contributors about :
-* licence of the project
-* continuous integration (build status, code coverage, code quality)
-* project status
-* latest version and where to get it
-* documentation
+![Build](https://github.com/jcornaz/heron/workflows/Build/badge.svg)
 
-Give a *short* introduction and/or overview that explains **what** the project is. This description should match descriptions defined in `Cargo.toml`
+An ergonomic API to physics in [bevy] games. (powered by [rapier])
 
-## Features
+## Design principles
 
-List the core "feature" that make this software/library attractive
+* Don't mirror rapier's API. Simplify what can be simplified. Use bevy idoms when possible. Don't expect users to know how [rapier] works.
+  * [rapier]'s API targets physics simulation for rust, where Heron targets [bevy] *games*. It is "similar", yes, but it isn't "the same".
+  * When designing the API, only usage in [bevy] *games* matters. How the rapier's API looks like doesn't matter.
+* Use [bevy] types and components when possible (`Vec2`, `Vec3`, `Quat`, `Transform`, etc.)
+* Data oriented. Using this lib should look like if it was part of [bevy].
+* Data is accessible and modifiable directly in components. (Use global resouce only for global config)
+* Hide the actual physics engine. This is an implementation detail, the user shouldn't have to care about.
+* Split concerns in multiple small components/resources
+* Require only the actually *necessary* components. For instance `Velocity` only requires a `Transform`, no need to create a rigid body to apply velocity.
 
-## Status
-
-Unless the project status is "stable". A short section should explain the current status of the project and what is its future. Is it incubating?, experimental? in maintenance mode? or discontinued?
-
-If discontinued, this should section should also explain the reasons, and what alternatives are available for the users.
-
-## Example
-
-Show what the project does as concisely as possible, developers should be able to figure out **how** the project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
 
 ## Motivation
 
-A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists.
+I think [rapier] is very powerful as a physics engine. But using it directly or via [bevy_rapier] in a [bevy] game is not ergonomic enough for my taste.
 
-## Setup
+Ideally I would like to have the *power* of [rapier] accessible behind a nice API designed around [bevy] (not around [rapier] and [nalgebra]).
 
-Provide code examples and explanations of how to get the project for a user.
 
-## Contribute
-
-Let people know how they can dive into the project, include important links to things like issue trackers and contribution guidelines.
+[bevy]: https://bevyengine.org
+[rapier]: https://rapier.rs
+[bevy_rapier]: https://github.com/dimforge/bevy_rapier
