@@ -14,6 +14,7 @@ pub extern crate rapier3d as rapier;
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoSystem, SystemStage};
+use bevy_transform::transform_propagate_system::transform_propagate_system;
 
 use heron_core::Gravity;
 
@@ -29,9 +30,9 @@ mod pipeline;
 
 #[allow(unused)]
 mod stage {
+    pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
-    pub(crate) const POST_STEP: &str = bevy_app::stage::LAST;
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.
@@ -80,7 +81,12 @@ impl Plugin for PhysicsPlugin {
             .add_resource(ColliderSet::new())
             .add_resource(JointSet::new())
             .add_stage_after(
-                bevy_app::stage::POST_UPDATE,
+                bevy_app::stage::UPDATE,
+                stage::START,
+                SystemStage::serial().with_system(transform_propagate_system.system()),
+            )
+            .add_stage_after(
+                stage::START,
                 stage::PRE_STEP,
                 SystemStage::parallel()
                     .with_system(bodies::create.system())
@@ -88,17 +94,17 @@ impl Plugin for PhysicsPlugin {
                     .with_system(bodies::update_rapier_position.system())
                     .with_system(bodies::remove.system()),
             )
-            .add_stage_after(
-                stage::PRE_STEP,
-                stage::STEP,
-                SystemStage::parallel()
-                    .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
-                    .with_system(pipeline::step.system()),
-            )
-            .add_system_to_stage(
-                bevy_app::stage::LAST,
-                bodies::update_bevy_transform.system(),
-            );
+            .add_stage_after(stage::PRE_STEP, stage::STEP, {
+                let mut stage = SystemStage::serial();
+
+                if self.parameters.dt().is_normal() {
+                    stage = stage
+                        .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
+                        .with_system(pipeline::step.system());
+                }
+
+                stage.with_system(bodies::update_bevy_transform.system())
+            });
     }
 }
 
