@@ -48,6 +48,20 @@ pub(crate) fn update_shape(
     }
 }
 
+pub(crate) fn update_transform(
+    mut bodies: ResMut<RigidBodySet>,
+    query: Query<(&GlobalTransform, &BodyHandle), Mutated<GlobalTransform>>,
+) {
+    for (transform, handle) in query.iter() {
+        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+            body.set_position(
+                convert::to_isometry(transform.translation, transform.rotation),
+                true,
+            );
+        }
+    }
+}
+
 fn collider_builder(body: &Body) -> ColliderBuilder {
     match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),

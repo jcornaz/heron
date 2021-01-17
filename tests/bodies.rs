@@ -4,6 +4,7 @@
 ))]
 
 use std::f32::consts::PI;
+use std::ops::DerefMut;
 
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
@@ -12,7 +13,6 @@ use bevy::reflect::TypeRegistryArc;
 use heron::rapier::dynamics::RigidBodySet;
 use heron::rapier::geometry::ColliderSet;
 use heron::*;
-use std::ops::DerefMut;
 
 struct TestEntity;
 
@@ -91,7 +91,7 @@ fn creates_body_in_rapier_world() {
 }
 
 #[test]
-fn update_sphere_radius() {
+fn update_shape() {
     let mut app = test_app();
 
     let entity = app.world.spawn((
@@ -113,4 +113,43 @@ fn update_sphere_radius() {
     let collider = colliders.get(handle.collider()).unwrap();
 
     assert_eq!(collider.shape().as_ball().unwrap().radius, 42.0)
+}
+
+#[test]
+fn update_transform() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        TestEntity,
+        Body::Sphere { radius: 2.0 },
+        GlobalTransform::default(),
+    ));
+
+    app.update();
+
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
+
+    let mut transform = app.world.get_mut::<GlobalTransform>(entity).unwrap();
+    transform.translation = translation;
+    transform.rotation = rotation;
+
+    app.update();
+
+    let colliders = app.resources.get::<RigidBodySet>().unwrap();
+    let handle = app.world.get::<BodyHandle>(entity).unwrap();
+    let rigid_body = colliders.get(handle.rigid_body()).unwrap();
+    let (actual_translation, actual_rotation) = convert::from_isometry(*rigid_body.position());
+
+    #[cfg(feature = "3d")]
+    assert_eq!(actual_translation, translation);
+
+    #[cfg(feature = "2d")]
+    assert_eq!(actual_translation.truncate(), translation.truncate());
+
+    let (axis, angle) = rotation.to_axis_angle();
+    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
+
+    assert!(actual_axis.angle_between(axis) < 0.001);
+    assert!((actual_angle - angle).abs() < 0.001);
 }
