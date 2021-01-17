@@ -79,7 +79,10 @@ pub(crate) fn update_bevy_transform(
     )>,
 ) {
     for (mut local_transform, global_transform, handle, parent) in query.iter_mut() {
-        if let Some(body) = bodies.get(handle.rigid_body).filter(|it| !it.is_sleeping()) {
+        if let Some(body) = bodies
+            .get(handle.rigid_body)
+            .filter(|it| it.is_dynamic() && !it.is_sleeping())
+        {
             let (translation, rotation) = convert::from_isometry(*body.position());
 
             if translation != global_transform.translation || rotation != global_transform.rotation

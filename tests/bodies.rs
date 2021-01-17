@@ -13,14 +13,13 @@ use bevy::reflect::TypeRegistryArc;
 use heron::rapier::dynamics::RigidBodySet;
 use heron::rapier::geometry::ColliderSet;
 use heron::*;
-use heron_rapier::rapier::dynamics::BodyStatus;
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_plugin(PhysicsPlugin::default());
+        .add_plugin(PhysicsPlugin::with_steps_per_second(0));
     builder.app
 }
 
@@ -215,23 +214,9 @@ fn update_bevy_transform() {
         let body = bodies.get_mut(handle.rigid_body()).unwrap();
 
         body.set_position(convert::to_isometry(translation, rotation), true);
-        body.body_status = BodyStatus::Static;
-    }
-    {
-        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
-        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
-        let body = bodies.get_mut(handle.rigid_body()).unwrap();
-        println!("before: {:?}", body.position());
     }
 
     app.update();
-
-    {
-        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
-        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
-        let body = bodies.get_mut(handle.rigid_body()).unwrap();
-        println!("after: {:?}", body.position());
-    }
 
     let Transform {
         translation: actual_translation,
