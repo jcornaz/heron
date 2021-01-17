@@ -11,6 +11,8 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
+pub use crate::rapier::na as nalgebra;
+
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoSystem, SystemStage};

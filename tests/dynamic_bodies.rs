@@ -27,7 +27,7 @@ fn creates_body_in_rapier_world() {
     };
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI);
+    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
 
     let entity = app.world.spawn((
         TestEntity,
@@ -80,5 +80,9 @@ fn creates_body_in_rapier_world() {
     #[cfg(feature = "2d")]
     assert_eq!(actual_translation.truncate(), translation.truncate());
 
-    assert_eq!(actual_rotation, rotation);
+    let (axis, angle) = rotation.to_axis_angle();
+    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
+
+    assert!(actual_axis.angle_between(axis) < 0.001);
+    assert!((actual_angle - angle).abs() < 0.001);
 }
