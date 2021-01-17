@@ -18,3 +18,4 @@ heron_rapier = { path = "rapier" }
 
 [dev-dependencies]
 bevy = "^0.4.0"
+bevy_reflect = "^0.4.0"

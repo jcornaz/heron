@@ -17,11 +17,14 @@ use bevy_ecs::{IntoSystem, SystemStage};
 
 use heron_core::Gravity;
 
-use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
-use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
+use crate::bodies::HandleMap;
+use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
+use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
+pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
 
-mod convert;
+mod bodies;
+pub mod convert;
 mod pipeline;
 
 #[allow(unused)]
@@ -38,6 +41,15 @@ mod stage {
 #[derive(Clone, Default)]
 pub struct PhysicsPlugin {
     parameters: IntegrationParameters,
+}
+
+/// Components automatically register, by the plugin that reference the body in rapier's world
+///
+/// It can be used to get direct access to rapier's world.
+#[derive(Debug, Copy, Clone)]
+pub struct BodyHandle {
+    rigid_body: RigidBodyHandle,
+    collider: ColliderHandle,
 }
 
 impl PhysicsPlugin {
@@ -60,6 +72,7 @@ impl Plugin for PhysicsPlugin {
         app.resources_mut().get_or_insert_with(Gravity::default);
 
         app.init_resource::<PhysicsPipeline>()
+            .init_resource::<HandleMap>()
             .add_resource(self.parameters.clone())
             .add_resource(BroadPhase::new())
             .add_resource(NarrowPhase::new())
@@ -69,7 +82,11 @@ impl Plugin for PhysicsPlugin {
             .add_stage_after(
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
-                SystemStage::parallel(),
+                SystemStage::parallel()
+                    .with_system(bodies::create.system())
+                    .with_system(bodies::update_shape.system())
+                    .with_system(bodies::update_rapier_position.system())
+                    .with_system(bodies::remove.system()),
             )
             .add_stage_after(
                 stage::PRE_STEP,
@@ -77,6 +94,21 @@ impl Plugin for PhysicsPlugin {
                 SystemStage::parallel()
                     .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
                     .with_system(pipeline::step.system()),
+            )
+            .add_system_to_stage(
+                bevy_app::stage::LAST,
+                bodies::update_bevy_transform.system(),
             );
+    }
+}
+
+impl BodyHandle {
+    /// Returns the rapier's rigid body handle
+    pub fn rigid_body(&self) -> RigidBodyHandle {
+        self.rigid_body
+    }
+    /// Returns the rapier's collider handle
+    pub fn collider(&self) -> ColliderHandle {
+        self.collider
     }
 }

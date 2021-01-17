@@ -15,5 +15,7 @@ bevy_math = "^0.4.0"
 bevy_core = "^0.4.0"
 bevy_ecs = "^0.4.0"
 bevy_app = "^0.4.0"
+bevy_transform = "^0.4.0"
 rapier2d = { version = "^0.4.2", optional = true, features = ["simd-stable", "parallel"] }
 rapier3d = { version = "^0.4.2", optional = true, features = ["simd-stable", "parallel"] }
+fnv = "^1.0"
