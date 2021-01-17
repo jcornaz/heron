@@ -1,36 +1,33 @@
-use bevy_ecs::{
-    Changed, Commands, IntoChainSystem, IntoSystem, Mutated, Query, ResMut, System, With, Without,
-};
+use bevy_ecs::*;
+use bevy_transform::components::GlobalTransform;
 
-use crate::rapier::dynamics::RigidBodySet;
-use crate::rapier::geometry::ColliderSet;
-use crate::BodyHandle;
 use heron_core::Body;
 
-pub(crate) fn maintenance() -> impl System<In = (), Out = ()> {
-    delete_bodies
-        .system()
-        .chain(update_bodies.system())
-        .chain(create_bodies.system())
-}
+use crate::rapier::dynamics::{RigidBodyBuilder, RigidBodySet};
+use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
+use crate::BodyHandle;
 
-pub fn create_bodies(
+pub(crate) fn create(
     commands: &mut Commands,
-    mut body_set: ResMut<RigidBodySet>,
-    mut collider_set: ResMut<ColliderSet>,
-    query: Query<(&Body,), Without<BodyHandle>>,
+    mut bodies: ResMut<RigidBodySet>,
+    mut colliders: ResMut<ColliderSet>,
+    query: Query<(Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
 ) {
-    todo!()
+    for (entity, body, _) in query.iter() {
+        let rigid_body = bodies.insert(RigidBodyBuilder::new_dynamic().build());
+        let collider = colliders.insert(collider_builder(body).build(), rigid_body, &mut bodies);
+        commands.insert_one(
+            entity,
+            BodyHandle {
+                rigid_body,
+                collider,
+            },
+        );
+    }
 }
 
-pub fn update_bodies(
-    mut body_set: ResMut<RigidBodySet>,
-    mut collider_set: ResMut<ColliderSet>,
-    query: Query<&Body, (Mutated<Body>, With<BodyHandle>)>,
-) {
-    todo!()
-}
-
-pub fn delete_bodies() {
-    todo!()
+fn collider_builder(body: &Body) -> ColliderBuilder {
+    match body {
+        Body::Sphere { radius } => ColliderBuilder::ball(*radius),
+    }
 }

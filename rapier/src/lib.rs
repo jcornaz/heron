@@ -79,7 +79,7 @@ impl Plugin for PhysicsPlugin {
             .add_stage_after(
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
-                SystemStage::parallel(),
+                SystemStage::parallel().with_system(bodies::create.system()),
             )
             .add_stage_after(
                 stage::PRE_STEP,

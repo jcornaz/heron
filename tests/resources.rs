@@ -12,20 +12,15 @@ use heron_core::Gravity;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 
-fn build_test_app() -> AppBuilder {
-    let mut builder = App::build();
-
-    builder
-        .init_resource::<TypeRegistryArc>()
-        .add_plugin(CorePlugin)
-        .add_plugin(PhysicsPlugin::default());
-
-    builder
-}
+mod dynamic_bodies;
 
 #[test]
 fn can_run_without_panic() {
-    build_test_app().run();
+    App::build()
+        .init_resource::<TypeRegistryArc>()
+        .add_plugin(CorePlugin)
+        .add_plugin(PhysicsPlugin::default())
+        .run();
 }
 
 #[test]
