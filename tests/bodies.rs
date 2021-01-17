@@ -179,7 +179,25 @@ fn remove_body_component() {
 }
 
 #[test]
-#[ignore]
-fn remove_body_entity() {
-    todo!()
+fn despawn_body_entity() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        TestEntity,
+        Body::Sphere { radius: 2.0 },
+        GlobalTransform::default(),
+    ));
+
+    app.update();
+
+    app.world.despawn(entity).unwrap();
+    app.update();
+
+    assert!(app.world.get::<BodyHandle>(entity).is_err());
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    assert_eq!(bodies.len(), 0);
+
+    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    assert_eq!(colliders.len(), 0);
 }

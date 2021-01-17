@@ -1,16 +1,20 @@
 use bevy_ecs::*;
 use bevy_transform::components::GlobalTransform;
+use fnv::FnvHashMap;
 
 use heron_core::Body;
 
-use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodySet};
+use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
 use crate::{convert, BodyHandle};
+
+pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
 pub(crate) fn create(
     commands: &mut Commands,
     mut bodies: ResMut<RigidBodySet>,
     mut colliders: ResMut<ColliderSet>,
+    mut handles: ResMut<HandleMap>,
     query: Query<(Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
 ) {
     for (entity, body, transform) in query.iter() {
@@ -23,6 +27,7 @@ pub(crate) fn create(
                 .build(),
         );
         let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
+        handles.insert(entity, rigid_body);
         commands.insert_one(
             entity,
             BodyHandle {
@@ -64,14 +69,17 @@ pub(crate) fn update_transform(
 
 pub(crate) fn remove(
     commands: &mut Commands,
+    mut handles: ResMut<HandleMap>,
     mut bodies: ResMut<RigidBodySet>,
     mut colliders: ResMut<ColliderSet>,
     mut joints: ResMut<JointSet>,
     query: Query<(Entity, &BodyHandle), Without<Body>>,
 ) {
-    for (entity, handle) in query.iter() {
-        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
-        commands.remove_one::<BodyHandle>(entity);
+    for entity in query.removed::<Body>() {
+        if let Some(handle) = handles.remove(entity) {
+            bodies.remove(handle, &mut colliders, &mut joints);
+            commands.remove_one::<BodyHandle>(*entity);
+        }
     }
 }
 

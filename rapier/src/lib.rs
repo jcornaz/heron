@@ -17,6 +17,7 @@ use bevy_ecs::{IntoSystem, SystemStage};
 
 use heron_core::Gravity;
 
+use crate::bodies::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -71,6 +72,7 @@ impl Plugin for PhysicsPlugin {
         app.resources_mut().get_or_insert_with(Gravity::default);
 
         app.init_resource::<PhysicsPipeline>()
+            .init_resource::<HandleMap>()
             .add_resource(self.parameters.clone())
             .add_resource(BroadPhase::new())
             .add_resource(NarrowPhase::new())
