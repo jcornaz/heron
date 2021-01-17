@@ -11,8 +11,6 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-pub use crate::rapier::na as nalgebra;
-
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoSystem, SystemStage};
@@ -21,6 +19,7 @@ use heron_core::Gravity;
 
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
+pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
 
 mod bodies;
@@ -81,7 +80,9 @@ impl Plugin for PhysicsPlugin {
             .add_stage_after(
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
-                SystemStage::parallel().with_system(bodies::create.system()),
+                SystemStage::parallel()
+                    .with_system(bodies::create.system())
+                    .with_system(bodies::update_shape.system()),
             )
             .add_stage_after(
                 stage::PRE_STEP,

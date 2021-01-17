@@ -12,19 +12,22 @@ use bevy::reflect::TypeRegistryArc;
 use heron::rapier::dynamics::RigidBodySet;
 use heron::rapier::geometry::ColliderSet;
 use heron::*;
+use std::ops::DerefMut;
 
 struct TestEntity;
 
+fn test_app() -> App {
+    let mut builder = App::build();
+    builder
+        .init_resource::<TypeRegistryArc>()
+        .add_plugin(CorePlugin)
+        .add_plugin(PhysicsPlugin::default());
+    builder.app
+}
+
 #[test]
 fn creates_body_in_rapier_world() {
-    let mut app = {
-        let mut builder = App::build();
-        builder
-            .init_resource::<TypeRegistryArc>()
-            .add_plugin(CorePlugin)
-            .add_plugin(PhysicsPlugin::default());
-        builder.app
-    };
+    let mut app = test_app();
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
@@ -85,4 +88,29 @@ fn creates_body_in_rapier_world() {
 
     assert!(actual_axis.angle_between(axis) < 0.001);
     assert!((actual_angle - angle).abs() < 0.001);
+}
+
+#[test]
+fn update_sphere_radius() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        TestEntity,
+        Body::Sphere { radius: 2.0 },
+        GlobalTransform::default(),
+    ));
+
+    app.update();
+
+    let mut body_def = app.world.get_mut::<Body>(entity).unwrap();
+    let Body::Sphere { radius } = body_def.deref_mut();
+    *radius = 42.0;
+
+    app.update();
+
+    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let handle = app.world.get::<BodyHandle>(entity).unwrap();
+    let collider = colliders.get(handle.collider()).unwrap();
+
+    assert_eq!(collider.shape().as_ball().unwrap().radius, 42.0)
 }

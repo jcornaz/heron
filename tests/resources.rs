@@ -3,25 +3,12 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-use bevy::core::CorePlugin;
 use bevy::prelude::*;
-use bevy::reflect::TypeRegistryArc;
 
 use heron::*;
 use heron_core::Gravity;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
-
-mod dynamic_bodies;
-
-#[test]
-fn can_run_without_panic() {
-    App::build()
-        .init_resource::<TypeRegistryArc>()
-        .add_plugin(CorePlugin)
-        .add_plugin(PhysicsPlugin::default())
-        .run();
-}
 
 #[test]
 fn can_define_gravity_before_plugin() {

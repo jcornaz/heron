@@ -22,13 +22,28 @@ pub(crate) fn create(
                 ))
                 .build(),
         );
-        let collider = colliders.insert(collider_builder(body).build(), rigid_body, &mut bodies);
+        let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
         commands.insert_one(
             entity,
             BodyHandle {
                 rigid_body,
                 collider,
             },
+        );
+    }
+}
+
+pub(crate) fn update_shape(
+    mut bodies: ResMut<RigidBodySet>,
+    mut colliders: ResMut<ColliderSet>,
+    mut query: Query<(&Body, &mut BodyHandle), Mutated<Body>>,
+) {
+    for (body_def, mut handle) in query.iter_mut() {
+        colliders.remove(handle.collider, &mut bodies, true);
+        handle.collider = colliders.insert(
+            collider_builder(&body_def).build(),
+            handle.rigid_body,
+            &mut bodies,
         );
     }
 }
