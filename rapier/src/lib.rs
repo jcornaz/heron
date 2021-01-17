@@ -22,7 +22,7 @@ use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPha
 use crate::rapier::pipeline::PhysicsPipeline;
 
 mod bodies;
-mod convert;
+pub mod convert;
 mod pipeline;
 
 #[allow(unused)]

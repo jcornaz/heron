@@ -5,7 +5,7 @@ use heron_core::Body;
 
 use crate::rapier::dynamics::{RigidBodyBuilder, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
-use crate::BodyHandle;
+use crate::{convert, BodyHandle};
 
 pub(crate) fn create(
     commands: &mut Commands,
@@ -13,8 +13,15 @@ pub(crate) fn create(
     mut colliders: ResMut<ColliderSet>,
     query: Query<(Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
 ) {
-    for (entity, body, _) in query.iter() {
-        let rigid_body = bodies.insert(RigidBodyBuilder::new_dynamic().build());
+    for (entity, body, transform) in query.iter() {
+        let rigid_body = bodies.insert(
+            RigidBodyBuilder::new_dynamic()
+                .position(convert::to_isometry(
+                    transform.translation,
+                    transform.rotation,
+                ))
+                .build(),
+        );
         let collider = colliders.insert(collider_builder(body).build(), rigid_body, &mut bodies);
         commands.insert_one(
             entity,

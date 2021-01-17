@@ -9,9 +9,9 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
+use heron::rapier::dynamics::RigidBodySet;
+use heron::rapier::geometry::ColliderSet;
 use heron::*;
-use heron_rapier::rapier::dynamics::RigidBodySet;
-use heron_rapier::rapier::geometry::ColliderSet;
 
 struct TestEntity;
 
@@ -26,12 +26,15 @@ fn creates_body_in_rapier_world() {
         builder.app
     };
 
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI);
+
     let entity = app.world.spawn((
         TestEntity,
         Body::Sphere { radius: 2.0 },
         GlobalTransform {
-            translation: Vec3::new(1.0, 2.0, 3.0),
-            rotation: Quat::from_axis_angle(Vec3::unit_z(), PI),
+            translation,
+            rotation,
             ..Default::default()
         },
     ));
@@ -69,5 +72,13 @@ fn creates_body_in_rapier_world() {
 
     assert_eq!(shape.radius, 2.0); // (The radius should be scaled)
 
-    todo!("check position and rotation")
+    let (actual_translation, actual_rotation) = convert::from_isometry(*body.position());
+
+    #[cfg(feature = "3d")]
+    assert_eq!(actual_translation, translation);
+
+    #[cfg(feature = "2d")]
+    assert_eq!(actual_translation.truncate(), translation.truncate());
+
+    assert_eq!(actual_rotation, rotation);
 }

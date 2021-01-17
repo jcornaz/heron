@@ -1,17 +1,93 @@
-//! Type conversions between bevy and rapier
+#![allow(missing_docs)]
+
+//! Type conversions between bevy and nalgebra (used by rapier's API)
+//!
+//! Names are 'bevy' centered.
+//! * To convert from nalgebra to bevy use `from_xxx`
+//! * To convert from bevy to nalgebra  use `to_xxx`
 
 use bevy_math::*;
 
-use crate::rapier::math::Vector;
+use crate::rapier::na as nalgebra;
 
 #[inline]
-#[cfg(feature = "2d")]
-pub(crate) fn to_vector(v: Vec3) -> Vector<f32> {
-    Vector::new(v.x, v.y)
+pub fn from_vector(v: nalgebra::Vector3<f32>) -> Vec3 {
+    Vec3::new(v.x, v.y, v.z)
 }
 
 #[inline]
-#[cfg(feature = "3d")]
-pub(crate) fn to_vector(v: Vec3) -> Vector<f32> {
-    Vector::new(v.x, v.y, v.z)
+pub fn from_translation(translation: rapier3d::math::Translation<f32>) -> Vec3 {
+    from_vector(translation.vector)
+}
+
+#[inline]
+pub fn from_unit_quaternion(quaternion: nalgebra::UnitQuaternion<f32>) -> Quat {
+    Quat::from_xyzw(quaternion.i, quaternion.j, quaternion.k, quaternion.w)
+}
+
+#[inline]
+#[allow(dead_code)]
+pub fn from_isometry(isometry: rapier3d::math::Isometry<f32>) -> (Vec3, Quat) {
+    (
+        from_translation(isometry.translation),
+        from_unit_quaternion(isometry.rotation),
+    )
+}
+
+#[inline]
+pub fn to_vector(v: Vec3) -> nalgebra::Vector3<f32> {
+    nalgebra::Vector3::new(v.x, v.y, v.z)
+}
+
+#[inline]
+pub fn to_translation(v: Vec3) -> rapier3d::math::Translation<f32> {
+    rapier3d::math::Translation::from(to_vector(v))
+}
+
+#[inline]
+pub fn to_unit_quaternion(rotation: Quat) -> nalgebra::UnitQuaternion<f32> {
+    nalgebra::UnitQuaternion::new_normalize(nalgebra::Quaternion::new(
+        rotation.w, rotation.x, rotation.y, rotation.z,
+    ))
+}
+
+#[inline]
+pub fn to_isometry(translation: Vec3, rotation: Quat) -> rapier3d::math::Isometry<f32> {
+    rapier3d::math::Isometry::from_parts(to_translation(translation), to_unit_quaternion(rotation))
+}
+
+#[cfg(all(test, feature = "3d"))]
+mod tests {
+    use std::f32::consts::PI;
+
+    use bevy_math::{Quat, Vec3};
+
+    use super::*;
+
+    mod isometry {
+        use super::*;
+
+        #[test]
+        fn set_translation() {
+            let translation = Vec3::new(1.0, 2.0, 3.0);
+            let result = to_isometry(translation, Quat::identity());
+            assert_eq!(translation.x, result.translation.x);
+            assert_eq!(translation.y, result.translation.y);
+            assert_eq!(translation.z, result.translation.z);
+        }
+
+        #[test]
+        fn set_rotation() {
+            let angle = PI / 2.0;
+            let axis = Vec3::new(1.0, 2.0, 3.0);
+
+            let quat = Quat::from_axis_angle(axis, angle).normalize();
+            let result = to_isometry(Vec3::default(), quat);
+
+            assert_eq!(result.rotation.i, quat.x);
+            assert_eq!(result.rotation.j, quat.y);
+            assert_eq!(result.rotation.k, quat.z);
+            assert_eq!(result.rotation.w, quat.w);
+        }
+    }
 }
