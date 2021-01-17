@@ -8,6 +8,7 @@ edition = "2018"
 default = []
 2d = ["rapier2d"]
 3d = ["rapier3d"]
+debug = ["bevy_prototype_lyon"]
 
 [dependencies]
 heron_core = { path = "../core" }
@@ -18,4 +19,5 @@ bevy_app = "^0.4.0"
 bevy_transform = "^0.4.0"
 rapier2d = { version = "^0.4.2", optional = true, features = ["simd-stable", "parallel"] }
 rapier3d = { version = "^0.4.2", optional = true, features = ["simd-stable", "parallel"] }
+bevy_prototype_lyon = { version = "^0.1.5", optional = true }
 fnv = "^1.0"

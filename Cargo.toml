@@ -11,6 +11,7 @@ edition = "2018"
 default = ["3d"]
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d"]
+debug = ["heron_rapier/debug"]
 
 [dependencies]
 heron_core = { path = "core" }
