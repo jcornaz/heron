@@ -13,8 +13,7 @@ use bevy::reflect::TypeRegistryArc;
 use heron::rapier::dynamics::RigidBodySet;
 use heron::rapier::geometry::ColliderSet;
 use heron::*;
-
-struct TestEntity;
+use heron_rapier::rapier::dynamics::BodyStatus;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -33,7 +32,6 @@ fn creates_body_in_rapier_world() {
     let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
 
     let entity = app.world.spawn((
-        TestEntity,
         Body::Sphere { radius: 2.0 },
         GlobalTransform {
             translation,
@@ -94,17 +92,17 @@ fn creates_body_in_rapier_world() {
 fn update_shape() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        TestEntity,
-        Body::Sphere { radius: 2.0 },
-        GlobalTransform::default(),
-    ));
+    let entity = app
+        .world
+        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
 
-    app.update();
+    {
+        app.update();
 
-    let mut body_def = app.world.get_mut::<Body>(entity).unwrap();
-    let Body::Sphere { radius } = body_def.deref_mut();
-    *radius = 42.0;
+        let mut body_def = app.world.get_mut::<Body>(entity).unwrap();
+        let Body::Sphere { radius } = body_def.deref_mut();
+        *radius = 42.0;
+    }
 
     app.update();
 
@@ -116,23 +114,22 @@ fn update_shape() {
 }
 
 #[test]
-fn update_transform() {
+fn update_rapier_position() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        TestEntity,
-        Body::Sphere { radius: 2.0 },
-        GlobalTransform::default(),
-    ));
-
-    app.update();
+    let entity = app
+        .world
+        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
 
-    let mut transform = app.world.get_mut::<GlobalTransform>(entity).unwrap();
-    transform.translation = translation;
-    transform.rotation = rotation;
+    {
+        app.update();
+        let mut transform = app.world.get_mut::<GlobalTransform>(entity).unwrap();
+        transform.translation = translation;
+        transform.rotation = rotation;
+    }
 
     app.update();
 
@@ -158,11 +155,9 @@ fn update_transform() {
 fn remove_body_component() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        TestEntity,
-        Body::Sphere { radius: 2.0 },
-        GlobalTransform::default(),
-    ));
+    let entity = app
+        .world
+        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
 
     app.update();
 
@@ -182,11 +177,9 @@ fn remove_body_component() {
 fn despawn_body_entity() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        TestEntity,
-        Body::Sphere { radius: 2.0 },
-        GlobalTransform::default(),
-    ));
+    let entity = app
+        .world
+        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
 
     app.update();
 
@@ -200,4 +193,61 @@ fn despawn_body_entity() {
 
     let colliders = app.resources.get::<ColliderSet>().unwrap();
     assert_eq!(colliders.len(), 0);
+}
+
+#[test]
+fn update_bevy_transform() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        Body::Sphere { radius: 2.0 },
+        Transform::default(),
+        GlobalTransform::default(),
+    ));
+
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
+
+    {
+        app.update();
+        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
+        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
+        let body = bodies.get_mut(handle.rigid_body()).unwrap();
+
+        body.set_position(convert::to_isometry(translation, rotation), true);
+        body.body_status = BodyStatus::Static;
+    }
+    {
+        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
+        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
+        let body = bodies.get_mut(handle.rigid_body()).unwrap();
+        println!("before: {:?}", body.position());
+    }
+
+    app.update();
+
+    {
+        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
+        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
+        let body = bodies.get_mut(handle.rigid_body()).unwrap();
+        println!("after: {:?}", body.position());
+    }
+
+    let Transform {
+        translation: actual_translation,
+        rotation: actual_rotation,
+        ..
+    } = *app.world.get::<Transform>(entity).unwrap();
+
+    #[cfg(feature = "3d")]
+    assert_eq!(actual_translation, translation);
+
+    #[cfg(feature = "2d")]
+    assert_eq!(actual_translation.truncate(), translation.truncate());
+
+    let (axis, angle) = rotation.to_axis_angle();
+    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
+
+    assert!(actual_axis.angle_between(axis) < 0.001);
+    assert!((actual_angle - angle).abs() < 0.001);
 }

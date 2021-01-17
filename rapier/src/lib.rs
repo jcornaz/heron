@@ -85,7 +85,7 @@ impl Plugin for PhysicsPlugin {
                 SystemStage::parallel()
                     .with_system(bodies::create.system())
                     .with_system(bodies::update_shape.system())
-                    .with_system(bodies::update_transform.system())
+                    .with_system(bodies::update_rapier_position.system())
                     .with_system(bodies::remove.system()),
             )
             .add_stage_after(
@@ -94,6 +94,10 @@ impl Plugin for PhysicsPlugin {
                 SystemStage::parallel()
                     .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
                     .with_system(pipeline::step.system()),
+            )
+            .add_system_to_stage(
+                bevy_app::stage::LAST,
+                bodies::update_bevy_transform.system(),
             );
     }
 }

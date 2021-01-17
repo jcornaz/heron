@@ -1,5 +1,5 @@
 use bevy_ecs::*;
-use bevy_transform::components::GlobalTransform;
+use bevy_transform::components::{Children, GlobalTransform, Parent, Transform};
 use fnv::FnvHashMap;
 
 use heron_core::Body;
@@ -53,16 +53,47 @@ pub(crate) fn update_shape(
     }
 }
 
-pub(crate) fn update_transform(
+pub(crate) fn update_rapier_position(
     mut bodies: ResMut<RigidBodySet>,
     query: Query<(&GlobalTransform, &BodyHandle), Mutated<GlobalTransform>>,
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
+            println!("Update rapier position");
             body.set_position(
                 convert::to_isometry(transform.translation, transform.rotation),
                 true,
             );
+        }
+    }
+}
+
+pub(crate) fn update_bevy_transform(
+    bodies: Res<RigidBodySet>,
+    parents: Query<&GlobalTransform, With<Children>>,
+    mut query: Query<(
+        &mut Transform,
+        &GlobalTransform,
+        &BodyHandle,
+        Option<&Parent>,
+    )>,
+) {
+    for (mut local_transform, global_transform, handle, parent) in query.iter_mut() {
+        if let Some(body) = bodies.get(handle.rigid_body).filter(|it| !it.is_sleeping()) {
+            let (translation, rotation) = convert::from_isometry(*body.position());
+
+            if translation != global_transform.translation || rotation != global_transform.rotation
+            {
+                if let Some(parent_transform) =
+                    parent.and_then(|Parent(entity)| parents.get(*entity).ok())
+                {
+                    local_transform.translation = translation - parent_transform.translation;
+                    local_transform.rotation = rotation * parent_transform.rotation.conjugate();
+                } else {
+                    local_transform.translation = translation;
+                    local_transform.rotation = rotation;
+                }
+            }
         }
     }
 }
