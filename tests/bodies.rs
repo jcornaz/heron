@@ -1,6 +1,7 @@
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
+    not(feature = "debug"),
 ))]
 
 use std::f32::consts::PI;
@@ -19,7 +20,7 @@ fn test_app() -> App {
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_plugin(PhysicsPlugin::with_steps_per_second(0));
+        .add_plugin(PhysicsPlugin::from_steps_per_second(0));
     builder.app
 }
 

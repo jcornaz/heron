@@ -26,6 +26,7 @@ use crate::rapier::pipeline::PhysicsPipeline;
 
 mod bodies;
 pub mod convert;
+mod debug;
 mod pipeline;
 
 #[allow(unused)]
@@ -33,15 +34,19 @@ mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
+    pub(crate) const POST_STEP: &str = "heron-post-step";
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct PhysicsPlugin {
     parameters: IntegrationParameters,
+
+    #[cfg(feature = "debug")]
+    debug_color: bevy_render::color::Color,
 }
 
 /// Components automatically register, by the plugin that reference the body in rapier's world
@@ -55,16 +60,38 @@ pub struct BodyHandle {
 
 impl PhysicsPlugin {
     /// Configure how many times per second the physics world needs to be updated
-    pub fn with_steps_per_second(steps_per_second: u8) -> Self {
+    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         let mut parameters = IntegrationParameters::default();
         parameters.set_dt(1.0 / steps_per_second as f32);
         Self::from(parameters)
+    }
+
+    /// Define color of collision shape (debug mode)
+    #[cfg(feature = "debug")]
+    pub fn with_debug_color(mut self, color: bevy_render::color::Color) -> Self {
+        self.debug_color = color;
+        self
+    }
+}
+
+impl Default for PhysicsPlugin {
+    fn default() -> Self {
+        Self::from(IntegrationParameters::default())
     }
 }
 
 impl From<IntegrationParameters> for PhysicsPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
-        Self { parameters }
+        Self {
+            parameters,
+
+            #[cfg(feature = "debug")]
+            debug_color: {
+                let mut color = bevy_render::color::Color::BLUE;
+                color.set_a(0.2);
+                color
+            },
+        }
     }
 }
 
@@ -88,11 +115,11 @@ impl Plugin for PhysicsPlugin {
             .add_stage_after(
                 stage::START,
                 stage::PRE_STEP,
-                SystemStage::parallel()
-                    .with_system(bodies::create.system())
+                SystemStage::serial()
+                    .with_system(bodies::remove.system())
                     .with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
-                    .with_system(bodies::remove.system()),
+                    .with_system(bodies::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, stage::STEP, {
                 let mut stage = SystemStage::serial();
@@ -104,7 +131,15 @@ impl Plugin for PhysicsPlugin {
                 }
 
                 stage.with_system(bodies::update_bevy_transform.system())
-            });
+            })
+            .add_stage_after(stage::STEP, stage::POST_STEP, SystemStage::serial());
+
+        #[cfg(all(feature = "debug", feature = "2d"))]
+        {
+            app.add_resource(debug::DebugMaterial::from(self.debug_color))
+                .add_startup_system(debug::DebugMaterial::init.system())
+                .add_system(debug::add_debug_sprites.system());
+        }
     }
 }
 
