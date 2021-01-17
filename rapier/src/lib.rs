@@ -17,10 +17,11 @@ use bevy_ecs::{IntoSystem, SystemStage};
 
 use heron_core::Gravity;
 
-use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
-use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
+use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
+use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 use crate::rapier::pipeline::PhysicsPipeline;
 
+mod bodies;
 mod convert;
 mod pipeline;
 
@@ -38,6 +39,15 @@ mod stage {
 #[derive(Clone, Default)]
 pub struct PhysicsPlugin {
     parameters: IntegrationParameters,
+}
+
+/// Components automatically register, by the plugin that reference the body in rapier's world
+///
+/// It can be used to get direct access to rapier's world.
+#[derive(Debug, Copy, Clone)]
+pub struct BodyHandle {
+    rigid_body: RigidBodyHandle,
+    collider: ColliderHandle,
 }
 
 impl PhysicsPlugin {
@@ -78,5 +88,16 @@ impl Plugin for PhysicsPlugin {
                     .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
                     .with_system(pipeline::step.system()),
             );
+    }
+}
+
+impl BodyHandle {
+    /// Returns the rapier's rigid body handle
+    pub fn rigid_body(&self) -> RigidBodyHandle {
+        self.rigid_body
+    }
+    /// Returns the rapier's collider handle
+    pub fn collider(&self) -> ColliderHandle {
+        self.collider
     }
 }
