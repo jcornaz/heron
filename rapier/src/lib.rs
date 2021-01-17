@@ -83,7 +83,8 @@ impl Plugin for PhysicsPlugin {
                 SystemStage::parallel()
                     .with_system(bodies::create.system())
                     .with_system(bodies::update_shape.system())
-                    .with_system(bodies::update_transform.system()),
+                    .with_system(bodies::update_transform.system())
+                    .with_system(bodies::remove.system()),
             )
             .add_stage_after(
                 stage::PRE_STEP,

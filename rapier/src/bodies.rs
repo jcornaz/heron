@@ -3,7 +3,7 @@ use bevy_transform::components::GlobalTransform;
 
 use heron_core::Body;
 
-use crate::rapier::dynamics::{RigidBodyBuilder, RigidBodySet};
+use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
 use crate::{convert, BodyHandle};
 
@@ -59,6 +59,19 @@ pub(crate) fn update_transform(
                 true,
             );
         }
+    }
+}
+
+pub(crate) fn remove(
+    commands: &mut Commands,
+    mut bodies: ResMut<RigidBodySet>,
+    mut colliders: ResMut<ColliderSet>,
+    mut joints: ResMut<JointSet>,
+    query: Query<(Entity, &BodyHandle), Without<Body>>,
+) {
+    for (entity, handle) in query.iter() {
+        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+        commands.remove_one::<BodyHandle>(entity);
     }
 }
 

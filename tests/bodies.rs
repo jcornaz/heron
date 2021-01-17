@@ -153,3 +153,33 @@ fn update_transform() {
     assert!(actual_axis.angle_between(axis) < 0.001);
     assert!((actual_angle - angle).abs() < 0.001);
 }
+
+#[test]
+fn remove_body_component() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        TestEntity,
+        Body::Sphere { radius: 2.0 },
+        GlobalTransform::default(),
+    ));
+
+    app.update();
+
+    app.world.remove_one::<Body>(entity).unwrap();
+    app.update();
+
+    assert!(app.world.get::<BodyHandle>(entity).is_err());
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    assert_eq!(bodies.len(), 0);
+
+    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    assert_eq!(colliders.len(), 0);
+}
+
+#[test]
+#[ignore]
+fn remove_body_entity() {
+    todo!()
+}
