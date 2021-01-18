@@ -34,7 +34,7 @@ mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
-    pub(crate) const POST_STEP: &str = "heron-post-step";
+    pub(crate) const DEBUG: &str = "heron-debug";
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.
@@ -131,14 +131,21 @@ impl Plugin for PhysicsPlugin {
                 }
 
                 stage.with_system(bodies::update_bevy_transform.system())
-            })
-            .add_stage_after(stage::STEP, stage::POST_STEP, SystemStage::serial());
+            });
 
         #[cfg(all(feature = "debug", feature = "2d"))]
         {
             app.add_resource(debug::DebugMaterial::from(self.debug_color))
-                .add_startup_system(debug::DebugMaterial::init.system())
-                .add_system(debug::add_debug_sprites.system());
+                .add_stage_after(
+                    stage::PRE_STEP,
+                    stage::DEBUG,
+                    SystemStage::serial()
+                        .with_system(debug::delete_debug_sprite.system())
+                        .with_system(debug::replace_debug_sprite.system())
+                        .with_system(debug::create_debug_sprites.system())
+                        .with_system(debug::reference_debug_sprites.system()),
+                )
+                .add_startup_system(debug::DebugMaterial::init.system());
         }
     }
 }
