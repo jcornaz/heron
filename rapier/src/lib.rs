@@ -111,7 +111,7 @@ impl Plugin for PhysicsPlugin {
                 stage::PRE_STEP,
                 SystemStage::serial()
                     .with_system(bodies::remove.system())
-                    .with_system(bodies::update_shape.system())
+                    //.with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
                     .with_system(bodies::create.system()),
             )

@@ -1,9 +1,10 @@
-use bevy::prelude::*;
+use std::ops::DerefMut;
 
 use bevy::input::system::exit_on_esc_system;
+use bevy::prelude::*;
+
 use heron::*;
 use heron_rapier::PhysicsPlugin;
-use std::ops::DerefMut;
 
 fn main() {
     App::build()
@@ -23,7 +24,7 @@ fn spawn(commands: &mut Commands) {
     ));
 }
 
-fn scale(inputs: Res<Input<KeyCode>>, mut query: Query<(&mut Body, &mut Transform)>) {
+fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Body>) {
     let factor = if inputs.pressed(KeyCode::Up) {
         2.0
     } else if inputs.pressed(KeyCode::Down) {
@@ -32,11 +33,12 @@ fn scale(inputs: Res<Input<KeyCode>>, mut query: Query<(&mut Body, &mut Transfor
         return;
     };
 
-    for (mut body, mut transform) in query.iter_mut() {
-        transform.scale *= factor;
-        // if let Body::Sphere { radius } = body.deref_mut() {
-        //     println!("Scaling by {}", factor);
-        //     *radius *= factor;
-        // }
+    for mut body in query.iter_mut() {
+        let Body::Sphere { radius } = body.deref_mut();
+        *radius = lerp(*radius, *radius * factor, time.delta_seconds());
     }
+}
+
+fn lerp(start: f32, end: f32, factor: f32) -> f32 {
+    start + ((end - start) * factor)
 }

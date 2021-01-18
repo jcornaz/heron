@@ -26,6 +26,7 @@ type DebugSpriteMap = FnvHashMap<Entity, (Entity, Handle<Mesh>)>;
 
 struct HasDebug;
 struct IsDebug(Entity);
+struct Indexed;
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -95,11 +96,13 @@ fn create_debug_sprites(
 }
 
 fn reference_debug_sprites(
+    commands: &mut Commands,
     mut map: ResMut<'_, DebugSpriteMap>,
-    query: Query<(Entity, &IsDebug, &Handle<Mesh>), Added<IsDebug>>,
+    query: Query<(Entity, &IsDebug, &Handle<Mesh>), Without<Indexed>>,
 ) {
-    for (parent_entity, IsDebug(debug_entity), mesh_handle) in query.iter() {
-        map.insert(parent_entity, (*debug_entity, mesh_handle.clone()));
+    for (debug_entity, IsDebug(parent_entity), mesh_handle) in query.iter() {
+        map.insert(*parent_entity, (debug_entity, mesh_handle.clone()));
+        commands.insert_one(debug_entity, Indexed);
     }
 }
 
@@ -177,8 +180,10 @@ fn create_sprite(
     );
 
     bundle.transform.translation.z = 1.0;
+    bundle.transform.scale = transform.scale.recip();
     bundle.global_transform = transform;
     bundle.global_transform.translation.z += 1.0;
+    bundle.global_transform.scale = Vec3::new(1.0, 1.0, 1.0);
     bundle
 }
 
