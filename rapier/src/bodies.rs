@@ -69,30 +69,36 @@ pub(crate) fn update_rapier_position(
 
 pub(crate) fn update_bevy_transform(
     bodies: Res<RigidBodySet>,
-    mut query: Query<(&mut Transform, &mut GlobalTransform, &BodyHandle)>,
+    mut query: Query<(Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
 ) {
     for (mut local, mut global, handle) in query.iter_mut() {
-        if let Some(body) = bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
-            let (translation, rotation) = convert::from_isometry(*body.position());
+        let body = match bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
+            None => continue,
+            Some(body) => body,
+        };
+        let (translation, rotation) = convert::from_isometry(*body.position());
 
-            if translation != global.translation || rotation != global.rotation {
-                if local.translation != global.translation {
-                    local.translation = translation - (global.translation - local.translation);
-                } else {
-                    local.translation = translation;
-                }
+        if translation == global.translation && rotation == global.rotation {
+            continue;
+        }
 
-                if local.rotation != global.rotation {
-                    local.rotation =
-                        rotation * (global.rotation * local.rotation.conjugate()).conjugate();
-                } else {
-                    local.rotation = rotation;
-                }
+        if let Some(local) = &mut local {
+            if local.translation != global.translation {
+                local.translation = translation - (global.translation - local.translation);
+            } else {
+                local.translation = translation;
+            }
 
-                global.translation = translation;
-                global.rotation = rotation;
+            if local.rotation != global.rotation {
+                local.rotation =
+                    rotation * (global.rotation * local.rotation.conjugate()).conjugate();
+            } else {
+                local.rotation = rotation;
             }
         }
+
+        global.translation = translation;
+        global.rotation = rotation;
     }
 }
 

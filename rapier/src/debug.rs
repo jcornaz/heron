@@ -145,15 +145,17 @@ fn delete_debug_sprite(
     }
 }
 
-fn scale_debug_sprite(mut query: Query<(&mut Transform, &mut GlobalTransform)>) {
+fn scale_debug_sprite(mut query: Query<(Option<&mut Transform>, &mut GlobalTransform)>) {
     query
         .iter_mut()
         .filter(|(_, global)| {
             let scale = global.scale;
             scale.x != 1.0 || scale.y != 1.0
         })
-        .for_each(|(mut local, mut global)| {
-            local.scale *= global.scale.recip();
+        .for_each(|(local, mut global)| {
+            if let Some(mut local) = local {
+                local.scale *= global.scale.recip()
+            }
             global.scale.x = 1.0;
             global.scale.y = 1.0;
             global.scale.z = 1.0;
