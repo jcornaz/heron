@@ -62,7 +62,7 @@ jobs:
 
       - name: Static analysis
         run: cargo clippy -- -Dwarnings
-        
+
       - name: Run tests with default features
         run: cargo test --workspace
 
@@ -107,7 +107,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: ${{ matrix.rust }}
+          toolchain: stable
           override: true
 
       - name: Install dependencies
