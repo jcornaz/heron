@@ -1,5 +1,5 @@
-use bevy_ecs::*;
-use bevy_transform::components::{Children, GlobalTransform, Parent, Transform};
+use bevy_ecs::prelude::*;
+use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
 use heron_core::Body;
@@ -69,29 +69,28 @@ pub(crate) fn update_rapier_position(
 
 pub(crate) fn update_bevy_transform(
     bodies: Res<RigidBodySet>,
-    parents: Query<&GlobalTransform, With<Children>>,
-    mut query: Query<(
-        &mut Transform,
-        &GlobalTransform,
-        &BodyHandle,
-        Option<&Parent>,
-    )>,
+    mut query: Query<(&mut Transform, &mut GlobalTransform, &BodyHandle)>,
 ) {
-    for (mut local_transform, global_transform, handle, parent) in query.iter_mut() {
+    for (mut local, mut global, handle) in query.iter_mut() {
         if let Some(body) = bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
             let (translation, rotation) = convert::from_isometry(*body.position());
 
-            if translation != global_transform.translation || rotation != global_transform.rotation
-            {
-                if let Some(parent_transform) =
-                    parent.and_then(|Parent(entity)| parents.get(*entity).ok())
-                {
-                    local_transform.translation = translation - parent_transform.translation;
-                    local_transform.rotation = rotation * parent_transform.rotation.conjugate();
+            if translation != global.translation || rotation != global.rotation {
+                if local.translation != global.translation {
+                    local.translation = translation - (global.translation - local.translation);
                 } else {
-                    local_transform.translation = translation;
-                    local_transform.rotation = rotation;
+                    local.translation = translation;
                 }
+
+                if local.rotation != global.rotation {
+                    local.rotation =
+                        rotation * (global.rotation * local.rotation.conjugate()).conjugate();
+                } else {
+                    local.rotation = rotation;
+                }
+
+                global.translation = translation;
+                global.rotation = rotation;
             }
         }
     }

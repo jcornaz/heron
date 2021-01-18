@@ -14,12 +14,10 @@ pub extern crate rapier3d as rapier;
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoSystem, SystemStage};
-use bevy_transform::transform_propagate_system::transform_propagate_system;
 
 use heron_core::Gravity;
 
 use crate::bodies::HandleMap;
-use crate::debug::DebugPlugin;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -126,13 +124,11 @@ impl Plugin for PhysicsPlugin {
                         .with_system(pipeline::step.system());
                 }
 
-                stage
-                    .with_system(bodies::update_bevy_transform.system())
-                    .with_system(transform_propagate_system.system())
+                stage.with_system(bodies::update_bevy_transform.system())
             });
 
         #[cfg(all(feature = "debug", feature = "2d"))]
-        app.add_plugin(DebugPlugin(self.debug_color));
+        app.add_plugin(debug::DebugPlugin(self.debug_color));
     }
 }
 

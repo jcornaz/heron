@@ -2,6 +2,7 @@
 
 use std::ops::Deref;
 
+use bevy_app::{AppBuilder, Plugin};
 use bevy_asset::prelude::*;
 use bevy_ecs::prelude::*;
 use bevy_math::Vec3;
@@ -11,7 +12,6 @@ use bevy_sprite::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use bevy_app::{AppBuilder, Plugin};
 use heron_core::Body;
 
 pub(crate) struct DebugPlugin(pub(crate) Color);
@@ -41,7 +41,7 @@ impl Plugin for DebugPlugin {
                     .with_system(reference_debug_sprites.system())
                     .with_system(scale_debug_sprite.system()),
             )
-            .add_startup_system(DebugMaterial::init.system());
+            .add_startup_system(create_material.system());
     }
 }
 
@@ -52,17 +52,20 @@ impl From<Color> for DebugMaterial {
 }
 
 impl DebugMaterial {
-    pub fn init(mut debug_mat: ResMut<DebugMaterial>, mut assets: ResMut<Assets<ColorMaterial>>) {
-        if let DebugMaterial::Color(color) = debug_mat.deref() {
-            *debug_mat = DebugMaterial::Handle(assets.add((*color).into()));
-        }
-    }
-
     fn handle(&self) -> Option<&Handle<ColorMaterial>> {
         match self {
             DebugMaterial::Color(_) => None,
             DebugMaterial::Handle(handle) => Some(handle),
         }
+    }
+}
+
+fn create_material(
+    mut debug_mat: ResMut<DebugMaterial>,
+    mut assets: ResMut<Assets<ColorMaterial>>,
+) {
+    if let DebugMaterial::Color(color) = debug_mat.deref() {
+        *debug_mat = DebugMaterial::Handle(assets.add((*color).into()));
     }
 }
 
