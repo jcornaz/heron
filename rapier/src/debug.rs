@@ -11,18 +11,39 @@ use bevy_sprite::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
+use bevy_app::{AppBuilder, Plugin};
 use heron_core::Body;
 
+pub(crate) struct DebugPlugin(pub(crate) Color);
+
 #[derive(Debug, Clone)]
-pub(crate) enum DebugMaterial {
+enum DebugMaterial {
     Color(Color),
     Handle(Handle<ColorMaterial>),
 }
 
-pub(crate) type DebugSpriteMap = FnvHashMap<Entity, (Entity, Handle<Mesh>)>;
+type DebugSpriteMap = FnvHashMap<Entity, (Entity, Handle<Mesh>)>;
 
-pub(crate) struct HasDebug;
-pub(crate) struct IsDebug(Entity);
+struct HasDebug;
+struct IsDebug(Entity);
+
+impl Plugin for DebugPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.add_resource(DebugMaterial::from(self.0))
+            .init_resource::<DebugSpriteMap>()
+            .add_stage_after(
+                crate::stage::PRE_STEP,
+                crate::stage::DEBUG,
+                SystemStage::serial()
+                    .with_system(delete_debug_sprite.system())
+                    .with_system(replace_debug_sprite.system())
+                    .with_system(create_debug_sprites.system())
+                    .with_system(reference_debug_sprites.system())
+                    .with_system(scale_debug_sprite.system()),
+            )
+            .add_startup_system(DebugMaterial::init.system());
+    }
+}
 
 impl From<Color> for DebugMaterial {
     fn from(color: Color) -> Self {
@@ -45,7 +66,7 @@ impl DebugMaterial {
     }
 }
 
-pub(crate) fn create_debug_sprites(
+fn create_debug_sprites(
     commands: &mut Commands,
     query: Query<(Entity, &Body, &GlobalTransform), Without<HasDebug>>,
     debug_mat: Res<DebugMaterial>,
@@ -70,7 +91,7 @@ pub(crate) fn create_debug_sprites(
     }
 }
 
-pub(crate) fn reference_debug_sprites(
+fn reference_debug_sprites(
     mut map: ResMut<'_, DebugSpriteMap>,
     query: Query<(Entity, &IsDebug, &Handle<Mesh>), Added<IsDebug>>,
 ) {
@@ -79,7 +100,7 @@ pub(crate) fn reference_debug_sprites(
     }
 }
 
-pub(crate) fn replace_debug_sprite(
+fn replace_debug_sprite(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugSpriteMap>,
     query: Query<(Entity, &Body, &GlobalTransform), (With<HasDebug>, Mutated<Body>)>,
@@ -107,7 +128,7 @@ pub(crate) fn replace_debug_sprite(
     }
 }
 
-pub(crate) fn delete_debug_sprite(
+fn delete_debug_sprite(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugSpriteMap>,
     query: Query<Entity, (With<HasDebug>, Without<Body>)>,
@@ -121,9 +142,7 @@ pub(crate) fn delete_debug_sprite(
     }
 }
 
-pub(crate) fn scale_debug_sprite(
-    mut query: Query<(&mut Transform, &mut GlobalTransform), Mutated<GlobalTransform>>,
-) {
+fn scale_debug_sprite(mut query: Query<(&mut Transform, &mut GlobalTransform)>) {
     query
         .iter_mut()
         .filter(|(_, global)| {
@@ -134,6 +153,7 @@ pub(crate) fn scale_debug_sprite(
             local.scale *= global.scale.recip();
             global.scale.x = 1.0;
             global.scale.y = 1.0;
+            global.scale.z = 1.0;
         });
 }
 

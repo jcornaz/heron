@@ -59,7 +59,6 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            println!("Update rapier position");
             body.set_position(
                 convert::to_isometry(transform.translation, transform.rotation),
                 true,

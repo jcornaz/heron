@@ -19,6 +19,7 @@ use bevy_transform::transform_propagate_system::transform_propagate_system;
 use heron_core::Gravity;
 
 use crate::bodies::HandleMap;
+use crate::debug::DebugPlugin;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -108,12 +109,7 @@ impl Plugin for PhysicsPlugin {
             .add_resource(ColliderSet::new())
             .add_resource(JointSet::new())
             .add_stage_after(
-                bevy_app::stage::UPDATE,
-                stage::START,
-                SystemStage::serial().with_system(transform_propagate_system.system()),
-            )
-            .add_stage_after(
-                stage::START,
+                bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
                 SystemStage::serial()
                     .with_system(bodies::remove.system())
@@ -130,24 +126,13 @@ impl Plugin for PhysicsPlugin {
                         .with_system(pipeline::step.system());
                 }
 
-                stage.with_system(bodies::update_bevy_transform.system())
+                stage
+                    .with_system(bodies::update_bevy_transform.system())
+                    .with_system(transform_propagate_system.system())
             });
 
         #[cfg(all(feature = "debug", feature = "2d"))]
-        {
-            app.add_resource(debug::DebugMaterial::from(self.debug_color))
-                .add_stage_after(
-                    stage::PRE_STEP,
-                    stage::DEBUG,
-                    SystemStage::serial()
-                        .with_system(debug::delete_debug_sprite.system())
-                        .with_system(debug::replace_debug_sprite.system())
-                        .with_system(debug::create_debug_sprites.system())
-                        .with_system(debug::reference_debug_sprites.system())
-                        .with_system(debug::scale_debug_sprite.system()),
-                )
-                .add_startup_system(debug::DebugMaterial::init.system());
-        }
+        app.add_plugin(DebugPlugin(self.debug_color));
     }
 }
 
