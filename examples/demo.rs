@@ -12,6 +12,7 @@ fn main() {
         .add_plugin(PhysicsPlugin::default())
         .add_startup_system(spawn.system())
         .add_system(scale.system())
+        .add_system(delete.system())
         .add_system(exit_on_esc_system.system())
         .run();
 }
@@ -36,6 +37,14 @@ fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Bod
     for mut body in query.iter_mut() {
         let Body::Sphere { radius } = body.deref_mut();
         *radius = lerp(*radius, *radius * factor, time.delta_seconds());
+    }
+}
+
+fn delete(inputs: Res<Input<KeyCode>>, query: Query<Entity, With<Body>>, commands: &mut Commands) {
+    if inputs.pressed(KeyCode::Delete) {
+        for entity in query.iter() {
+            commands.despawn(entity);
+        }
     }
 }
 
