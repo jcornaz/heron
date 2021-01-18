@@ -10,6 +10,16 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### Features
+
+* `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
+* `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to
+  disable the default features.
+* `debug` Render collision shapes. Works only in 2d for now, support for 3d will be added later.
+
+Note that either `2d` or `3d` (but not both) must be enabled. If none of theses two features is enabled,
+the `PhysicsPlugin` won't be available.
+
 ### PhysicsPlugin plugin
 
 Add the `PhysicsPlugin` to setup collision detection and physics simulation. It also registers rapier's `RigidBodySet`
