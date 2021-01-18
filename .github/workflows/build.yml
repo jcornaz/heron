@@ -57,14 +57,14 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
-      - name: Run tests with default features
-        run: cargo test --workspace
-
       - name: Format check
         run: cargo fmt --all -- --check
 
       - name: Static analysis
         run: cargo clippy -- -Dwarnings
+        
+      - name: Run tests with default features
+        run: cargo test --workspace
 
   test-features:
     runs-on: ubuntu-latest
