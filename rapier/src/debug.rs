@@ -47,18 +47,23 @@ impl DebugMaterial {
 
 pub(crate) fn create_debug_sprites(
     commands: &mut Commands,
-    query: Query<(Entity, &Body), Without<HasDebug>>,
+    query: Query<(Entity, &Body, &GlobalTransform), Without<HasDebug>>,
     debug_mat: Res<DebugMaterial>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     let material = debug_mat.handle().expect("Debug material wasn't loaded");
 
-    for (entity, body) in query.iter() {
+    for (entity, body, transform) in query.iter() {
         commands.set_current_entity(entity);
         commands
             .with_children(|builder| {
                 builder
-                    .spawn(create_sprite(body, material.clone(), &mut meshes))
+                    .spawn(create_sprite(
+                        body,
+                        material.clone(),
+                        &mut meshes,
+                        *transform,
+                    ))
                     .with(IsDebug(entity));
             })
             .with(HasDebug);
@@ -77,20 +82,25 @@ pub(crate) fn reference_debug_sprites(
 pub(crate) fn replace_debug_sprite(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugSpriteMap>,
-    query: Query<(Entity, &Body), (With<HasDebug>, Mutated<Body>)>,
+    query: Query<(Entity, &Body, &GlobalTransform), (With<HasDebug>, Mutated<Body>)>,
     debug_mat: Res<DebugMaterial>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
     let material = debug_mat.handle().expect("Debug material wasn't loaded");
 
-    for (parent_entity, body) in query.iter() {
+    for (parent_entity, body, transform) in query.iter() {
         if let Some((debug_entity, mesh)) = map.remove(&parent_entity) {
             commands.despawn(debug_entity);
             meshes.remove(mesh);
             commands.set_current_entity(parent_entity);
             commands.with_children(|builder| {
                 builder
-                    .spawn(create_sprite(body, material.clone(), &mut meshes))
+                    .spawn(create_sprite(
+                        body,
+                        material.clone(),
+                        &mut meshes,
+                        *transform,
+                    ))
                     .with(IsDebug(parent_entity));
             });
         }
@@ -111,10 +121,27 @@ pub(crate) fn delete_debug_sprite(
     }
 }
 
+pub(crate) fn scale_debug_sprite(
+    mut query: Query<(&mut Transform, &mut GlobalTransform), Mutated<GlobalTransform>>,
+) {
+    query
+        .iter_mut()
+        .filter(|(_, global)| {
+            let scale = global.scale;
+            scale.x != 1.0 || scale.y != 1.0
+        })
+        .for_each(|(mut local, mut global)| {
+            local.scale *= global.scale.recip();
+            global.scale.x = 1.0;
+            global.scale.y = 1.0;
+        });
+}
+
 fn create_sprite(
     body: &Body,
     material: Handle<ColorMaterial>,
     meshes: &mut ResMut<'_, Assets<Mesh>>,
+    transform: GlobalTransform,
 ) -> SpriteBundle {
     let mut bundle = primitive(
         material,
@@ -125,6 +152,8 @@ fn create_sprite(
     );
 
     bundle.transform.translation.z = 1.0;
+    bundle.global_transform = transform;
+    bundle.global_transform.translation.z += 1.0;
     bundle
 }
 

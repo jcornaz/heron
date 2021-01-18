@@ -143,7 +143,8 @@ impl Plugin for PhysicsPlugin {
                         .with_system(debug::delete_debug_sprite.system())
                         .with_system(debug::replace_debug_sprite.system())
                         .with_system(debug::create_debug_sprites.system())
-                        .with_system(debug::reference_debug_sprites.system()),
+                        .with_system(debug::reference_debug_sprites.system())
+                        .with_system(debug::scale_debug_sprite.system()),
                 )
                 .add_startup_system(debug::DebugMaterial::init.system());
         }
