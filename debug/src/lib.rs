@@ -1,4 +1,4 @@
-#![cfg(all(feature = "debug", feature = "2d"))]
+#![cfg(all(feature = "2d", not(feature = "3d")))]
 
 use std::ops::Deref;
 
@@ -14,7 +14,7 @@ use fnv::FnvHashMap;
 
 use heron_core::Body;
 
-pub(crate) struct DebugPlugin(pub(crate) Color);
+pub struct DebugPlugin(pub(crate) Color);
 
 #[derive(Debug, Clone)]
 enum DebugMaterial {
@@ -33,8 +33,8 @@ impl Plugin for DebugPlugin {
         app.add_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugSpriteMap>()
             .add_stage_after(
-                crate::stage::PRE_STEP,
-                crate::stage::DEBUG,
+                bevy_app::stage::POST_UPDATE,
+                "heron-debug",
                 SystemStage::serial()
                     .with_system(delete_debug_sprite.system())
                     .with_system(replace_debug_sprite.system())

@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "rapier"]
+members = ["core", "debug", "rapier"]
 
 [package]
 name = "heron"
@@ -9,13 +9,14 @@ edition = "2018"
 
 [features]
 default = ["3d"]
-2d = ["heron_rapier/2d"]
-3d = ["heron_rapier/3d"]
-debug = ["heron_rapier/debug"]
+2d = ["heron_rapier/2d", "heron_debug/2d"]
+3d = ["heron_rapier/3d", "heron_debug/3d"]
+debug = ["heron_debug"]
 
 [dependencies]
 heron_core = { path = "core" }
 heron_rapier = { path = "rapier" }
+heron_debug = { path = "debug", optional = true }
 
 [dev-dependencies]
 bevy = "^0.4.0"

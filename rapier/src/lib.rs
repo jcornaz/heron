@@ -25,7 +25,6 @@ use crate::rapier::pipeline::PhysicsPipeline;
 
 mod bodies;
 pub mod convert;
-mod debug;
 mod pipeline;
 
 #[allow(unused)]
@@ -126,9 +125,6 @@ impl Plugin for PhysicsPlugin {
 
                 stage.with_system(bodies::update_bevy_transform.system())
             });
-
-        #[cfg(all(feature = "debug", feature = "2d"))]
-        app.add_plugin(debug::DebugPlugin(self.debug_color));
     }
 }
 
