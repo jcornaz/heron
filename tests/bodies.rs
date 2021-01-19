@@ -11,9 +11,10 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron::rapier::dynamics::RigidBodySet;
-use heron::rapier::geometry::ColliderSet;
 use heron::*;
+use heron_rapier::rapier::dynamics::RigidBodySet;
+use heron_rapier::rapier::geometry::ColliderSet;
+use heron_rapier::{convert, BodyHandle};
 
 fn test_app() -> App {
     let mut builder = App::build();

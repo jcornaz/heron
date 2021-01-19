@@ -6,9 +6,8 @@ edition = "2018"
 
 [features]
 default = []
-2d = []
+2d = ["bevy_prototype_lyon"]
 3d = []
-debug = []
 
 [dependencies]
 heron_core = { path = "../core" }
@@ -19,5 +18,5 @@ bevy_transform = "^0.4.0"
 bevy_render = "^0.4.0"
 bevy_sprite = "^0.4.0"
 bevy_asset = "^0.4.0"
-bevy_prototype_lyon = "0.1.5"
+bevy_prototype_lyon = { version = "0.1.5", optional = true }
 fnv = "^1.0"

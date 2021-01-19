@@ -35,16 +35,13 @@ mod stage {
     pub(crate) const DEBUG: &str = "heron-debug";
 }
 
-/// Plugin to install in order to enable collision detection and physics behavior.
+/// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
 #[derive(Clone)]
-pub struct PhysicsPlugin {
+pub struct RapierPlugin {
     parameters: IntegrationParameters,
-
-    #[cfg(feature = "debug")]
-    debug_color: bevy_render::color::Color,
 }
 
 /// Components automatically register, by the plugin that reference the body in rapier's world
@@ -56,44 +53,28 @@ pub struct BodyHandle {
     collider: ColliderHandle,
 }
 
-impl PhysicsPlugin {
+impl RapierPlugin {
     /// Configure how many times per second the physics world needs to be updated
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         let mut parameters = IntegrationParameters::default();
         parameters.set_dt(1.0 / steps_per_second as f32);
         Self::from(parameters)
     }
-
-    /// Define color of collision shape (debug mode)
-    #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy_render::color::Color) -> Self {
-        self.debug_color = color;
-        self
-    }
 }
 
-impl Default for PhysicsPlugin {
+impl Default for RapierPlugin {
     fn default() -> Self {
         Self::from(IntegrationParameters::default())
     }
 }
 
-impl From<IntegrationParameters> for PhysicsPlugin {
+impl From<IntegrationParameters> for RapierPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
-        Self {
-            parameters,
-
-            #[cfg(feature = "debug")]
-            debug_color: {
-                let mut color = bevy_render::color::Color::BLUE;
-                color.set_a(0.2);
-                color
-            },
-        }
+        Self { parameters }
     }
 }
 
-impl Plugin for PhysicsPlugin {
+impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.resources_mut().get_or_insert_with(Gravity::default);
 

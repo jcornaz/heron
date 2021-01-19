@@ -4,7 +4,6 @@ use bevy::input::system::exit_on_esc_system;
 use bevy::prelude::*;
 
 use heron::*;
-use heron_rapier::PhysicsPlugin;
 
 fn main() {
     App::build()
