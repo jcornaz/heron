@@ -1,5 +1,5 @@
-use bevy_ecs::*;
-use bevy_transform::components::{Children, GlobalTransform, Parent, Transform};
+use bevy_ecs::prelude::*;
+use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
 use heron_core::Body;
@@ -59,7 +59,6 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            println!("Update rapier position");
             body.set_position(
                 convert::to_isometry(transform.translation, transform.rotation),
                 true,
@@ -70,31 +69,36 @@ pub(crate) fn update_rapier_position(
 
 pub(crate) fn update_bevy_transform(
     bodies: Res<RigidBodySet>,
-    parents: Query<&GlobalTransform, With<Children>>,
-    mut query: Query<(
-        &mut Transform,
-        &GlobalTransform,
-        &BodyHandle,
-        Option<&Parent>,
-    )>,
+    mut query: Query<(Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
 ) {
-    for (mut local_transform, global_transform, handle, parent) in query.iter_mut() {
-        if let Some(body) = bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
-            let (translation, rotation) = convert::from_isometry(*body.position());
+    for (mut local, mut global, handle) in query.iter_mut() {
+        let body = match bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
+            None => continue,
+            Some(body) => body,
+        };
+        let (translation, rotation) = convert::from_isometry(*body.position());
 
-            if translation != global_transform.translation || rotation != global_transform.rotation
-            {
-                if let Some(parent_transform) =
-                    parent.and_then(|Parent(entity)| parents.get(*entity).ok())
-                {
-                    local_transform.translation = translation - parent_transform.translation;
-                    local_transform.rotation = rotation * parent_transform.rotation.conjugate();
-                } else {
-                    local_transform.translation = translation;
-                    local_transform.rotation = rotation;
-                }
+        if translation == global.translation && rotation == global.rotation {
+            continue;
+        }
+
+        if let Some(local) = &mut local {
+            if local.translation != global.translation {
+                local.translation = translation - (global.translation - local.translation);
+            } else {
+                local.translation = translation;
+            }
+
+            if local.rotation != global.rotation {
+                local.rotation =
+                    rotation * (global.rotation * local.rotation.conjugate()).conjugate();
+            } else {
+                local.rotation = rotation;
             }
         }
+
+        global.translation = translation;
+        global.rotation = rotation;
     }
 }
 

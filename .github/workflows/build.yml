@@ -11,37 +11,7 @@ on:
       - '*'
 
 jobs:
-  check-style:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Global cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          components: rustfmt, clippy
-
-      - name: Format check
-        run: cargo fmt --all -- --check
-
-      - name: Static analysis
-        run: cargo clippy
-
   test:
-    needs: check-style
     timeout-minutes: 20
 
     strategy:
@@ -87,17 +57,67 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
+      - name: Format check
+        run: cargo fmt --all -- --check
+
+      - name: Static analysis
+        run: cargo clippy -- -Dwarnings
+
       - name: Run tests with default features
         run: cargo test --workspace
 
-      - name: Run tests 3d only
-        run: cargo test --workspace --no-default-features --features "3d"
+  test-features:
+    runs-on: ubuntu-latest
+    needs: test
+    timeout-minutes: 20
+    env:
+      RUSTFLAGS: "-D warnings"
 
-      - name: Run tests 2d only
-        run: cargo test --workspace --no-default-features --features "2d"
+    strategy:
+      matrix:
+        feature-set:
+          - "2d"
+          - "3d"
+          - "2d, debug"
+          - "3d, debug"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Global cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo
+            ~/.rustup
+          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: cargo-ubuntu-latest-stable
+
+      - name: Target Cache
+        uses: actions/cache@v2
+        with:
+          path: ./target
+          key: target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
+          restore-keys: |
+            target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
+            target-ubuntu-latest-stable
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install dependencies
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
+
+      - name: Run tests with default features
+        run: cargo test --workspace --no-default-features --features "${{ matrix.feature-set }}"
 
   wasm-check:
-    needs: check-style
+    needs: test
     timeout-minutes: 20
     runs-on: ubuntu-latest
     env:
@@ -137,7 +157,7 @@ jobs:
         run: cargo check --workspace --target wasm32-unknown-unknown
 
   ignored-tests:
-    needs: [ check-style, test ]
+    needs: [ test, test-features, wasm-check ]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -176,4 +196,4 @@ jobs:
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Run ignored tests
-        run: cargo test --workspace -- --ignored
+        run: cargo test --workspace --features "debug" -- --ignored

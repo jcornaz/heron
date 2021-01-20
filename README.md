@@ -4,6 +4,7 @@
 
 An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 
+
 ## Design principles
 
 * Don't mirror rapier's API. Simplify what can be simplified. Use bevy idoms when possible. Don't expect users to know
@@ -22,10 +23,20 @@ An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 * Require only the actually *necessary* components. For instance `Velocity` only requires a `Transform`, no need to
   create a rigid body to apply velocity.
 
+
 ## Features
 
-* `3d` Enable simulation using the 3 dimensions x, y, and z. (Enabled by default)
-* `2d` Enable simulation using only the first 2 dimensions x and y. Requires to disable the default features.
+One must choose to use either `2d` or `3d` (but not both). If none of theses two features is enabled, the `PhysicsPlugin` won't be available.
+
+### Enabled by Default
+
+* `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
+
+### Optional
+
+* `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
+* `debug` Render collision shapes. Works only in 2d, support for 3d will be added later.
+
 
 ## Motivation
 

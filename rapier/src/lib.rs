@@ -14,7 +14,6 @@ pub extern crate rapier3d as rapier;
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoSystem, SystemStage};
-use bevy_transform::transform_propagate_system::transform_propagate_system;
 
 use heron_core::Gravity;
 
@@ -33,14 +32,15 @@ mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
+    pub(crate) const DEBUG: &str = "heron-debug";
 }
 
-/// Plugin to install in order to enable collision detection and physics behavior.
+/// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
-#[derive(Clone, Default)]
-pub struct PhysicsPlugin {
+#[derive(Clone)]
+pub struct RapierPlugin {
     parameters: IntegrationParameters,
 }
 
@@ -53,22 +53,28 @@ pub struct BodyHandle {
     collider: ColliderHandle,
 }
 
-impl PhysicsPlugin {
+impl RapierPlugin {
     /// Configure how many times per second the physics world needs to be updated
-    pub fn with_steps_per_second(steps_per_second: u8) -> Self {
+    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         let mut parameters = IntegrationParameters::default();
         parameters.set_dt(1.0 / steps_per_second as f32);
         Self::from(parameters)
     }
 }
 
-impl From<IntegrationParameters> for PhysicsPlugin {
+impl Default for RapierPlugin {
+    fn default() -> Self {
+        Self::from(IntegrationParameters::default())
+    }
+}
+
+impl From<IntegrationParameters> for RapierPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
         Self { parameters }
     }
 }
 
-impl Plugin for PhysicsPlugin {
+impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.resources_mut().get_or_insert_with(Gravity::default);
 
@@ -81,18 +87,13 @@ impl Plugin for PhysicsPlugin {
             .add_resource(ColliderSet::new())
             .add_resource(JointSet::new())
             .add_stage_after(
-                bevy_app::stage::UPDATE,
-                stage::START,
-                SystemStage::serial().with_system(transform_propagate_system.system()),
-            )
-            .add_stage_after(
-                stage::START,
+                bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
-                SystemStage::parallel()
-                    .with_system(bodies::create.system())
+                SystemStage::serial()
+                    .with_system(bodies::remove.system())
                     .with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
-                    .with_system(bodies::remove.system()),
+                    .with_system(bodies::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, stage::STEP, {
                 let mut stage = SystemStage::serial();

@@ -1,20 +1,22 @@
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
+    not(feature = "debug"),
 ))]
 
-use bevy::prelude::*;
+use bevy_app::prelude::*;
+use bevy_math::prelude::*;
 
-use heron::*;
 use heron_core::Gravity;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
+use heron_rapier::RapierPlugin;
 
 #[test]
 fn can_define_gravity_before_plugin() {
     let mut app = App::build();
     app.add_resource(Gravity::from(Vec3::unit_y()))
-        .add_plugin(PhysicsPlugin::default());
+        .add_plugin(RapierPlugin::default());
 
     assert_eq!(
         Vec3::unit_y(),
@@ -25,7 +27,7 @@ fn can_define_gravity_before_plugin() {
 #[test]
 fn rapier_world_is_registered() {
     let mut app = App::build();
-    app.add_plugin(PhysicsPlugin::default());
+    app.add_plugin(RapierPlugin::default());
 
     assert!(app.resources().contains::<RigidBodySet>());
     assert!(app.resources().contains::<ColliderSet>());
