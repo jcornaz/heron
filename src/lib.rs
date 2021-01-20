@@ -9,7 +9,7 @@ pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
-pub mod rapier {
+pub mod rapier_plugin {
     pub use heron_rapier::*;
 }
 
