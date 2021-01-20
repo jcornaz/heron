@@ -7,21 +7,24 @@
 use std::f32::consts::PI;
 use std::ops::DerefMut;
 
-use bevy::core::CorePlugin;
-use bevy::prelude::*;
-use bevy::reflect::TypeRegistryArc;
+use bevy_app::prelude::*;
+use bevy_core::CorePlugin;
+use bevy_ecs::prelude::*;
+use bevy_math::prelude::*;
+use bevy_transform::prelude::*;
 
-use heron::*;
+use bevy_reflect::TypeRegistryArc;
+use heron_core::Body;
 use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{convert, BodyHandle};
+use heron_rapier::{convert, BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_plugin(PhysicsPlugin::from_steps_per_second(0));
+        .add_plugin(RapierPlugin::from_steps_per_second(0));
     builder.app
 }
 
