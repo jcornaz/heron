@@ -6,6 +6,7 @@ name = "heron"
 version = "0.1.0-dev"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
+license = "MIT"
 
 [features]
 default = ["3d"]
