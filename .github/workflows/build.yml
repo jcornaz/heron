@@ -114,7 +114,7 @@ jobs:
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Run tests with default features
-        run: cargo test --workspace --no-default-features -- features "${{ matrix.feature-set }}"
+        run: cargo test --workspace --no-default-features --features "${{ matrix.feature-set }}"
 
   wasm-check:
     needs: test

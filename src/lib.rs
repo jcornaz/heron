@@ -1,21 +1,18 @@
+#![cfg(all(
+    any(feature = "2d", feature = "3d"),
+    not(all(feature = "2d", feature = "3d")),
+))]
+
 use bevy_app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
-#[cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
 pub mod rapier {
     pub use heron_rapier::*;
 }
 
-#[cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
 pub struct PhysicsPlugin {
     rapier: rapier::RapierPlugin,
 
