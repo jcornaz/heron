@@ -14,7 +14,7 @@ pub mod rapier_plugin {
 }
 
 pub struct PhysicsPlugin {
-    rapier: rapier::RapierPlugin,
+    rapier: RapierPlugin,
 
     #[cfg(feature = "debug")]
     debug: heron_debug::DebugPlugin,
@@ -51,7 +51,7 @@ impl Default for PhysicsPlugin {
     }
 }
 
-impl From<rapier::rapier::dynamics::IntegrationParameters> for PhysicsPlugin {
+impl From<rapier_plugin::rapier::dynamics::IntegrationParameters> for PhysicsPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
         Self::from(RapierPlugin::from(parameters))
     }
