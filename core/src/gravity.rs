@@ -6,6 +6,7 @@ pub struct Gravity(Vec3);
 
 impl Gravity {
     /// Returns the underlying vector
+    #[must_use]
     pub fn vector(self) -> Vec3 {
         self.0
     }

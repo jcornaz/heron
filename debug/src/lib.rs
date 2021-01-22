@@ -1,4 +1,8 @@
-use std::ops::Deref;
+#![deny(future_incompatible, nonstandard_style)]
+#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![allow(clippy::needless_pass_by_value)]
+
+//! Rendering of collision shapes for debugging purposes
 
 use bevy_app::{AppBuilder, Plugin};
 use bevy_asset::prelude::*;
@@ -11,6 +15,7 @@ use fnv::FnvHashMap;
 #[cfg(feature = "2d")]
 mod dim2;
 
+/// Plugin that enables rendering of collision shapes
 #[derive(Debug, Copy, Clone)]
 pub struct DebugPlugin(Color);
 
@@ -85,10 +90,10 @@ impl DebugMaterial {
 }
 
 fn create_material(
-    mut debug_mat: ResMut<DebugMaterial>,
-    mut assets: ResMut<Assets<ColorMaterial>>,
+    mut debug_mat: ResMut<'_, DebugMaterial>,
+    mut assets: ResMut<'_, Assets<ColorMaterial>>,
 ) {
-    if let DebugMaterial::Color(color) = debug_mat.deref() {
+    if let DebugMaterial::Color(color) = &*debug_mat {
         *debug_mat = DebugMaterial::Handle(assets.add((*color).into()));
     }
 }
@@ -96,7 +101,7 @@ fn create_material(
 fn track_debug_entities(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<(Entity, &IsDebug, &Handle<Mesh>), Without<Indexed>>,
+    query: Query<'_, (Entity, &IsDebug, &Handle<Mesh>), Without<Indexed>>,
 ) {
     for (debug_entity, IsDebug(parent_entity), mesh_handle) in query.iter() {
         map.insert(*parent_entity, (debug_entity, mesh_handle.clone()));
@@ -104,7 +109,7 @@ fn track_debug_entities(
     }
 }
 
-fn scale_debug_entities(mut query: Query<(Option<&mut Transform>, &mut GlobalTransform)>) {
+fn scale_debug_entities(mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform)>) {
     query
         .iter_mut()
         .filter(|(_, global)| {

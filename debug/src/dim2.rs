@@ -11,9 +11,9 @@ use heron_core::Body;
 use super::*;
 pub(crate) fn create_debug_sprites(
     commands: &mut Commands,
-    query: Query<(Entity, &Body, &GlobalTransform), Without<HasDebug>>,
-    debug_mat: Res<DebugMaterial>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    query: Query<'_, (Entity, &Body, &GlobalTransform), Without<HasDebug>>,
+    debug_mat: Res<'_, DebugMaterial>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
 ) {
     let material = debug_mat.handle().expect("Debug material wasn't loaded");
 
@@ -37,9 +37,9 @@ pub(crate) fn create_debug_sprites(
 pub(crate) fn replace_debug_sprite(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<(Entity, &Body, &GlobalTransform), (With<HasDebug>, Mutated<Body>)>,
-    debug_mat: Res<DebugMaterial>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    query: Query<'_, (Entity, &Body, &GlobalTransform), (With<HasDebug>, Mutated<Body>)>,
+    debug_mat: Res<'_, DebugMaterial>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
 ) {
     let material = debug_mat.handle().expect("Debug material wasn't loaded");
 
@@ -65,8 +65,8 @@ pub(crate) fn replace_debug_sprite(
 pub(crate) fn delete_debug_sprite(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<Entity, (With<HasDebug>, Without<Body>)>,
-    mut meshes: ResMut<Assets<Mesh>>,
+    query: Query<'_, Entity, (With<HasDebug>, Without<Body>)>,
+    mut meshes: ResMut<'_, Assets<Mesh>>,
 ) {
     for parent_entity in query.removed::<Body>() {
         if let Some((debug_entity, mesh)) = map.remove(&parent_entity) {
