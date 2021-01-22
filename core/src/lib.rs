@@ -4,10 +4,14 @@
 //! This crate contains the core components and resources to use Heron.
 
 pub use gravity::Gravity;
+pub use velocity::Angular as AngularVelocity;
+pub use velocity::Linear as LinearVelocity;
 
 mod gravity;
+mod velocity;
 
 /// Components that define a body subject to physics and collision
+#[derive(Debug, Clone)]
 pub enum Body {
     /// A sphere (or circle in 2d) shape defined by its radius
     Sphere {
