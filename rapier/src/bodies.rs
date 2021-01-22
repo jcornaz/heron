@@ -12,10 +12,10 @@ pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
 pub(crate) fn create(
     commands: &mut Commands,
-    mut bodies: ResMut<RigidBodySet>,
-    mut colliders: ResMut<ColliderSet>,
-    mut handles: ResMut<HandleMap>,
-    query: Query<(Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut handles: ResMut<'_, HandleMap>,
+    query: Query<'_, (Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
 ) {
     for (entity, body, transform) in query.iter() {
         let rigid_body = bodies.insert(
@@ -39,9 +39,9 @@ pub(crate) fn create(
 }
 
 pub(crate) fn update_shape(
-    mut bodies: ResMut<RigidBodySet>,
-    mut colliders: ResMut<ColliderSet>,
-    mut query: Query<(&Body, &mut BodyHandle), Mutated<Body>>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut query: Query<'_, (&Body, &mut BodyHandle), Mutated<Body>>,
 ) {
     for (body_def, mut handle) in query.iter_mut() {
         colliders.remove(handle.collider, &mut bodies, true);
@@ -54,8 +54,8 @@ pub(crate) fn update_shape(
 }
 
 pub(crate) fn update_rapier_position(
-    mut bodies: ResMut<RigidBodySet>,
-    query: Query<(&GlobalTransform, &BodyHandle), Mutated<GlobalTransform>>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    query: Query<'_, (&GlobalTransform, &BodyHandle), Mutated<GlobalTransform>>,
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
@@ -68,8 +68,8 @@ pub(crate) fn update_rapier_position(
 }
 
 pub(crate) fn update_bevy_transform(
-    bodies: Res<RigidBodySet>,
-    mut query: Query<(Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
+    bodies: Res<'_, RigidBodySet>,
+    mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
 ) {
     for (mut local, mut global, handle) in query.iter_mut() {
         let body = match bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
@@ -83,17 +83,17 @@ pub(crate) fn update_bevy_transform(
         }
 
         if let Some(local) = &mut local {
-            if local.translation != global.translation {
-                local.translation = translation - (global.translation - local.translation);
-            } else {
+            if local.translation == global.translation {
                 local.translation = translation;
+            } else {
+                local.translation = translation - (global.translation - local.translation);
             }
 
-            if local.rotation != global.rotation {
+            if local.rotation == global.rotation {
+                local.rotation = rotation;
+            } else {
                 local.rotation =
                     rotation * (global.rotation * local.rotation.conjugate()).conjugate();
-            } else {
-                local.rotation = rotation;
             }
         }
 
@@ -104,11 +104,11 @@ pub(crate) fn update_bevy_transform(
 
 pub(crate) fn remove(
     commands: &mut Commands,
-    mut handles: ResMut<HandleMap>,
-    mut bodies: ResMut<RigidBodySet>,
-    mut colliders: ResMut<ColliderSet>,
-    mut joints: ResMut<JointSet>,
-    query: Query<(Entity, &BodyHandle), Without<Body>>,
+    mut handles: ResMut<'_, HandleMap>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut joints: ResMut<'_, JointSet>,
+    query: Query<'_, (Entity, &BodyHandle), Without<Body>>,
 ) {
     for entity in query.removed::<Body>() {
         if let Some(handle) = handles.remove(entity) {

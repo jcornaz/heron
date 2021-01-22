@@ -9,17 +9,16 @@ use crate::rapier::pipeline::PhysicsPipeline;
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn step(
-    mut pipeline: ResMut<PhysicsPipeline>,
-    gravity: Res<Gravity>,
-    integration_parameters: Res<IntegrationParameters>,
-    mut broad_phase: ResMut<BroadPhase>,
-    mut narrow_phase: ResMut<NarrowPhase>,
-    mut bodies: ResMut<RigidBodySet>,
-    mut colliders: ResMut<ColliderSet>,
-    mut joints: ResMut<JointSet>,
+    mut pipeline: ResMut<'_, PhysicsPipeline>,
+    gravity: Res<'_, Gravity>,
+    integration_parameters: Res<'_, IntegrationParameters>,
+    mut broad_phase: ResMut<'_, BroadPhase>,
+    mut narrow_phase: ResMut<'_, NarrowPhase>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut joints: ResMut<'_, JointSet>,
 ) {
     let gravity = convert::to_vector(gravity.vector());
-    let events = ();
     pipeline.step(
         &gravity,
         &integration_parameters,
@@ -30,6 +29,6 @@ pub(crate) fn step(
         &mut joints,
         None,
         None,
-        &events,
+        &(),
     );
 }

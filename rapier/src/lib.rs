@@ -1,4 +1,6 @@
-#![warn(missing_docs)]
+#![deny(future_incompatible, nonstandard_style)]
+#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![allow(clippy::needless_pass_by_value)]
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
@@ -39,6 +41,7 @@ mod stage {
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
+#[must_use]
 #[derive(Clone)]
 pub struct RapierPlugin {
     parameters: IntegrationParameters,
@@ -57,7 +60,7 @@ impl RapierPlugin {
     /// Configure how many times per second the physics world needs to be updated
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         let mut parameters = IntegrationParameters::default();
-        parameters.set_dt(1.0 / steps_per_second as f32);
+        parameters.set_dt(1.0 / f32::from(steps_per_second));
         Self::from(parameters)
     }
 }
@@ -100,7 +103,7 @@ impl Plugin for RapierPlugin {
 
                 if self.parameters.dt().is_normal() {
                     stage = stage
-                        .with_run_criteria(FixedTimestep::step(self.parameters.dt() as f64))
+                        .with_run_criteria(FixedTimestep::step(self.parameters.dt().into()))
                         .with_system(pipeline::step.system());
                 }
 
@@ -111,10 +114,13 @@ impl Plugin for RapierPlugin {
 
 impl BodyHandle {
     /// Returns the rapier's rigid body handle
+    #[must_use]
     pub fn rigid_body(&self) -> RigidBodyHandle {
         self.rigid_body
     }
+
     /// Returns the rapier's collider handle
+    #[must_use]
     pub fn collider(&self) -> ColliderHandle {
         self.collider
     }
