@@ -1,7 +1,15 @@
+#![deny(future_incompatible, nonstandard_style)]
+#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![allow(clippy::needless_pass_by_value)]
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
 ))]
+
+//! An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
+//!
+//! [bevy]: https://bevyengine.org
+//! [rapier]: https://rapier.rs
 
 use bevy_app::{AppBuilder, Plugin};
 
@@ -9,10 +17,18 @@ pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
+/// Physics behavior powered by [rapier](https://rapier.rs)
+///
+/// Allow to access the underlying physics world directly
 pub mod rapier_plugin {
     pub use heron_rapier::*;
 }
 
+/// Plugin to install in order to enable collision detection and physics behavior.
+///
+/// When creating the plugin, you may choose the number of physics steps per second.
+/// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
+#[must_use]
 pub struct PhysicsPlugin {
     rapier: RapierPlugin,
 
