@@ -4,6 +4,7 @@ use fnv::FnvHashMap;
 
 use heron_core::Body;
 
+use crate::convert::IntoBevy;
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
 use crate::{convert, BodyHandle};
@@ -76,7 +77,7 @@ pub(crate) fn update_bevy_transform(
             None => continue,
             Some(body) => body,
         };
-        let (translation, rotation) = convert::from_isometry(*body.position());
+        let (translation, rotation) = body.position().into_bevy();
 
         if translation == global.translation && rotation == global.rotation {
             continue;
