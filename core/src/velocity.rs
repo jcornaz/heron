@@ -32,9 +32,9 @@ pub struct Velocity {
     pub angular: AxisAngle,
 }
 
-/// An axis-angle representation
+/// An [axis-angle] representation
 ///
-/// https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+/// [axis-angle]: https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct AxisAngle(Vec3);
 
@@ -111,6 +111,18 @@ impl From<Velocity> for AxisAngle {
 impl From<Velocity> for Quat {
     fn from(Velocity { angular, .. }: Velocity) -> Self {
         angular.into()
+    }
+}
+
+impl From<Vec3> for AxisAngle {
+    fn from(v: Vec3) -> Self {
+        Self(v)
+    }
+}
+
+impl From<AxisAngle> for Vec3 {
+    fn from(AxisAngle(v): AxisAngle) -> Self {
+        v
     }
 }
 

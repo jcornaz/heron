@@ -29,56 +29,34 @@ fn test_app() -> App {
 }
 
 #[test]
-fn body_with_linear_velocity_is_moved() {
+fn body_is_created_with_velocity() {
     let mut app = test_app();
+
+    let linear = Vec3::new(1.0, 2.0, 3.0);
+    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
 
     let entity = app.world.spawn((
         Transform::default(),
         GlobalTransform::default(),
         Body::Sphere { radius: 1.0 },
-        Velocity::from_linear(Vec3::new(1.0, 2.0, 3.0)),
+        Velocity { linear, angular },
     ));
 
     app.update();
 
-    let position = app
-        .resources
-        .get::<RigidBodySet>()
-        .unwrap()
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+
+    let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap()
-        .position()
-        .translation
-        .into_bevy();
+        .unwrap();
 
-    assert!(is_near(position.x, 1.0));
-    assert!(is_near(position.y, 2.0));
-
-    #[cfg(feature = "3d")]
-    assert!(is_near(position.z, 3.0));
-
-    app.update();
-
-    let position = app
-        .resources
-        .get::<RigidBodySet>()
-        .unwrap()
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap()
-        .position()
-        .translation
-        .into_bevy();
-
-    assert!(is_near(position.x, 2.0));
-    assert!(is_near(position.y, 4.0));
-
-    #[cfg(feature = "3d")]
-    assert!(is_near(position.z, 6.0));
+    assert_eq!(linear, (*body.linvel()).into_bevy());
+    assert_eq!(angular, (*body.angvel()).into_bevy().into());
 }
 
 #[test]
 #[ignore]
-fn body_with_angular_velocity_is_rotated() {
+fn velocity_may_be_added_after_creating_the_body() {
     todo!()
 }
 
@@ -86,9 +64,4 @@ fn body_with_angular_velocity_is_rotated() {
 #[ignore]
 fn velocity_is_updated_to_reflect_rapier_world() {
     todo!()
-}
-
-#[inline]
-fn is_near(v1: f32, v2: f32) -> bool {
-    (v2 - v1).abs() <= f32::EPSILON
 }

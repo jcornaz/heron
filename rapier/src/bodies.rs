@@ -1,5 +1,4 @@
 use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
@@ -8,7 +7,6 @@ use heron_core::{Body, Velocity};
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
-use crate::rapier::math::AngVector;
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -25,7 +23,9 @@ pub(crate) fn create(
             .position((transform.translation, transform.rotation).into_rapier());
 
         if let Some(v) = velocity {
-            builder = builder.linvel(v.linear.x, v.linear.y, v.linear.z);
+            builder = builder
+                .linvel(v.linear.x, v.linear.y, v.linear.z)
+                .angvel(v.angular.into_rapier());
         }
 
         let rigid_body = bodies.insert(builder.build());
