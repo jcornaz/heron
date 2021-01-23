@@ -1,10 +1,5 @@
 #![deny(future_incompatible, nonstandard_style)]
-#![warn(
-    missing_docs,
-    rust_2018_idioms,
-    clippy::pedantic,
-    missing_doc_code_examples
-)]
+#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 
 //! This crate contains the core components and resources to use Heron.
 

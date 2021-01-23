@@ -7,19 +7,16 @@
 use std::f32::consts::PI;
 use std::ops::DerefMut;
 
-use bevy_app::prelude::*;
-use bevy_core::CorePlugin;
-use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::core::CorePlugin;
+use bevy::prelude::*;
+use bevy::reflect::TypeRegistryArc;
+use rapier3d::dynamics::IntegrationParameters;
 
-use bevy_reflect::TypeRegistryArc;
 use heron_core::Body;
 use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
-use rapier3d::dynamics::IntegrationParameters;
 
 fn test_app() -> App {
     let mut builder = App::build();

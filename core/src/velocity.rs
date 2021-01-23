@@ -8,7 +8,7 @@ use bevy_math::prelude::*;
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
 ///
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(commands: &mut Commands) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 })
 ///         .with(LinearVelocity::from(Vec2::unit_x() * 10.0));
@@ -18,6 +18,20 @@ use bevy_math::prelude::*;
 pub struct Linear(Vec3);
 
 /// Component that defines the angular velocity in radians-per-second around an axis
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// # use std::f32::consts::PI;
+///
+/// fn spawn(commands: &mut Commands) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 })
+///         .with(AngularVelocity::from_axis_angle(Vec3::unit_z(), 0.5 * PI));
+/// }
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Angular(Quat);
 
