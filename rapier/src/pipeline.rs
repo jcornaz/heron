@@ -1,8 +1,9 @@
 use bevy_ecs::{Res, ResMut};
+use bevy_math::Vec3;
 
 use heron_core::Gravity;
 
-use crate::convert;
+use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 use crate::rapier::pipeline::PhysicsPipeline;
@@ -18,7 +19,7 @@ pub(crate) fn step(
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
 ) {
-    let gravity = convert::to_vector(gravity.vector());
+    let gravity = Vec3::from(*gravity).into_rapier();
     pipeline.step(
         &gravity,
         &integration_parameters,

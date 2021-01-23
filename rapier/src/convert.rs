@@ -2,127 +2,134 @@
 
 //! Type conversions between bevy and nalgebra (used by rapier's API)
 //!
-//! Names are 'bevy' centered.
-//! * To convert from nalgebra to bevy use `from_xxx`
-//! * To convert from bevy to nalgebra  use `to_xxx`
+//! Provides the [`IntoBevy`](IntoBevy) and [`IntoRapier`](IntoRapier)
+//! with implementations for bevy and rapier types
 
-use crate::nalgebra;
-use crate::rapier;
 use bevy_math::prelude::*;
 
-#[inline]
-#[must_use]
-#[cfg(feature = "3d")]
-pub fn from_vector(v: nalgebra::Vector3<f32>) -> Vec3 {
-    Vec3::new(v.x, v.y, v.z)
+use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
+use crate::rapier::math::{Isometry, Translation, Vector};
+
+pub trait IntoBevy<T> {
+    #[must_use]
+    fn into_bevy(self) -> T;
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "2d")]
-pub fn from_vector(v: nalgebra::Vector2<f32>) -> Vec3 {
-    Vec3::new(v.x, v.y, 0.0)
+pub trait IntoRapier<T> {
+    #[must_use]
+    fn into_rapier(self) -> T;
 }
 
-#[inline]
-#[must_use]
-pub fn from_translation(translation: rapier::math::Translation<f32>) -> Vec3 {
-    from_vector(translation.vector)
+impl IntoBevy<Vec3> for Vector2<f32> {
+    fn into_bevy(self) -> Vec3 {
+        Vec3::new(self.x, self.y, 0.0)
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "3d")]
-pub fn from_rotation(quaternion: nalgebra::UnitQuaternion<f32>) -> Quat {
-    Quat::from_xyzw(quaternion.i, quaternion.j, quaternion.k, quaternion.w)
+impl IntoBevy<Vec3> for Vector3<f32> {
+    fn into_bevy(self) -> Vec3 {
+        Vec3::new(self.x, self.y, self.z)
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "2d")]
-pub fn from_rotation(quaternion: nalgebra::UnitComplex<f32>) -> Quat {
-    Quat::from_axis_angle(Vec3::unit_z(), -quaternion.angle())
+impl IntoBevy<Vec3> for Translation<f32> {
+    fn into_bevy(self) -> Vec3 {
+        self.vector.into_bevy()
+    }
 }
 
-#[inline]
-#[must_use]
-pub fn from_isometry(isometry: rapier::math::Isometry<f32>) -> (Vec3, Quat) {
-    (
-        from_translation(isometry.translation),
-        from_rotation(isometry.rotation),
-    )
+impl IntoBevy<Quat> for UnitComplex<f32> {
+    fn into_bevy(self) -> Quat {
+        Quat::from_axis_angle(Vec3::unit_z(), -self.angle())
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "3d")]
-pub fn to_vector(v: Vec3) -> nalgebra::Vector3<f32> {
-    nalgebra::Vector3::new(v.x, v.y, v.z)
+impl IntoBevy<Quat> for UnitQuaternion<f32> {
+    fn into_bevy(self) -> Quat {
+        Quat::from_xyzw(self.i, self.j, self.k, self.w)
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "2d")]
-pub fn to_vector(v: Vec3) -> nalgebra::Vector2<f32> {
-    nalgebra::Vector2::new(v.x, v.y)
+impl IntoBevy<(Vec3, Quat)> for Isometry<f32> {
+    fn into_bevy(self) -> (Vec3, Quat) {
+        (self.translation.into_bevy(), self.rotation.into_bevy())
+    }
 }
 
-#[inline]
-#[must_use]
-pub fn to_translation(v: Vec3) -> rapier::math::Translation<f32> {
-    rapier::math::Translation::from(to_vector(v))
+impl IntoRapier<Vector2<f32>> for Vec2 {
+    fn into_rapier(self) -> Vector2<f32> {
+        Vector2::new(self.x, self.y)
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "3d")]
-pub fn to_rotation(rotation: Quat) -> nalgebra::UnitQuaternion<f32> {
-    nalgebra::UnitQuaternion::new_normalize(nalgebra::Quaternion::new(
-        rotation.w, rotation.x, rotation.y, rotation.z,
-    ))
+impl IntoRapier<Vector2<f32>> for Vec3 {
+    fn into_rapier(self) -> Vector2<f32> {
+        self.truncate().into_rapier()
+    }
 }
 
-#[inline]
-#[must_use]
-#[cfg(feature = "2d")]
-pub fn to_rotation(rotation: Quat) -> nalgebra::UnitComplex<f32> {
-    let (_, angle) = rotation.to_axis_angle();
-    nalgebra::UnitComplex::new(-angle)
+impl IntoRapier<Vector3<f32>> for Vec3 {
+    fn into_rapier(self) -> Vector3<f32> {
+        Vector3::new(self.x, self.y, self.z)
+    }
 }
 
-#[inline]
-#[must_use]
-pub fn to_isometry(translation: Vec3, rotation: Quat) -> rapier::math::Isometry<f32> {
-    rapier::math::Isometry::from_parts(to_translation(translation), to_rotation(rotation))
+impl IntoRapier<Translation<f32>> for Vec3 {
+    fn into_rapier(self) -> Translation<f32> {
+        <Vec3 as IntoRapier<Vector<f32>>>::into_rapier(self).into()
+    }
 }
 
-#[cfg(all(test, feature = "3d"))]
+impl IntoRapier<UnitComplex<f32>> for Quat {
+    fn into_rapier(self) -> UnitComplex<f32> {
+        let (_, angle) = self.to_axis_angle();
+        nalgebra::UnitComplex::new(-angle)
+    }
+}
+
+impl IntoRapier<UnitQuaternion<f32>> for Quat {
+    fn into_rapier(self) -> UnitQuaternion<f32> {
+        UnitQuaternion::new_normalize(Quaternion::new(self.w, self.x, self.y, self.z))
+    }
+}
+
+impl IntoRapier<Isometry<f32>> for (Vec3, Quat) {
+    fn into_rapier(self) -> Isometry<f32> {
+        Isometry::from_parts(self.0.into_rapier(), self.1.into_rapier())
+    }
+}
+
+#[cfg(test)]
 mod tests {
+    #[cfg(feature = "3d")]
     use std::f32::consts::PI;
 
     use bevy_math::{Quat, Vec3};
 
     use super::*;
 
-    mod isometry {
+    mod into_isometry {
         use super::*;
 
         #[test]
         fn set_translation() {
             let translation = Vec3::new(1.0, 2.0, 3.0);
-            let result = to_isometry(translation, Quat::identity());
+            let result = (translation, Quat::identity()).into_rapier();
             assert_eq!(translation.x, result.translation.x);
             assert_eq!(translation.y, result.translation.y);
+
+            #[cfg(feature = "3d")]
             assert_eq!(translation.z, result.translation.z);
         }
 
         #[test]
+        #[cfg(feature = "3d")]
         fn set_rotation() {
             let angle = PI / 2.0;
             let axis = Vec3::new(1.0, 2.0, 3.0);
 
             let quat = Quat::from_axis_angle(axis, angle).normalize();
-            let result = to_isometry(Vec3::default(), quat);
+            let result = (Vec3::default(), quat).into_rapier();
 
             assert_eq!(result.rotation.i, quat.x);
             assert_eq!(result.rotation.j, quat.y);

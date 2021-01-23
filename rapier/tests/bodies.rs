@@ -15,9 +15,10 @@ use bevy_transform::prelude::*;
 
 use bevy_reflect::TypeRegistryArc;
 use heron_core::Body;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{convert, BodyHandle, RapierPlugin};
+use heron_rapier::{BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -77,7 +78,7 @@ fn creates_body_in_rapier_world() {
 
     assert_eq!(shape.radius, 2.0); // (The radius should be scaled)
 
-    let (actual_translation, actual_rotation) = convert::from_isometry(*body.position());
+    let (actual_translation, actual_rotation) = body.position().into_bevy();
 
     #[cfg(feature = "3d")]
     assert_eq!(actual_translation, translation);
@@ -140,7 +141,7 @@ fn update_rapier_position() {
     let colliders = app.resources.get::<RigidBodySet>().unwrap();
     let handle = app.world.get::<BodyHandle>(entity).unwrap();
     let rigid_body = colliders.get(handle.rigid_body()).unwrap();
-    let (actual_translation, actual_rotation) = convert::from_isometry(*rigid_body.position());
+    let (actual_translation, actual_rotation) = rigid_body.position().into_bevy();
 
     #[cfg(feature = "3d")]
     assert_eq!(actual_translation, translation);
@@ -218,7 +219,7 @@ fn update_bevy_transform() {
         let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
         let body = bodies.get_mut(handle.rigid_body()).unwrap();
 
-        body.set_position(convert::to_isometry(translation, rotation), true);
+        body.set_position((translation, rotation).into_rapier(), true);
     }
 
     app.update();
