@@ -117,6 +117,7 @@ impl Plugin for RapierPlugin {
                     .with_system(bodies::remove.system())
                     .with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
+                    .with_system(velocity::update_rapier_velocity.system())
                     .with_system(bodies::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, stage::STEP, {

@@ -55,9 +55,34 @@ fn body_is_created_with_velocity() {
 }
 
 #[test]
-#[ignore]
 fn velocity_may_be_added_after_creating_the_body() {
-    todo!()
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        Transform::default(),
+        GlobalTransform::default(),
+        Body::Sphere { radius: 1.0 },
+    ));
+
+    app.update();
+
+    let linear = Vec3::new(1.0, 2.0, 3.0);
+    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+
+    app.world
+        .insert_one(entity, Velocity { linear, angular })
+        .unwrap();
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+
+    let body = bodies
+        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+        .unwrap();
+
+    assert_eq!(linear, (*body.linvel()).into_bevy());
+    assert_eq!(angular, (*body.angvel()).into_bevy().into());
 }
 
 #[test]
