@@ -12,6 +12,7 @@ fn main() {
         .add_startup_system(spawn.system())
         .add_system(scale.system())
         .add_system(delete.system())
+        .add_system(apply_velocity.system())
         .add_system(exit_on_esc_system.system())
         .run();
 }
@@ -21,7 +22,23 @@ fn spawn(commands: &mut Commands) {
         Body::Sphere { radius: 50.0 },
         Transform::default(),
         GlobalTransform::default(),
+        Velocity::from_linear(Vec3::unit_x() * 1000.0),
     ));
+}
+
+fn apply_velocity(inputs: Res<Input<KeyCode>>, mut query: Query<&mut Velocity>) {
+    let linear = Vec3::unit_x()
+        * if inputs.pressed(KeyCode::Left) {
+            -1000.0
+        } else if inputs.pressed(KeyCode::Right) {
+            1000.0
+        } else {
+            0.0
+        };
+
+    for mut velocity in query.iter_mut() {
+        velocity.linear = linear;
+    }
 }
 
 fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Body>) {
