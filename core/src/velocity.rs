@@ -19,7 +19,7 @@ use crate::ext::NearZero;
 ///         .with(Body::Sphere { radius: 1.0 })
 ///         .with(
 ///             Velocity::from_linear(Vec3::unit_x() * 10.0)
-///                 .with_angular(Quat::from_axis_angle(Vec3::unit_z(), 0.5 * PI))
+///                 .with_angular(AxisAngle::new(Vec3::unit_z(), 0.5 * PI))
 ///         );
 /// }
 /// ```
@@ -29,8 +29,14 @@ pub struct Velocity {
     pub linear: Vec3,
 
     /// Angular velocity in radians-per-second around an axis
-    pub angular: Quat,
+    pub angular: AxisAngle,
 }
+
+/// An axis-angle representation
+///
+/// https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub struct AxisAngle(Vec3);
 
 impl Velocity {
     /// Returns a linear velocity from a vector
@@ -38,13 +44,13 @@ impl Velocity {
     pub fn from_linear(linear: Vec3) -> Self {
         Self {
             linear,
-            angular: Quat::identity(),
+            angular: AxisAngle::default(),
         }
     }
 
     /// Returns an angular velocity from a vector
     #[must_use]
-    pub fn from_angular(angular: Quat) -> Self {
+    pub fn from_angular(angular: AxisAngle) -> Self {
         Self {
             angular,
             linear: Vec3::zero(),
@@ -60,7 +66,7 @@ impl Velocity {
 
     /// Returns a new version with the given angular velocity
     #[must_use]
-    pub fn with_angular(mut self, angular: Quat) -> Self {
+    pub fn with_angular(mut self, angular: AxisAngle) -> Self {
         self.angular = angular;
         self
     }
@@ -84,20 +90,93 @@ impl From<Velocity> for Vec3 {
     }
 }
 
-impl From<Quat> for Velocity {
-    fn from(quat: Quat) -> Self {
-        Self::from_angular(quat)
+impl From<AxisAngle> for Velocity {
+    fn from(angular: AxisAngle) -> Self {
+        Self::from_angular(angular)
     }
 }
 
-impl From<Velocity> for Quat {
+impl From<Quat> for Velocity {
+    fn from(quat: Quat) -> Self {
+        Self::from_angular(quat.into())
+    }
+}
+
+impl From<Velocity> for AxisAngle {
     fn from(Velocity { angular, .. }: Velocity) -> Self {
         angular
     }
 }
 
+impl From<Velocity> for Quat {
+    fn from(Velocity { angular, .. }: Velocity) -> Self {
+        angular.into()
+    }
+}
+
 impl NearZero for Velocity {
     fn is_near_zero(self) -> bool {
-        self.linear.is_near_zero() && self.angular.is_near_identity()
+        self.linear.is_near_zero() && self.angular.is_near_zero()
+    }
+}
+
+impl AxisAngle {
+    /// Create a new axis-angle
+    #[inline]
+    #[must_use]
+    pub fn new(axis: Vec3, angle: f32) -> Self {
+        Self(axis.normalize() * angle)
+    }
+
+    /// Squared angle.
+    ///
+    /// In general faster than `angle` because it doesn't need to perform a square-root
+    #[inline]
+    #[must_use]
+    pub fn angle_squared(self) -> f32 {
+        self.0.length_squared()
+    }
+
+    /// Angle around the axis.
+    ///
+    /// For comparison you may consider `angle_squared`, that doesn't need to perform a square root.
+    #[inline]
+    #[must_use]
+    pub fn angle(self) -> f32 {
+        self.0.length()
+    }
+
+    /// Returns the axis **NOT** normalized.
+    #[inline]
+    #[must_use]
+    pub fn axis(self) -> Vec3 {
+        self.0
+    }
+}
+
+impl Default for AxisAngle {
+    fn default() -> Self {
+        Self(Vec3::zero())
+    }
+}
+
+impl NearZero for AxisAngle {
+    fn is_near_zero(self) -> bool {
+        self.0.is_near_zero()
+    }
+}
+
+impl From<Quat> for AxisAngle {
+    fn from(quat: Quat) -> Self {
+        let length = quat.length();
+        let (axis, angle) = quat.to_axis_angle();
+        Self(axis.normalize() * (angle * length))
+    }
+}
+
+impl From<AxisAngle> for Quat {
+    fn from(axis_angle: AxisAngle) -> Self {
+        let angle = axis_angle.0.length();
+        Quat::from_axis_angle(axis_angle.0 / angle, angle)
     }
 }
