@@ -1,23 +1,9 @@
 use bevy_math::prelude::*;
 
-/// Component that defines the linear velocity in unit-per-second in every axis
+/// Component that defines the linear and angular velocity.
 ///
-/// # Example
-///
-/// ```
-/// # use bevy::prelude::*;
-/// # use heron_core::*;
-///
-/// fn spawn(commands: &mut Commands) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 })
-///         .with(LinearVelocity::from(Vec2::unit_x() * 10.0));
-/// }
-/// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Linear(Vec3);
-
-/// Component that defines the angular velocity in radians-per-second around an axis
+/// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
+/// The angular part is in radians per second around an axis, represented as a `Quat`
 ///
 /// # Example
 ///
@@ -29,52 +15,81 @@ pub struct Linear(Vec3);
 /// fn spawn(commands: &mut Commands) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 })
-///         .with(AngularVelocity::from_axis_angle(Vec3::unit_z(), 0.5 * PI));
+///         .with(
+///             Velocity::from_linear(Vec3::unit_x() * 10.0)
+///                 .with_angular(Quat::from_axis_angle(Vec3::unit_z(), 0.5 * PI))
+///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Angular(Quat);
+#[derive(Debug, Clone, PartialEq)]
+pub struct Velocity {
+    /// Linear velocity in units-per-second on each axis
+    pub linear: Vec3,
 
-impl From<Vec2> for Linear {
+    /// Angular velocity in radians-per-second around an axis
+    pub angular: Quat,
+}
+
+impl Velocity {
+    /// Returns a linear velocity from a vector
+    #[must_use]
+    pub fn from_linear(linear: Vec3) -> Self {
+        Self {
+            linear,
+            angular: Quat::identity(),
+        }
+    }
+
+    /// Returns an angular velocity from a vector
+    #[must_use]
+    pub fn from_angular(angular: Quat) -> Self {
+        Self {
+            angular,
+            linear: Vec3::zero(),
+        }
+    }
+
+    /// Returns a new version with the given linear velocity
+    #[must_use]
+    pub fn with_linear(mut self, linear: Vec3) -> Self {
+        self.linear = linear;
+        self
+    }
+
+    /// Returns a new version with the given angular velocity
+    #[must_use]
+    pub fn with_angular(mut self, angular: Quat) -> Self {
+        self.angular = angular;
+        self
+    }
+}
+
+impl From<Vec2> for Velocity {
     fn from(v: Vec2) -> Self {
-        Self::from(v.extend(0.0))
+        Self::from_linear(v.extend(0.0))
     }
 }
 
-impl From<Vec3> for Linear {
-    fn from(v: Vec3) -> Self {
-        Self(v)
+impl From<Vec3> for Velocity {
+    fn from(linear: Vec3) -> Self {
+        Self::from_linear(linear)
     }
 }
 
-impl From<Linear> for Vec3 {
-    fn from(Linear(v): Linear) -> Self {
-        v
+impl From<Velocity> for Vec3 {
+    fn from(Velocity { linear, .. }: Velocity) -> Self {
+        linear
     }
 }
 
-impl Angular {
-    /// Create an angular velocity from a given angle (in radians) per second around the z axis
-    #[must_use]
-    pub fn from_angle(angle: f32) -> Self {
-        Self::from_axis_angle(Vec3::unit_z(), angle)
-    }
-
-    /// Create an angular velocity from a given angle (in radians) per second around the given axis axis
-    #[must_use]
-    pub fn from_axis_angle(axis: Vec3, angle: f32) -> Self {
-        Self::from(Quat::from_axis_angle(axis, angle))
-    }
-}
-
-impl From<Quat> for Angular {
+impl From<Quat> for Velocity {
     fn from(quat: Quat) -> Self {
-        Self(quat)
+        Self::from_angular(quat)
     }
 }
 
-impl From<Angular> for Quat {
-    fn from(Angular(quat): Angular) -> Self {
-        quat
+impl From<Velocity> for Quat {
+    fn from(Velocity { angular, .. }: Velocity) -> Self {
+        angular
     }
 }

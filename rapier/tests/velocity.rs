@@ -32,7 +32,7 @@ fn body_with_linear_velocity_is_moved() {
         Transform::default(),
         GlobalTransform::default(),
         Body::Sphere { radius: 1.0 },
-        LinearVelocity::from(Vec3::new(1.0, 2.0, 3.0)),
+        Velocity::from_linear(Vec3::new(1.0, 2.0, 3.0)),
     ));
 
     app.update();

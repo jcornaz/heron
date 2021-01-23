@@ -4,8 +4,7 @@
 //! This crate contains the core components and resources to use Heron.
 
 pub use gravity::Gravity;
-pub use velocity::Angular as AngularVelocity;
-pub use velocity::Linear as LinearVelocity;
+pub use velocity::Velocity;
 
 mod gravity;
 mod velocity;
