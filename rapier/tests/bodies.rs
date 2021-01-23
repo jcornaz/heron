@@ -15,10 +15,10 @@ use bevy_transform::prelude::*;
 
 use bevy_reflect::TypeRegistryArc;
 use heron_core::Body;
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{convert, BodyHandle, RapierPlugin};
+use heron_rapier::{BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -219,7 +219,7 @@ fn update_bevy_transform() {
         let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
         let body = bodies.get_mut(handle.rigid_body()).unwrap();
 
-        body.set_position(convert::to_isometry(translation, rotation), true);
+        body.set_position((translation, rotation).into_rapier(), true);
     }
 
     app.update();

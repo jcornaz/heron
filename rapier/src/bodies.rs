@@ -4,10 +4,10 @@ use fnv::FnvHashMap;
 
 use heron_core::Body;
 
-use crate::convert::IntoBevy;
+use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
-use crate::{convert, BodyHandle};
+use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
@@ -21,10 +21,7 @@ pub(crate) fn create(
     for (entity, body, transform) in query.iter() {
         let rigid_body = bodies.insert(
             RigidBodyBuilder::new_dynamic()
-                .position(convert::to_isometry(
-                    transform.translation,
-                    transform.rotation,
-                ))
+                .position((transform.translation, transform.rotation).into_rapier())
                 .build(),
         );
         let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
@@ -61,7 +58,7 @@ pub(crate) fn update_rapier_position(
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
             body.set_position(
-                convert::to_isometry(transform.translation, transform.rotation),
+                (transform.translation, transform.rotation).into_rapier(),
                 true,
             );
         }
