@@ -38,6 +38,10 @@ pub struct PhysicsPlugin {
 
 impl PhysicsPlugin {
     /// Configure how many times per second the physics world needs to be updated
+    ///
+    /// # Panic
+    ///
+    /// Panic if the number of steps_per_second is 0
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         Self::from(RapierPlugin::from_steps_per_second(steps_per_second))
     }

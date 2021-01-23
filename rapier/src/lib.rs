@@ -44,7 +44,11 @@ mod stage {
 #[must_use]
 #[derive(Clone)]
 pub struct RapierPlugin {
-    parameters: IntegrationParameters,
+    /// Number of step per second, None for a step each frame.
+    pub step_per_second: Option<f64>,
+
+    /// Integration parameters, incl. delta-time at each step.
+    pub parameters: IntegrationParameters,
 }
 
 /// Components automatically register, by the plugin that reference the body in rapier's world
@@ -58,10 +62,22 @@ pub struct BodyHandle {
 
 impl RapierPlugin {
     /// Configure how many times per second the physics world needs to be updated
+    ///
+    /// # Panic
+    ///
+    /// Panic if the number of steps_per_second is 0
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
+        assert!(
+            steps_per_second > 0,
+            "Invalid number of step per second: {}",
+            steps_per_second
+        );
         let mut parameters = IntegrationParameters::default();
         parameters.set_dt(1.0 / f32::from(steps_per_second));
-        Self::from(parameters)
+        Self {
+            parameters,
+            step_per_second: Some(steps_per_second.into()),
+        }
     }
 }
 
@@ -73,7 +89,11 @@ impl Default for RapierPlugin {
 
 impl From<IntegrationParameters> for RapierPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
-        Self { parameters }
+        Self {
+            #[allow(clippy::cast_possible_truncation)]
+            step_per_second: Some(1.0 / f64::from(parameters.dt())),
+            parameters,
+        }
     }
 }
 
@@ -101,13 +121,13 @@ impl Plugin for RapierPlugin {
             .add_stage_after(stage::PRE_STEP, stage::STEP, {
                 let mut stage = SystemStage::serial();
 
-                if self.parameters.dt().is_normal() {
-                    stage = stage
-                        .with_run_criteria(FixedTimestep::step(self.parameters.dt().into()))
-                        .with_system(pipeline::step.system());
+                if let Some(steps_per_second) = self.step_per_second {
+                    stage = stage.with_run_criteria(FixedTimestep::step(steps_per_second))
                 }
 
-                stage.with_system(bodies::update_bevy_transform.system())
+                stage
+                    .with_system(pipeline::step.system())
+                    .with_system(bodies::update_bevy_transform.system())
             });
     }
 }

@@ -19,13 +19,17 @@ use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
+use rapier3d::dynamics::IntegrationParameters;
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin::from_steps_per_second(0));
+        .add_plugin(RapierPlugin {
+            step_per_second: None,
+            parameters: IntegrationParameters::default(),
+        });
     builder.app
 }
 
