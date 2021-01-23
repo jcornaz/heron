@@ -124,7 +124,8 @@ impl Plugin for RapierPlugin {
                 let mut stage = SystemStage::serial();
 
                 if let Some(steps_per_second) = self.step_per_second {
-                    stage = stage.with_run_criteria(FixedTimestep::step(steps_per_second))
+                    stage =
+                        stage.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
                 }
 
                 stage

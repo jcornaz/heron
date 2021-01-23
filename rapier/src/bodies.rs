@@ -23,9 +23,16 @@ pub(crate) fn create(
             .position((transform.translation, transform.rotation).into_rapier());
 
         if let Some(v) = velocity {
-            builder = builder
-                .linvel(v.linear.x, v.linear.y, v.linear.z)
-                .angvel(v.angular.into_rapier());
+            #[cfg(feature = "2d")]
+            {
+                builder = builder.linvel(v.linear.x, v.linear.y);
+            }
+            #[cfg(feature = "3d")]
+            {
+                builder = builder.linvel(v.linear.x, v.linear.y, v.linear.z);
+            }
+
+            builder = builder.angvel(v.angular.into_rapier());
         }
 
         let rigid_body = bodies.insert(builder.build());

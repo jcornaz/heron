@@ -23,7 +23,7 @@ use crate::ext::NearZero;
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     pub linear: Vec3,
@@ -35,7 +35,7 @@ pub struct Velocity {
 /// An [axis-angle] representation
 ///
 /// [axis-angle]: https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
 pub struct AxisAngle(Vec3);
 
 impl Velocity {
@@ -163,12 +163,6 @@ impl AxisAngle {
     #[must_use]
     pub fn axis(self) -> Vec3 {
         self.0
-    }
-}
-
-impl Default for AxisAngle {
-    fn default() -> Self {
-        Self(Vec3::zero())
     }
 }
 

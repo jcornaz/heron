@@ -9,7 +9,7 @@ use crate::BodyHandle;
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    velocities: Query<'_, (&BodyHandle, &Velocity)>,
+    velocities: Query<'_, (&BodyHandle, &Velocity), Changed<Velocity>>,
 ) {
     for (handle, velocity) in velocities.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
