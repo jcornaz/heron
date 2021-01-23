@@ -131,6 +131,10 @@ impl Plugin for RapierPlugin {
                 stage
                     .with_system(pipeline::step.system())
                     .with_system(bodies::update_bevy_transform.system())
+                    .with_system(
+                        bevy_transform::transform_propagate_system::transform_propagate_system
+                            .system(),
+                    )
             });
     }
 }
