@@ -1,5 +1,7 @@
 use bevy_math::prelude::*;
 
+use crate::ext::NearZero;
+
 /// Component that defines the linear and angular velocity.
 ///
 /// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
@@ -21,7 +23,7 @@ use bevy_math::prelude::*;
 ///         );
 /// }
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     pub linear: Vec3,
@@ -91,5 +93,11 @@ impl From<Quat> for Velocity {
 impl From<Velocity> for Quat {
     fn from(Velocity { angular, .. }: Velocity) -> Self {
         angular
+    }
+}
+
+impl NearZero for Velocity {
+    fn is_near_zero(self) -> bool {
+        self.linear.is_near_zero() && self.angular.is_near_identity()
     }
 }

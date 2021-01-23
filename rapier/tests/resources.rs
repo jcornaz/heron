@@ -1,7 +1,6 @@
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
-    not(feature = "debug"),
 ))]
 
 use bevy_app::prelude::*;

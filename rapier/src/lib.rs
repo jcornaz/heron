@@ -28,6 +28,7 @@ use crate::rapier::pipeline::PhysicsPipeline;
 mod bodies;
 pub mod convert;
 mod pipeline;
+mod velocity;
 
 #[allow(unused)]
 mod stage {

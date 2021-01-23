@@ -6,6 +6,7 @@
 pub use gravity::Gravity;
 pub use velocity::Velocity;
 
+pub mod ext;
 mod gravity;
 mod velocity;
 

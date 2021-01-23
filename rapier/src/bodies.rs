@@ -1,12 +1,14 @@
 use bevy_ecs::prelude::*;
+use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::Body;
+use heron_core::{Body, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
+use crate::rapier::math::AngVector;
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -16,14 +18,17 @@ pub(crate) fn create(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
-    query: Query<'_, (Entity, &Body, &GlobalTransform), Without<BodyHandle>>,
+    query: Query<'_, (Entity, &Body, &GlobalTransform, Option<&Velocity>), Without<BodyHandle>>,
 ) {
-    for (entity, body, transform) in query.iter() {
-        let rigid_body = bodies.insert(
-            RigidBodyBuilder::new_dynamic()
-                .position((transform.translation, transform.rotation).into_rapier())
-                .build(),
-        );
+    for (entity, body, transform, velocity) in query.iter() {
+        let mut builder = RigidBodyBuilder::new_dynamic()
+            .position((transform.translation, transform.rotation).into_rapier());
+
+        if let Some(v) = velocity {
+            builder = builder.linvel(v.linear.x, v.linear.y, v.linear.z);
+        }
+
+        let rigid_body = bodies.insert(builder.build());
         let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
         handles.insert(entity, rigid_body);
         commands.insert_one(

@@ -1,3 +1,8 @@
+#![cfg(all(
+    any(feature = "2d", feature = "3d"),
+    not(all(feature = "2d", feature = "3d")),
+))]
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
@@ -24,7 +29,6 @@ fn test_app() -> App {
 }
 
 #[test]
-#[ignore]
 fn body_with_linear_velocity_is_moved() {
     let mut app = test_app();
 
@@ -75,18 +79,6 @@ fn body_with_linear_velocity_is_moved() {
 #[test]
 #[ignore]
 fn body_with_angular_velocity_is_rotated() {
-    todo!()
-}
-
-#[test]
-#[ignore]
-fn non_body_with_linear_velocity_is_moved() {
-    todo!()
-}
-
-#[test]
-#[ignore]
-fn non_body_with_angular_velocity_is_rotated() {
     todo!()
 }
 
