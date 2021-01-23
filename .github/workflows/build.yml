@@ -157,7 +157,7 @@ jobs:
         run: cargo check --workspace --target wasm32-unknown-unknown
 
   ignored-tests:
-    needs: [ test, test-features, wasm-check ]
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
