@@ -9,11 +9,10 @@ use std::ops::DerefMut;
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
-use rapier3d::dynamics::IntegrationParameters;
 
 use heron_core::Body;
 use heron_rapier::convert::{IntoBevy, IntoRapier};
-use heron_rapier::rapier::dynamics::RigidBodySet;
+use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
 

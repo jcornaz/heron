@@ -51,8 +51,19 @@ fn body_is_created_with_velocity() {
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
 
-    assert_eq!(linear, (*body.linvel()).into_bevy());
+    let actual_linear = (*body.linvel()).into_bevy();
+
+    assert_eq!(linear.x, actual_linear.x);
+    assert_eq!(linear.y, actual_linear.y);
+
+    #[cfg(feature = "3d")]
+    assert_eq!(linear.z, actual_linear.z);
+
+    #[cfg(feature = "3d")]
     assert_eq!(angular, (*body.angvel()).into_bevy().into());
+
+    #[cfg(feature = "2d")]
+    assert_eq!(angular.angle(), body.angvel());
 }
 
 #[test]
@@ -82,7 +93,17 @@ fn velocity_may_be_added_after_creating_the_body() {
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
 
-    assert_eq!(linear, (*body.linvel()).into_bevy());
+    let actual_linear = (*body.linvel()).into_bevy();
+    assert_eq!(linear.x, actual_linear.x);
+    assert_eq!(linear.y, actual_linear.y);
+
+    #[cfg(feature = "3d")]
+    assert_eq!(linear.z, actual_linear.z);
+
+    #[cfg(feature = "2d")]
+    assert_eq!(angular.angle(), body.angvel());
+
+    #[cfg(feature = "3d")]
     assert_eq!(angular, (*body.angvel()).into_bevy().into());
 }
 
@@ -116,6 +137,11 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 
     let velocity = app.world.get::<Velocity>(entity).unwrap();
 
-    assert_eq!(velocity.linear, linear);
+    assert_eq!(velocity.linear.x, linear.x);
+    assert_eq!(velocity.linear.y, linear.y);
+
+    #[cfg(feature = "3d")]
+    assert_eq!(velocity.linear.z, linear.z);
+
     assert_eq!(angular, velocity.angular.into());
 }
