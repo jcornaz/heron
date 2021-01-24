@@ -44,5 +44,11 @@ Heron will automatically handle removal of the body (when the component is remov
 Right now, only sphere are supported. More shape will be added in the future. Support for static and kinematic bodies
 will be added later too.
 
+### Velocity component
+
+Add the `Velocity` component to an entity to define/update or read the velocity of a dynamic body.
+
+The entity, must also have a `Body` component and a `GlobalTransform`.
+
 
 [Unreleased]: ../../compare/...HEAD
