@@ -1,12 +1,11 @@
 use bevy_ecs::prelude::*;
 
-use heron_core::ext::NearZero;
-use heron_core::{AxisAngle, Velocity};
+use heron_core::utils::NearZero;
+use heron_core::Velocity;
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::RigidBodySet;
 use crate::BodyHandle;
-use bevy_math::Vec3;
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
@@ -31,7 +30,8 @@ pub(crate) fn update_velocity_component(
 
             #[cfg(feature = "2d")]
             {
-                velocity.angular = AxisAngle::from(Vec3::unit_z() * body.angvel());
+                velocity.angular =
+                    heron_core::AxisAngle::from(bevy_math::Vec3::unit_z() * body.angvel());
             }
 
             #[cfg(feature = "3d")]

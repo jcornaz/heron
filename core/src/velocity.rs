@@ -1,6 +1,6 @@
 use bevy_math::prelude::*;
 
-use crate::ext::NearZero;
+use crate::utils::NearZero;
 
 /// Component that defines the linear and angular velocity.
 ///

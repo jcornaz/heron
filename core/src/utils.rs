@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-//! Utility extensions
+//! Utility traits and extensions
 
 use bevy_math::Vec3;
 

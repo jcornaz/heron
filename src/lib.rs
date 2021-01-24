@@ -24,6 +24,11 @@ pub mod rapier_plugin {
     pub use heron_rapier::*;
 }
 
+/// Re-exports of the most commons/useful types
+pub mod prelude {
+    pub use crate::{AxisAngle, Body, Gravity, PhysicsPlugin, Velocity};
+}
+
 /// Plugin to install in order to enable collision detection and physics behavior.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.

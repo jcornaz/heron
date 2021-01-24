@@ -6,8 +6,8 @@
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
-pub mod ext;
 mod gravity;
+pub mod utils;
 mod velocity;
 
 /// Components that define a body subject to physics and collision
