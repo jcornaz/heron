@@ -15,7 +15,7 @@ pub extern crate rapier3d as rapier;
 
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
-use bevy_ecs::{IntoSystem, SystemStage};
+use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
 
 use heron_core::Gravity;
 
@@ -35,6 +35,7 @@ mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
+    pub(crate) const POST_STEP: &str = "heron-step";
     pub(crate) const DEBUG: &str = "heron-debug";
 }
 
@@ -120,20 +121,28 @@ impl Plugin for RapierPlugin {
                     .with_system(velocity::update_rapier_velocity.system())
                     .with_system(bodies::create.system()),
             )
-            .add_stage_after(stage::PRE_STEP, stage::STEP, {
-                let mut stage = SystemStage::serial();
+            .add_stage_after(stage::PRE_STEP, "heron-step-and-pre-step", {
+                let mut stage = Schedule::default();
 
                 if let Some(steps_per_second) = self.step_per_second {
                     stage =
                         stage.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
                 }
 
-                stage
-                    .with_system(pipeline::step.system())
-                    .with_system(bodies::update_bevy_transform.system())
-                    .with_system(
-                        bevy_transform::transform_propagate_system::transform_propagate_system
-                            .system(),
+                stage.with_stage(
+                    stage::STEP,
+                    SystemStage::serial().with_system(pipeline::step.system()),
+                )
+                    .with_stage(
+                        stage::POST_STEP,
+                        SystemStage::parallel()
+                            .with_system(
+                                bodies::update_bevy_transform.system().chain(
+                                    bevy_transform::transform_propagate_system::transform_propagate_system
+                                        .system()
+                                )
+                            )
+                            .with_system(velocity::update_velocity_component.system())
                     )
             });
     }

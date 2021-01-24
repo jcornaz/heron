@@ -3,7 +3,7 @@ use bevy_ecs::prelude::*;
 use heron_core::ext::NearZero;
 use heron_core::Velocity;
 
-use crate::convert::IntoRapier;
+use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::RigidBodySet;
 use crate::BodyHandle;
 
@@ -16,6 +16,18 @@ pub(crate) fn update_rapier_velocity(
             let wake_up = velocity.is_near_zero();
             body.set_linvel(velocity.linear.into_rapier(), wake_up);
             body.set_angvel(velocity.angular.into_rapier(), wake_up);
+        }
+    }
+}
+
+pub(crate) fn update_velocity_component(
+    bodies: Res<'_, RigidBodySet>,
+    mut velocities: Query<'_, (&BodyHandle, &mut Velocity)>,
+) {
+    for (handle, mut velocity) in velocities.iter_mut() {
+        if let Some(body) = bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
+            velocity.linear = (*body.linvel()).into_bevy();
+            velocity.angular = (*body.angvel()).into_bevy().into();
         }
     }
 }
