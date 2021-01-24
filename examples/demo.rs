@@ -17,13 +17,17 @@ fn main() {
         .run();
 }
 
-fn spawn(commands: &mut Commands) {
-    commands.spawn(Camera2dBundle::default()).spawn((
-        Body::Sphere { radius: 50.0 },
-        Transform::default(),
-        GlobalTransform::default(),
-        Velocity::from_linear(Vec3::unit_x() * 1000.0),
-    ));
+fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+    commands
+        .spawn(Camera2dBundle::default())
+        .spawn(SpriteBundle {
+            transform: Transform::from_translation(Vec3::unit_z()),
+            sprite: Sprite::new(Vec2::new(100.0, 100.0)),
+            material: materials.add(Color::WHITE.into()),
+            ..Default::default()
+        })
+        .with(Body::Sphere { radius: 50.0 })
+        .with(Velocity::from_linear(Vec3::unit_x()));
 }
 
 fn apply_velocity(inputs: Res<Input<KeyCode>>, mut query: Query<&mut Velocity>) {
