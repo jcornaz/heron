@@ -9,6 +9,7 @@ use bevy_math::prelude::*;
 
 use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
 use crate::rapier::math::{Isometry, Translation, Vector};
+use heron_core::AxisAngle;
 
 pub trait IntoBevy<T> {
     #[must_use]
@@ -96,6 +97,18 @@ impl IntoRapier<UnitQuaternion<f32>> for Quat {
 impl IntoRapier<Isometry<f32>> for (Vec3, Quat) {
     fn into_rapier(self) -> Isometry<f32> {
         Isometry::from_parts(self.0.into_rapier(), self.1.into_rapier())
+    }
+}
+
+impl IntoRapier<f32> for AxisAngle {
+    fn into_rapier(self) -> f32 {
+        self.angle()
+    }
+}
+
+impl IntoRapier<Vector3<f32>> for AxisAngle {
+    fn into_rapier(self) -> Vector3<f32> {
+        Vec3::from(self).into_rapier()
     }
 }
 

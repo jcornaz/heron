@@ -1,22 +1,18 @@
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
-    not(feature = "debug"),
 ))]
 
 use std::f32::consts::PI;
 use std::ops::DerefMut;
 
-use bevy_app::prelude::*;
-use bevy_core::CorePlugin;
-use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::core::CorePlugin;
+use bevy::prelude::*;
+use bevy::reflect::TypeRegistryArc;
 
-use bevy_reflect::TypeRegistryArc;
 use heron_core::Body;
 use heron_rapier::convert::{IntoBevy, IntoRapier};
-use heron_rapier::rapier::dynamics::RigidBodySet;
+use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
 
@@ -25,7 +21,10 @@ fn test_app() -> App {
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin::from_steps_per_second(0));
+        .add_plugin(RapierPlugin {
+            step_per_second: None,
+            parameters: IntegrationParameters::default(),
+        });
     builder.app
 }
 

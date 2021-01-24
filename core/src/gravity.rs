@@ -1,6 +1,21 @@
 use bevy_math::{Vec2, Vec3};
 
 /// Resource that defines world's gravity.
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+///
+/// fn main() {
+///     App::build()
+///         // ... Add plugins
+///         .add_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0)))
+///         // ... Add systems
+///         .run();
+/// }
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Gravity(Vec3);
 

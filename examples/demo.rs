@@ -12,16 +12,37 @@ fn main() {
         .add_startup_system(spawn.system())
         .add_system(scale.system())
         .add_system(delete.system())
+        .add_system(apply_velocity.system())
         .add_system(exit_on_esc_system.system())
         .run();
 }
 
-fn spawn(commands: &mut Commands) {
-    commands.spawn(Camera2dBundle::default()).spawn((
-        Body::Sphere { radius: 50.0 },
-        Transform::default(),
-        GlobalTransform::default(),
-    ));
+fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+    commands
+        .spawn(Camera2dBundle::default())
+        .spawn(SpriteBundle {
+            transform: Transform::from_translation(Vec3::unit_z()),
+            sprite: Sprite::new(Vec2::new(100.0, 100.0)),
+            material: materials.add(Color::WHITE.into()),
+            ..Default::default()
+        })
+        .with(Body::Sphere { radius: 50.0 })
+        .with(Velocity::from_linear(Vec3::unit_x()));
+}
+
+fn apply_velocity(inputs: Res<Input<KeyCode>>, mut query: Query<&mut Velocity>) {
+    let linear = Vec3::unit_x()
+        * if inputs.pressed(KeyCode::Left) {
+            -1000.0
+        } else if inputs.pressed(KeyCode::Right) {
+            1000.0
+        } else {
+            0.0
+        };
+
+    for mut velocity in query.iter_mut() {
+        velocity.linear = linear;
+    }
 }
 
 fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Body>) {

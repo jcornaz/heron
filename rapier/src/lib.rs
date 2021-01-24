@@ -6,7 +6,7 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-//! This crate contains the [`PhysicsPlugin`].
+//! This crate contains the [`RapierPlugin`].
 
 #[cfg(feature = "2d")]
 pub extern crate rapier2d as rapier;
@@ -15,7 +15,7 @@ pub extern crate rapier3d as rapier;
 
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
-use bevy_ecs::{IntoSystem, SystemStage};
+use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
 
 use heron_core::Gravity;
 
@@ -28,12 +28,14 @@ use crate::rapier::pipeline::PhysicsPipeline;
 mod bodies;
 pub mod convert;
 mod pipeline;
+mod velocity;
 
 #[allow(unused)]
 mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
+    pub(crate) const POST_STEP: &str = "heron-step";
     pub(crate) const DEBUG: &str = "heron-debug";
 }
 
@@ -44,7 +46,11 @@ mod stage {
 #[must_use]
 #[derive(Clone)]
 pub struct RapierPlugin {
-    parameters: IntegrationParameters,
+    /// Number of step per second, None for a step each frame.
+    pub step_per_second: Option<f64>,
+
+    /// Integration parameters, incl. delta-time at each step.
+    pub parameters: IntegrationParameters,
 }
 
 /// Components automatically register, by the plugin that reference the body in rapier's world
@@ -58,10 +64,22 @@ pub struct BodyHandle {
 
 impl RapierPlugin {
     /// Configure how many times per second the physics world needs to be updated
+    ///
+    /// # Panic
+    ///
+    /// Panic if the number of `steps_per_second` is 0
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
+        assert!(
+            steps_per_second > 0,
+            "Invalid number of step per second: {}",
+            steps_per_second
+        );
         let mut parameters = IntegrationParameters::default();
         parameters.set_dt(1.0 / f32::from(steps_per_second));
-        Self::from(parameters)
+        Self {
+            parameters,
+            step_per_second: Some(steps_per_second.into()),
+        }
     }
 }
 
@@ -73,7 +91,11 @@ impl Default for RapierPlugin {
 
 impl From<IntegrationParameters> for RapierPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
-        Self { parameters }
+        Self {
+            #[allow(clippy::cast_possible_truncation)]
+            step_per_second: Some(1.0 / f64::from(parameters.dt())),
+            parameters,
+        }
     }
 }
 
@@ -96,18 +118,32 @@ impl Plugin for RapierPlugin {
                     .with_system(bodies::remove.system())
                     .with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
+                    .with_system(velocity::update_rapier_velocity.system())
                     .with_system(bodies::create.system()),
             )
-            .add_stage_after(stage::PRE_STEP, stage::STEP, {
-                let mut stage = SystemStage::serial();
+            .add_stage_after(stage::PRE_STEP, "heron-step-and-pre-step", {
+                let mut stage = Schedule::default();
 
-                if self.parameters.dt().is_normal() {
-                    stage = stage
-                        .with_run_criteria(FixedTimestep::step(self.parameters.dt().into()))
-                        .with_system(pipeline::step.system());
+                if let Some(steps_per_second) = self.step_per_second {
+                    stage =
+                        stage.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
                 }
 
-                stage.with_system(bodies::update_bevy_transform.system())
+                stage.with_stage(
+                    stage::STEP,
+                    SystemStage::serial().with_system(pipeline::step.system()),
+                )
+                    .with_stage(
+                        stage::POST_STEP,
+                        SystemStage::parallel()
+                            .with_system(
+                                bodies::update_bevy_transform.system().chain(
+                                    bevy_transform::transform_propagate_system::transform_propagate_system
+                                        .system()
+                                )
+                            )
+                            .with_system(velocity::update_velocity_component.system())
+                    )
             });
     }
 }
