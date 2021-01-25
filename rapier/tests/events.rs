@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::Body;
+use heron_core::{Body, CollisionEvent};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
@@ -19,12 +19,15 @@ fn test_app() -> App {
         .add_plugin(RapierPlugin {
             step_per_second: None,
             parameters: IntegrationParameters::default(),
-        });
+        })
+        .add_system_to_stage(
+            bevy::app::stage::POST_UPDATE,
+            bevy::transform::transform_propagate_system::transform_propagate_system.system(),
+        );
     builder.app
 }
 
 #[test]
-#[ignore]
 fn collision_events_are_fired() {
     let mut app = test_app();
 
@@ -35,19 +38,42 @@ fn collision_events_are_fired() {
     ));
 
     let entity2 = app.world.spawn((
-        Transform::from_translation(Vec3::unit_x() * 2.0),
+        Transform::from_translation(Vec3::unit_x() * 30.0),
         GlobalTransform::default(),
         Body::Sphere { radius: 10.0 },
     ));
 
-    app.update();
-
-    let mut transform = app.world.get_mut::<Transform>(entity2).unwrap();
-    transform.translation.x = 5.0;
+    let mut reader = EventReader::<CollisionEvent>::default();
 
     app.update();
 
-    todo!("Read events")
+    app.world
+        .get_mut::<Transform>(entity2)
+        .unwrap()
+        .translation
+        .x = 10.0;
+    app.update();
+
+    let events: Vec<CollisionEvent> = reader
+        .iter(&app.resources.get().unwrap())
+        .cloned()
+        .collect();
+
+    assert_eq!(events, vec![CollisionEvent::Started(entity1, entity2)]);
+
+    app.world
+        .get_mut::<Transform>(entity2)
+        .unwrap()
+        .translation
+        .x = 30.0;
+    app.update();
+
+    let events: Vec<CollisionEvent> = reader
+        .iter(&app.resources.get().unwrap())
+        .cloned()
+        .collect();
+
+    assert_eq!(events, vec![CollisionEvent::Stopped(entity1, entity2)])
 }
 
 #[test]

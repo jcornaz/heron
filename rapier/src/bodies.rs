@@ -20,6 +20,7 @@ pub(crate) fn create(
 ) {
     for (entity, body, transform, velocity) in query.iter() {
         let mut builder = RigidBodyBuilder::new_dynamic()
+            .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
         if let Some(v) = velocity {

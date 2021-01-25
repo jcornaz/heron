@@ -17,7 +17,7 @@ use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
 use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
 
-use heron_core::Gravity;
+use heron_core::{CollisionEvent, Gravity};
 
 use crate::bodies::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
@@ -35,7 +35,7 @@ mod stage {
     pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
-    pub(crate) const POST_STEP: &str = "heron-step";
+    pub(crate) const POST_STEP: &str = "heron-post-step";
     pub(crate) const DEBUG: &str = "heron-debug";
 }
 
@@ -105,6 +105,7 @@ impl Plugin for RapierPlugin {
 
         app.init_resource::<PhysicsPipeline>()
             .init_resource::<HandleMap>()
+            .add_event::<CollisionEvent>()
             .add_resource(self.parameters.clone())
             .add_resource(BroadPhase::new())
             .add_resource(NarrowPhase::new())
@@ -121,17 +122,18 @@ impl Plugin for RapierPlugin {
                     .with_system(velocity::update_rapier_velocity.system())
                     .with_system(bodies::create.system()),
             )
-            .add_stage_after(stage::PRE_STEP, "heron-step-and-pre-step", {
-                let mut stage = Schedule::default();
+            .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {
+                let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.step_per_second {
-                    stage =
-                        stage.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
+                    schedule =
+                        schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
                 }
 
-                stage.with_stage(
+                schedule.with_stage(
                     stage::STEP,
-                    SystemStage::serial().with_system(pipeline::step.system()),
+                    SystemStage::serial()
+                        .with_system(pipeline::step.system()),
                 )
                     .with_stage(
                         stage::POST_STEP,
