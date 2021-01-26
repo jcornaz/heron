@@ -8,7 +8,8 @@ use heron_core::{CollisionEvent, Gravity};
 use crate::convert::IntoRapier;
 use crate::rapier::data::arena::Index;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
-use crate::rapier::geometry::{BroadPhase, ColliderSet, ContactEvent, NarrowPhase};
+use crate::rapier::geometry::{BroadPhase, ColliderSet, ContactEvent, NarrowPhase, ProximityEvent};
+use crate::rapier::ncollide::query::Proximity;
 use crate::rapier::pipeline::{ChannelEventCollector, PhysicsPipeline};
 
 #[allow(clippy::too_many_arguments)]
@@ -38,51 +39,279 @@ pub(crate) fn step(
         &event_manager.handler,
     );
 
-    event_manager.fire_events(&bodies, &mut events);
+    event_manager.fire_events(&colliders, &mut events);
 }
 
 pub(crate) struct EventManager {
     contacts: Receiver<ContactEvent>,
+    proximities: Receiver<ProximityEvent>,
     handler: ChannelEventCollector,
 }
 
 impl Default for EventManager {
     fn default() -> Self {
         let (contact_send, contacts) = crossbeam::channel::unbounded();
-        let (proximity_send, _) = crossbeam::channel::unbounded();
+        let (proximity_send, proximities) = crossbeam::channel::unbounded();
         let handler = ChannelEventCollector::new(proximity_send, contact_send);
-        Self { contacts, handler }
+        Self {
+            contacts,
+            handler,
+            proximities,
+        }
     }
 }
 
 impl EventManager {
-    fn fire_events(&self, bodies: &RigidBodySet, events: &mut Events<CollisionEvent>) {
+    fn fire_events(&self, colliders: &ColliderSet, events: &mut Events<CollisionEvent>) {
         while let Ok(event) = self.contacts.try_recv() {
             match event {
                 ContactEvent::Started(h1, h2) => {
-                    println!("started");
-                    if let Some((e1, e2)) = Self::entity_pair(bodies, h1, h2) {
+                    if let Some((e1, e2)) = Self::entity_pair(colliders, h1, h2) {
                         events.send(CollisionEvent::Started(e1, e2));
                     }
                 }
                 ContactEvent::Stopped(h1, h2) => {
-                    println!("stopped");
-                    if let Some((e1, e2)) = Self::entity_pair(bodies, h1, h2) {
+                    if let Some((e1, e2)) = Self::entity_pair(colliders, h1, h2) {
                         events.send(CollisionEvent::Stopped(e1, e2));
                     }
+                }
+            }
+        }
+
+        while let Ok(ProximityEvent {
+            collider1,
+            collider2,
+            prev_status,
+            new_status,
+        }) = self.proximities.try_recv()
+        {
+            if let Some((e1, e2)) = Self::entity_pair(colliders, collider1, collider2) {
+                match (prev_status, new_status) {
+                    (_, Proximity::Intersecting) => {
+                        events.send(CollisionEvent::Started(e1, e2));
+                    }
+                    (Proximity::Intersecting, _) => {
+                        events.send(CollisionEvent::Stopped(e1, e2));
+                    }
+                    _ => {}
                 }
             }
         }
     }
 
     #[allow(clippy::cast_possible_truncation)]
-    fn entity_pair(bodies: &RigidBodySet, h1: Index, h2: Index) -> Option<(Entity, Entity)> {
-        if let (Some(b1), Some(b2)) = (bodies.get(h1), bodies.get(h2)) {
+    fn entity_pair(colliders: &ColliderSet, h1: Index, h2: Index) -> Option<(Entity, Entity)> {
+        if let (Some(b1), Some(b2)) = (colliders.get(h1), colliders.get(h2)) {
             let e1 = Entity::from_bits(b1.user_data as u64);
             let e2 = Entity::from_bits(b2.user_data as u64);
             Some(if e1 < e2 { (e1, e2) } else { (e2, e2) })
         } else {
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::pipeline::EventManager;
+    use crate::rapier::dynamics::RigidBodyBuilder;
+    use crate::rapier::geometry::{ColliderBuilder, ColliderHandle};
+    use crate::rapier::ncollide::pipeline::ProximityEvent;
+    use crate::rapier::pipeline::EventHandler;
+
+    use super::*;
+
+    struct TestContext {
+        colliders: ColliderSet,
+        entity1: Entity,
+        entity2: Entity,
+        handle1: ColliderHandle,
+        handle2: ColliderHandle,
+    }
+
+    impl Default for TestContext {
+        fn default() -> Self {
+            let mut bodies = RigidBodySet::new();
+            let mut colliders = ColliderSet::new();
+
+            let entity1 = Entity::new(0);
+            let entity2 = Entity::new(1);
+            let body1 = bodies.insert(RigidBodyBuilder::new_dynamic().build());
+            let body2 = bodies.insert(RigidBodyBuilder::new_dynamic().build());
+            let handle1 = colliders.insert(
+                ColliderBuilder::ball(1.0)
+                    .user_data(entity1.to_bits().into())
+                    .build(),
+                body1,
+                &mut bodies,
+            );
+            let handle2 = colliders.insert(
+                ColliderBuilder::ball(1.0)
+                    .user_data(entity2.to_bits().into())
+                    .build(),
+                body2,
+                &mut bodies,
+            );
+
+            Self {
+                colliders,
+                entity1,
+                entity2,
+                handle1,
+                handle2,
+            }
+        }
+    }
+
+    #[test]
+    fn contact_started_fires_collision_started() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager
+            .handler
+            .handle_contact_event(ContactEvent::Started(context.handle1, context.handle2));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Started(context.entity1, context.entity2),]
+        );
+    }
+
+    #[test]
+    fn contact_stopped_fires_collision_stopped() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager
+            .handler
+            .handle_contact_event(ContactEvent::Stopped(context.handle1, context.handle2));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Stopped(context.entity1, context.entity2),]
+        );
+    }
+
+    #[test]
+    fn proximity_disjoint_to_intersection_fires_collision_started() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::Disjoint,
+            Proximity::Intersecting,
+        ));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Started(context.entity1, context.entity2),]
+        );
+    }
+
+    #[test]
+    fn proximity_intersection_to_disjoint_fires_collision_stopped() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::Intersecting,
+            Proximity::Disjoint,
+        ));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Stopped(context.entity1, context.entity2)]
+        );
+    }
+
+    #[test]
+    fn proximity_within_margin_to_disjoint_and_vice_versa_does_nothing() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::WithinMargin,
+            Proximity::Disjoint,
+        ));
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::Disjoint,
+            Proximity::WithinMargin,
+        ));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert!(events.is_empty());
+    }
+
+    #[test]
+    fn proximity_with_margin_to_intersecting_fires_collision_started() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::WithinMargin,
+            Proximity::Intersecting,
+        ));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Started(context.entity1, context.entity2)]
+        );
+    }
+
+    #[test]
+    fn proximity_intersecting_to_within_margin_fires_collision_stopped() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager.handler.handle_proximity_event(ProximityEvent::new(
+            context.handle1,
+            context.handle2,
+            Proximity::Intersecting,
+            Proximity::WithinMargin,
+        ));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.colliders, &mut events);
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+
+        assert_eq!(
+            events,
+            vec![CollisionEvent::Stopped(context.entity1, context.entity2)]
+        );
     }
 }

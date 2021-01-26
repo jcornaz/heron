@@ -37,7 +37,13 @@ pub(crate) fn create(
         }
 
         let rigid_body = bodies.insert(builder.build());
-        let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
+        let collider = colliders.insert(
+            collider_builder(&body)
+                .user_data(entity.to_bits().into())
+                .build(),
+            rigid_body,
+            &mut bodies,
+        );
         handles.insert(entity, rigid_body);
         commands.insert_one(
             entity,
