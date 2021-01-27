@@ -20,6 +20,7 @@ pub(crate) fn create(
 ) {
     for (entity, body, transform, velocity) in query.iter() {
         let mut builder = RigidBodyBuilder::new_dynamic()
+            .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
         if let Some(v) = velocity {
@@ -36,7 +37,13 @@ pub(crate) fn create(
         }
 
         let rigid_body = bodies.insert(builder.build());
-        let collider = colliders.insert(collider_builder(&body).build(), rigid_body, &mut bodies);
+        let collider = colliders.insert(
+            collider_builder(&body)
+                .user_data(entity.to_bits().into())
+                .build(),
+            rigid_body,
+            &mut bodies,
+        );
         handles.insert(entity, rigid_body);
         commands.insert_one(
             entity,

@@ -7,6 +7,7 @@ license = "MIT"
 
 [dependencies]
 bevy_math = "^0.4.0"
+bevy_ecs = "^0.4.0"
 
 [dev-dependencies]
 bevy = { version = "^0.4.0", default-features = false }
