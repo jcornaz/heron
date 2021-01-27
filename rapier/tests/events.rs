@@ -75,9 +75,3 @@ fn collision_events_are_fired() {
 
     assert_eq!(events, vec![CollisionEvent::Stopped(entity1, entity2)])
 }
-
-#[test]
-#[ignore]
-fn other_components_can_be_queried_from_a_collision() {
-    todo!()
-}
