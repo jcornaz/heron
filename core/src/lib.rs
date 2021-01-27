@@ -56,3 +56,34 @@ pub enum CollisionEvent {
     /// The two entities no longer collide
     Stopped(Entity, Entity),
 }
+
+/// Component that define the [Coefficient of Restitution]
+///
+/// [Coefficient of Restitution]: https://en.wikipedia.org/wiki/Coefficient_of_restitution
+pub struct Restitution(f32);
+
+impl Restitution {
+    /// Perfectly inelastic coefficient, all kinematic energy is lost on collision. (Do not bounce at all)
+    pub const PERFECTLY_INELASTIC: Restitution = Restitution(0.0);
+
+    /// Perfectly elastic coefficient, all kinematic energy is restated in movement. (Vey bouncy)
+    pub const PERFECTLY_ELASTIC: Restitution = Restitution(1.0);
+
+    /// Create a new restitution from a coefficient value.
+    ///
+    /// The coefficient must be >= 0
+    ///
+    /// # Panic
+    ///
+    /// Panic if the value is bellow 0
+    #[must_use]
+    pub fn new(coefficient: f32) -> Self {
+        Self(coefficient)
+    }
+}
+
+impl Default for Restitution {
+    fn default() -> Self {
+        Self::PERFECTLY_INELASTIC
+    }
+}

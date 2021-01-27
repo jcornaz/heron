@@ -62,7 +62,10 @@
 //! }
 //! ```
 //!
-//! It is also possible to define the world's [`Gravity`] and to listen to [`CollisionEvent`]
+//! It is also possible to:
+//! * Define the world's [`Gravity`]
+//! * listen to [`CollisionEvent`]
+//! * Define body's [`Restitution`]
 
 use bevy_app::{AppBuilder, Plugin};
 
