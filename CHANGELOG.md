@@ -50,5 +50,9 @@ Add the `Velocity` component to an entity to define/update or read the velocity 
 
 The entity, must also have a `Body` component and a `GlobalTransform`.
 
+### CollisionEvent event
+
+One can read from `Events<CollisionEvent>` to be notified when collisions start and stop.
+
 
 [Unreleased]: ../../compare/...HEAD
