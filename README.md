@@ -7,7 +7,7 @@ An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 
 ## Design principles
 
-* Don't mirror rapier's API. Simplify what can be simplified. Use bevy idoms when possible. Don't expect users to know
+* Don't mirror rapier's API and don't expect users to know
   how [rapier] works.
     * [rapier]'s API targets physics simulation for rust, where Heron targets [bevy] *games*. It is "similar", yes, but
       it isn't "the same".
@@ -15,13 +15,10 @@ An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
 * Provide a single API that works for both 2d and 3d. (Like bevy does)
 * Data oriented. Using this lib should look like if it was part of [bevy].
-* Data is accessible and modifiable directly in components. (Use global resouce only for global config)
+* Avoid asking the user find data in resources using handle components. Data should be accessible and modifiable directly in components.
 * Hide the actual physics engine. This is an implementation detail the user shouldn't have to care about.
     * Yet, allow advanced users to access the underlying [`rapier`] resources, so a user is never blocked by a missing
       element in the API of heron.
-* Split concerns in multiple small components/resources.
-* Require only the actually *necessary* components. For instance `Velocity` only requires a `Transform`, no need to
-  create a rigid body to apply velocity.
 
 
 ## Features
@@ -43,8 +40,7 @@ One must choose to use either `2d` or `3d` (but not both). If none of theses two
 I think [rapier] is very powerful as a physics engine. But using it directly or via [bevy_rapier] in a [bevy] game is
 not ergonomic enough for my taste.
 
-Ideally I would like to have the *power* of [rapier] accessible behind a nice API designed around [bevy] (not
-around [rapier] and [nalgebra]).
+Ideally I would like to have the *power* of [rapier] accessible behind a an API focused on [bevy] *games*.
 
 
 [bevy]: https://bevyengine.org
