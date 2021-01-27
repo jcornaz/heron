@@ -19,7 +19,6 @@ mod velocity;
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-///
 /// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 });
@@ -35,6 +34,20 @@ pub enum Body {
 }
 
 /// An event fired when the collision state between two entities changed
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn detect_collisions(mut reader: Local<EventReader<CollisionEvent>>, events: Res<Events<CollisionEvent>>) {
+///     for event in reader.iter(&events) {
+///         match event {
+///             CollisionEvent::Started(entity1, entity2) => println!("Entity {:?} and {:?} started to collide", entity1, entity2),
+///             CollisionEvent::Stopped(entity1, entity2) => println!("Entity {:?} and {:?} stopped to collide", entity1, entity2),
+///         }   
+///     }   
+/// }
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CollisionEvent {
     /// The two entities started to collide

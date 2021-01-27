@@ -23,3 +23,13 @@ file = "CHANGELOG.md"
 search = "\\[Unreleased\\]: "
 replace = "[Unreleased]: ../../compare/{{tag_name}}...HEAD\n[{{version}}]: "
 max = 1
+
+[[pre-release-replacements]]
+file = "src/lib.rs"
+search = "//! heron = \".+\""
+replace = "//! heron = \"{{version}}\""
+
+[[pre-release-replacements]]
+file = "src/lib.rs"
+search = "//! heron = { version = \".+\""
+replace = "//! heron = { version = \"{{version}}\""

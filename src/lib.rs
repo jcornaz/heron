@@ -1,6 +1,6 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::needless_pass_by_value)]
+#![allow(clippy::needless_pass_by_value, clippy::needless_doctest_main)]
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
@@ -10,6 +10,59 @@
 //!
 //! [bevy]: https://bevyengine.org
 //! [rapier]: https://rapier.rs
+//!
+//! # Get started
+//!
+//! ## Add the dependency
+//!
+//! Add the library to `Cargo.toml`
+//! ```toml
+//! heron = "0.1.0-dev"
+//! ```
+//!
+//! If you are creating a 2d game, change the default features:
+//! ```toml
+//! heron = { version = "0.1.0-dev", default-features = false, features = ["2d"] }
+//! ```
+//!
+//! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
+//!
+//! ## Install the plugin
+//!
+//! To enable physics and collision detection, the [`PhysicsPlugin`] should be installed
+//!
+//! ```no_run
+//! use bevy::prelude::*;
+//! use heron::prelude::*;
+//!
+//! fn main() {
+//!   App::build()
+//!     .add_plugins(DefaultPlugins)
+//!     .add_plugin(PhysicsPlugin::default())
+//!     // ... Add your resources and systems
+//!     .run();
+//! }
+//! ```
+//!
+//! ## Create rigid bodies
+//!
+//! To create a rigid body, add the component `Body` to the entity, choosing a collision shape.
+//! It will turn the entity into a dynamic rigid body affected by physics.
+//!
+//! The position, and rotation is defined by the bevy `GlobalTransform` component.
+//!
+//! ```
+//! # use bevy::prelude::*;
+//! # use heron::prelude::*;
+//! fn spawn(commands: &mut Commands) {
+//!     commands
+//!         .spawn(SpriteBundle::default()) // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
+//!         .with(Body::Sphere { radius: 10.0 }) // Make it a physics body, by attaching a collision shape
+//!         .with(Velocity::from(Vec2::unit_x() * 2.0)); // Optionally add a velocity component
+//! }
+//! ```
+//!
+//! It is also possible to define the world's [`Gravity`] and to listen to [`CollisionEvent`]
 
 use bevy_app::{AppBuilder, Plugin};
 
@@ -26,7 +79,7 @@ pub mod rapier_plugin {
 
 /// Re-exports of the most commons/useful types
 pub mod prelude {
-    pub use crate::{AxisAngle, Body, Gravity, PhysicsPlugin, Velocity};
+    pub use crate::{AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Velocity};
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.
