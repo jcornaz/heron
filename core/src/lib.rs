@@ -37,9 +37,9 @@ pub enum Body {
 /// An event fired when the collision state between two entities changed
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CollisionEvent {
-    /// The two entity started to collide
+    /// The two entities started to collide
     Started(Entity, Entity),
 
-    /// The two entity no longer collide
+    /// The two entities no longer collide
     Stopped(Entity, Entity),
 }
