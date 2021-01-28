@@ -25,7 +25,7 @@ fn test_app() -> App {
 }
 
 #[test]
-fn bodies_are_created_with_restitution() {
+fn restitution_can_be_defined_when_creating_body() {
     let mut app = test_app();
 
     let coefficient = 0.42;
@@ -34,6 +34,31 @@ fn bodies_are_created_with_restitution() {
         Body::Sphere { radius: 10.0 },
         Restitution::new(coefficient),
     ));
+
+    app.update();
+
+    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let collider = colliders
+        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
+        .unwrap();
+
+    assert_eq!(coefficient, collider.restitution)
+}
+
+#[test]
+fn restitution_can_be_updated() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+
+    app.update();
+
+    let coefficient = 2.0;
+    app.world
+        .insert_one(entity, Restitution::from(coefficient))
+        .unwrap();
 
     app.update();
 

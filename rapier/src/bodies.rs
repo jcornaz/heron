@@ -11,6 +11,7 @@ use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn create(
     commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
@@ -50,7 +51,7 @@ pub(crate) fn create(
         let collider = colliders.insert(
             collider_builder(&body)
                 .user_data(entity.to_bits().into())
-                .restitution(restitution.map(|it| (*it).into()).unwrap_or(0.0))
+                .restitution(restitution.map_or(0.0, |it| (*it).into()))
                 .build(),
             rigid_body,
             &mut bodies,
