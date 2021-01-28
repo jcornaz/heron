@@ -2,7 +2,7 @@ use bevy_ecs::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, Velocity};
+use heron_core::{Body, Restitution, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
@@ -11,14 +11,25 @@ use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn create(
     commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
-    query: Query<'_, (Entity, &Body, &GlobalTransform, Option<&Velocity>), Without<BodyHandle>>,
+    query: Query<
+        '_,
+        (
+            Entity,
+            &Body,
+            &GlobalTransform,
+            Option<&Velocity>,
+            Option<&Restitution>,
+        ),
+        Without<BodyHandle>,
+    >,
 ) {
-    for (entity, body, transform, velocity) in query.iter() {
+    for (entity, body, transform, velocity, restitution) in query.iter() {
         let mut builder = RigidBodyBuilder::new_dynamic()
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
@@ -40,6 +51,7 @@ pub(crate) fn create(
         let collider = colliders.insert(
             collider_builder(&body)
                 .user_data(entity.to_bits().into())
+                .restitution(restitution.map_or(0.0, |it| (*it).into()))
                 .build(),
             rigid_body,
             &mut bodies,

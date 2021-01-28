@@ -62,7 +62,10 @@
 //! }
 //! ```
 //!
-//! It is also possible to define the world's [`Gravity`] and to listen to [`CollisionEvent`]
+//! It is also possible to:
+//! * Define the world's [`Gravity`]
+//! * Listen to [`CollisionEvent`]
+//! * Define body's [`Restitution`]
 
 use bevy_app::{AppBuilder, Plugin};
 
@@ -79,7 +82,9 @@ pub mod rapier_plugin {
 
 /// Re-exports of the most commons/useful types
 pub mod prelude {
-    pub use crate::{AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Velocity};
+    pub use crate::{
+        AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+    };
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.
