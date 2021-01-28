@@ -67,7 +67,7 @@ impl Restitution {
     /// Perfectly inelastic coefficient, all kinematic energy is lost on collision. (Do not bounce at all)
     pub const PERFECTLY_INELASTIC: Restitution = Restitution(0.0);
 
-    /// Perfectly elastic coefficient, all kinematic energy is restated in movement. (Vey bouncy)
+    /// Perfectly elastic coefficient, all kinematic energy is restated in movement. (Very bouncy)
     pub const PERFECTLY_ELASTIC: Restitution = Restitution(1.0);
 
     /// Create a new restitution from a coefficient value.
