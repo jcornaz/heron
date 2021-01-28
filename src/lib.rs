@@ -82,7 +82,9 @@ pub mod rapier_plugin {
 
 /// Re-exports of the most commons/useful types
 pub mod prelude {
-    pub use crate::{AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Velocity};
+    pub use crate::{
+        AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+    };
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior.

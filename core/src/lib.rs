@@ -60,6 +60,7 @@ pub enum CollisionEvent {
 /// Component that define the [Coefficient of Restitution]
 ///
 /// [Coefficient of Restitution]: https://en.wikipedia.org/wiki/Coefficient_of_restitution
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Restitution(f32);
 
 impl Restitution {
@@ -85,5 +86,17 @@ impl Restitution {
 impl Default for Restitution {
     fn default() -> Self {
         Self::PERFECTLY_INELASTIC
+    }
+}
+
+impl From<f32> for Restitution {
+    fn from(value: f32) -> Self {
+        Self(value)
+    }
+}
+
+impl From<Restitution> for f32 {
+    fn from(Restitution(value): Restitution) -> Self {
+        value
     }
 }
