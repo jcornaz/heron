@@ -15,10 +15,10 @@ An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
     * When designing the API, only usage in [bevy] *games* matters. How the rapier's API looks like doesn't matter.
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
 * Provide a single API that works for both 2d and 3d. (Like bevy does)
-* Data oriented. Using this lib should look like if it was part of [bevy].
-* Avoid asking the user tp lookup in resources using handle components. Data should be accessible and modifiable directly in components.
+* Data oriented. Using this library should look like it is part of [bevy].
+* Avoid asking the user to lookup in resources via *handles*. Data should be accessible and modifiable directly in components.
 * Hide the actual physics engine. This is an implementation detail the user shouldn't have to care about.
-    * Yet, allow advanced users to access the underlying [rapier] resources, so a user is never blocked by a missing
+    * But, allow advanced users to access the underlying [rapier] resources, so a user is never blocked by a missing
       element in the API of heron.
 
 
