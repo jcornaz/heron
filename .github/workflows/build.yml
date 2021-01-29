@@ -18,8 +18,10 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+          - windows-latest
         rust:
           - stable
+          - nightly
 
     runs-on: ${{ matrix.os }}
     env:
@@ -54,7 +56,8 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
 
-      - name: Install dependencies
+      - name: Install linux dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Format check
