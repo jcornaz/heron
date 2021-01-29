@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/jcornaz/heron)](https://github.com/jcornaz/heron/blob/main/LICENSE)
 [![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 
-An ergonomic physics API for 2d and 3d bevy [bevy] games. (powered by [rapier])
+An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
 
 ## Design principles
