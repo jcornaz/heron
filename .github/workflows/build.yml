@@ -29,24 +29,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Global cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-${{ matrix.os }}-${{ matrix.rust }}
-
-      - name: Target Cache
-        uses: actions/cache@v2
-        with:
-          path: ./target
-          key: target-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
-          restore-keys: |
-            target-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
-            target-${{ matrix.os }}-${{ matrix.rust }}
-
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -85,24 +67,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Global cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Target Cache
-        uses: actions/cache@v2
-        with:
-          path: ./target
-          key: target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
-          restore-keys: |
-            target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-            target-ubuntu-latest-stable
-
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -127,24 +91,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Global cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable-wasm
-
-      - name: Target Cache
-        uses: actions/cache@v2
-        with:
-          path: ./target
-          key: target-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
-          restore-keys: |
-            target-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}
-            target-ubuntu-latest-stable-wasm
-
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
         with:
@@ -166,24 +112,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Global cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Target Cache
-        uses: actions/cache@v2
-        with:
-          path: ./target
-          key: target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
-          restore-keys: |
-            target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-            target-ubuntu-latest-stable
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1
