@@ -61,9 +61,11 @@ jobs:
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Format check
+        if: matrix.os == 'ubuntu-latest' && matrix.rust == 'stable'
         run: cargo fmt --all -- --check
 
       - name: Static analysis
+        if: matrix.os == 'ubuntu-latest' && matrix.rust == 'stable'
         run: cargo clippy -- -Dwarnings
 
       - name: Run tests with default features
