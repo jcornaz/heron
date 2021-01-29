@@ -1,8 +1,9 @@
 # Heron
 
-![Build](https://github.com/jcornaz/heron/workflows/Build/badge.svg)
+[![License](https://img.shields.io/github/license/jcornaz/heron)](https://github.com/jcornaz/heron/blob/main/LICENSE)
+[![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 
-An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
+An ergonomic physics API for 2d and 3d bevy [bevy] games. (powered by [rapier])
 
 
 ## Design principles
@@ -15,10 +16,11 @@ An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
 * Provide a single API that works for both 2d and 3d. (Like bevy does)
 * Data oriented. Using this lib should look like if it was part of [bevy].
-* Avoid asking the user find data in resources using handle components. Data should be accessible and modifiable directly in components.
+* Avoid asking the user tp lookup in resources using handle components. Data should be accessible and modifiable directly in components.
 * Hide the actual physics engine. This is an implementation detail the user shouldn't have to care about.
-    * Yet, allow advanced users to access the underlying [`rapier`] resources, so a user is never blocked by a missing
+    * Yet, allow advanced users to access the underlying [rapier] resources, so a user is never blocked by a missing
       element in the API of heron.
+
 
 
 ## Features
