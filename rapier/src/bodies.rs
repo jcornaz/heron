@@ -150,5 +150,47 @@ pub(crate) fn remove(
 fn collider_builder(body: &Body) -> ColliderBuilder {
     match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),
+        Body::Capsule {
+            half_segment: half_height,
+            radius,
+        } => ColliderBuilder::capsule_y(*half_height, *radius),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_sphere() {
+        let builder = collider_builder(&Body::Sphere { radius: 4.2 });
+        let ball = builder
+            .shape
+            .as_ball()
+            .expect("Created shape was not a ball");
+        assert_eq!(ball.radius, 4.2);
+    }
+
+    #[test]
+    fn build_capsule() {
+        let builder = collider_builder(&Body::Capsule {
+            half_segment: 10.0,
+            radius: 5.0,
+        });
+        let capsule = builder
+            .shape
+            .as_capsule()
+            .expect("Created shape was not a capsule");
+
+        assert_eq!(capsule.radius, 5.0);
+        assert_eq!(capsule.segment.a.x, 0.0);
+        assert_eq!(capsule.segment.b.x, 0.0);
+        assert_eq!(capsule.segment.a.y, -10.0);
+        assert_eq!(capsule.segment.b.y, 10.0);
+
+        #[cfg(feature = "3d")]
+        assert_eq!(capsule.segment.a.z, 0.0);
+        #[cfg(feature = "3d")]
+        assert_eq!(capsule.segment.b.z, 0.0);
     }
 }

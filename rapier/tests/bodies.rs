@@ -104,8 +104,9 @@ fn update_shape() {
         app.update();
 
         let mut body_def = app.world.get_mut::<Body>(entity).unwrap();
-        let Body::Sphere { radius } = body_def.deref_mut();
-        *radius = 42.0;
+        if let Body::Sphere { radius } = body_def.deref_mut() {
+            *radius = 42.0;
+        }
     }
 
     app.update();
