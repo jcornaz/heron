@@ -25,7 +25,7 @@ enum DebugMaterial {
     Handle(Handle<ColorMaterial>),
 }
 
-type DebugEntityMap = FnvHashMap<Entity, (Entity, Handle<Mesh>)>;
+type DebugEntityMap = FnvHashMap<Entity, Entity>;
 
 #[allow(unused)]
 struct HasDebug;
@@ -63,7 +63,8 @@ impl Plugin for DebugPlugin {
 
         #[cfg(feature = "2d")]
         {
-            app.add_system_to_stage("heron-debug", dim2::delete_debug_sprite.system())
+            app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
+                .add_system_to_stage("heron-debug", dim2::delete_debug_sprite.system())
                 .add_system_to_stage("heron-debug", dim2::replace_debug_sprite.system())
                 .add_system_to_stage("heron-debug", dim2::create_debug_sprites.system());
         }
@@ -101,10 +102,10 @@ fn create_material(
 fn track_debug_entities(
     commands: &mut Commands,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<'_, (Entity, &IsDebug, &Handle<Mesh>), Without<Indexed>>,
+    query: Query<'_, (Entity, &IsDebug), Without<Indexed>>,
 ) {
-    for (debug_entity, IsDebug(parent_entity), mesh_handle) in query.iter() {
-        map.insert(*parent_entity, (debug_entity, mesh_handle.clone()));
+    for (debug_entity, IsDebug(parent_entity)) in query.iter() {
+        map.insert(*parent_entity, debug_entity);
         commands.insert_one(debug_entity, Indexed);
     }
 }
