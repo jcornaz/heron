@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.1.0-alpha.1] - 2021-01-30
+
 ### Features
 
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
@@ -59,4 +63,5 @@ The `Restitution` component can be added to define the restitution coefficient o
 One can read from `Events<CollisionEvent>` to be notified when collisions start and stop.
 
 
-[Unreleased]: ../../compare/...HEAD
+[Unreleased]: ../../compare/v0.1.0-alpha.1...HEAD
+[0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1
