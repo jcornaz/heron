@@ -62,5 +62,5 @@ prerelease = true
 [[package.metadata.release.pre-release-replacements]]
 file = "src/lib.rs"
 search = "//! heron = \\{ version = \"[0-9a-z\\.-]+\""
-replace = "//! heron = \\{ version = \"{{version}}\""
+replace = "//! heron = { version = \"{{version}}\""
 prerelease = true

@@ -22,7 +22,7 @@
 //!
 //! If you are creating a 2d game, change the default features:
 //! ```toml
-//! heron = \{ version = "0.1.0-alpha.1", default-features = false, features = ["2d"] }
+//! heron = { version = "0.1.0-alpha.1", default-features = false, features = ["2d"] }
 //! ```
 //!
 //! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
