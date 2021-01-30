@@ -6,7 +6,7 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-//! This crate contains the [`RapierPlugin`].
+//! Physics behavior for Heron, using [rapier](https://rapier.rs/)
 
 #[cfg(feature = "2d")]
 pub extern crate rapier2d as rapier;

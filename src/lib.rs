@@ -6,7 +6,7 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-//! An ergonomic API to physics in [bevy] 2d and 3d games. (powered by [rapier])
+//! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
 //! [rapier]: https://rapier.rs

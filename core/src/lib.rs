@@ -1,7 +1,7 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 
-//! This crate contains the core components and resources to use Heron.
+//! Core components and resources to use Heron
 
 use bevy_ecs::Entity;
 

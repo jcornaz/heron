@@ -2,7 +2,7 @@
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 #![allow(clippy::needless_pass_by_value)]
 
-//! Rendering of collision shapes for debugging purposes
+//! Rendering of Heron's collision shapes for debugging purposes
 
 use bevy_app::{AppBuilder, Plugin};
 use bevy_asset::prelude::*;

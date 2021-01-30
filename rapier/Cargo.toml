@@ -4,6 +4,8 @@ version = "0.1.0-dev"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
+description = "Physics behavior for Heron, using rapier"
+repository = "https://github.com/jcornaz/heron/"
 
 [features]
 default = []
@@ -11,7 +13,7 @@ default = []
 3d = ["rapier3d"]
 
 [dependencies]
-heron_core = { path = "../core" }
+heron_core = { path = "../core", version = "0.1.0-dev" }
 bevy_math = "^0.4.0"
 bevy_core = "^0.4.0"
 bevy_ecs = "^0.4.0"
