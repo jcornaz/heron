@@ -71,12 +71,6 @@ impl Restitution {
     pub const PERFECTLY_ELASTIC: Restitution = Restitution(1.0);
 
     /// Create a new restitution from a coefficient value.
-    ///
-    /// The coefficient must be >= 0
-    ///
-    /// # Panic
-    ///
-    /// Panic if the value is bellow 0
     #[must_use]
     pub fn new(coefficient: f32) -> Self {
         Self(coefficient)
