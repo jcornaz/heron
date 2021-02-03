@@ -8,14 +8,29 @@
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
+## How it looks like
+
+```rust
+fn main() {
+  App::build()
+    .add_plugins(DefaultPlugins)
+    .add_plugin(PhysicsPlugin::default()) // Add the plugin
+    .add_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
+    .add_startup_system(spawn.system())
+    .run();
+}
+
+fn spawn(commands: &mut Commands) {
+    commands
+        .spawn(SpriteBundle::default()) // Spawn (and configure) any bundle of your choice. Only make sure there is a `GlobalTransform`
+        .with(Body::Sphere { radius: 10.0 }) // Make it a physics body, by attaching a collision shape
+        .with(Velocity::from(Vec2::unit_x() * 2.0)); // Optionally define the (current) velocity
+        .with(Restitution::from(0.5)); // Optionally define restitution
+}
+```
 
 ## Design principles
 
-* Don't mirror rapier's API and don't expect users to know
-  how [rapier] works.
-    * [rapier]'s API targets physics simulation for rust, where Heron targets [bevy] *games*. It is "similar", yes, but
-      it isn't "the same".
-    * When designing the API, only usage in [bevy] *games* matters. How the rapier's API looks like doesn't matter.
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
 * Provide a single API that works for both 2d and 3d. (Like bevy does)
 * Data oriented. Using this library should look like it is part of [bevy].
@@ -25,8 +40,7 @@ An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
       element in the API of heron.
 
 
-
-## Features
+## Feature flags
 
 One must choose to use either `2d` or `3d` (but not both). If none of theses two features is enabled, the `PhysicsPlugin` won't be available.
 
