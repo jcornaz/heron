@@ -21,7 +21,7 @@ jobs:
           - windows-latest
         rust:
           - stable
-          - nightly
+          # - nightly
 
     runs-on: ${{ matrix.os }}
     env:
