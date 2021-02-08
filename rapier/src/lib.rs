@@ -75,8 +75,11 @@ impl RapierPlugin {
             "Invalid number of step per second: {}",
             steps_per_second
         );
-        let mut parameters = IntegrationParameters::default();
-        parameters.dt = 1.0 / f32::from(steps_per_second);
+        let parameters = IntegrationParameters {
+            dt: 1.0 / f32::from(steps_per_second),
+            ..IntegrationParameters::default()
+        };
+
         Self {
             parameters,
             step_per_second: Some(steps_per_second.into()),
