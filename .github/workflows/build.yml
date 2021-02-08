@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             ~/.cargo
@@ -41,7 +41,7 @@ jobs:
           restore-keys: cargo-${{ matrix.os }}-${{ matrix.rust }}
 
       - name: Target Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ./target
           key: target-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
@@ -91,7 +91,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             ~/.cargo
@@ -100,7 +100,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable
 
       - name: Target Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ./target
           key: target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
@@ -133,7 +133,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             ~/.cargo
@@ -142,7 +142,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable-wasm
 
       - name: Target Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ./target
           key: target-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
@@ -173,7 +173,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: |
             ~/.cargo
@@ -182,7 +182,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable
 
       - name: Target Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         with:
           path: ./target
           key: target-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
