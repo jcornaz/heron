@@ -22,7 +22,7 @@ fn test_app() -> App {
             step_per_second: None,
             parameters: {
                 let mut params = IntegrationParameters::default();
-                params.set_dt(1.0);
+                params.dt = 1.0;
                 params
             },
         });

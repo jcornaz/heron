@@ -75,8 +75,11 @@ impl RapierPlugin {
             "Invalid number of step per second: {}",
             steps_per_second
         );
-        let mut parameters = IntegrationParameters::default();
-        parameters.set_dt(1.0 / f32::from(steps_per_second));
+        let parameters = IntegrationParameters {
+            dt: 1.0 / f32::from(steps_per_second),
+            ..IntegrationParameters::default()
+        };
+
         Self {
             parameters,
             step_per_second: Some(steps_per_second.into()),
@@ -94,7 +97,7 @@ impl From<IntegrationParameters> for RapierPlugin {
     fn from(parameters: IntegrationParameters) -> Self {
         Self {
             #[allow(clippy::cast_possible_truncation)]
-            step_per_second: Some(1.0 / f64::from(parameters.dt())),
+            step_per_second: Some(1.0 / f64::from(parameters.dt)),
             parameters,
         }
     }
