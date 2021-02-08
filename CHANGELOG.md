@@ -10,6 +10,9 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### ⚠ Dependency requirement updated
+
+* Required rapier version is now >= 0.5.0 < 0.6.0
 
 
 ## [0.1.0-alpha.1] - 2021-01-30
