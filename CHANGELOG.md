@@ -10,9 +10,14 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
-### ⚠ Dependency requirement updated
+### ⚠ Dependency requirement updated (breaking)
 
-* Required rapier version is now >= 0.5.0 < 0.6.0
+The required rapier version is now >= 0.5.0 < 0.6.0.
+
+
+### ⚠ New collision shapes (breaking)
+
+The variant `Body::Capsule` has been added. It takes a *haf_segment* and a *radius*.
 
 
 ## [0.1.0-alpha.1] - 2021-01-30
@@ -24,7 +29,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
   disable the default features.
 * `debug` Render collision shapes. Works only in 2d for now, support for 3d will be added later.
 
-Importatn: Either `2d` or `3d` (but not both) must be enabled. If none or both of theses two features are enabled,
+Important: Either `2d` or `3d` (but not both) must be enabled. If none or both of theses two features are enabled,
 the `PhysicsPlugin` won't be available.
 
 ### PhysicsPlugin plugin
@@ -41,14 +46,16 @@ the `Gravity` resource to change the world's gravity.
 
 A `Body` component can be added to make the entity a *dynamic* rigid body with the given shape.
 
-The position of the body is defined by the bevy `GlobalTransform` component. Updating the `GlobalTransform`, will teleport the body ignoring physics rules.
+The position of the body is defined by the bevy `GlobalTransform` component. Updating the `GlobalTransform`, will
+teleport the body ignoring physics rules.
 
 Every frame the `Transform` will be updated to reflect the body position in the world.
 
-Heron will automatically handle replacement and removal of the body (when the component mutated/removed or when the entity is despawned)
+Heron will automatically handle replacement and removal of the body (when the component mutated/removed or when the
+entity is despawned)
 
-At the moment, only spheres are supported. More shape will be added in the future. Support for static and kinematic bodies
-will be added later too.
+At the moment, only spheres are supported. More shape will be added in the future. Support for static and kinematic
+bodies will be added later too.
 
 ### Velocity component
 

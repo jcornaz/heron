@@ -31,6 +31,15 @@ pub enum Body {
         /// Radius of the sphere
         radius: f32,
     },
+
+    /// A capsule shape
+    Capsule {
+        /// Distance from the center of the capsule to the center of an hemisphere.
+        half_segment: f32,
+
+        /// Radius of the hemispheres
+        radius: f32,
+    },
 }
 
 /// An event fired when the collision state between two entities changed

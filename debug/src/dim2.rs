@@ -9,6 +9,7 @@ use bevy_transform::prelude::*;
 use heron_core::Body;
 
 use super::*;
+use std::f32::consts::PI;
 
 pub(crate) fn create_debug_sprites(
     commands: &mut Commands,
@@ -82,10 +83,36 @@ fn base_builder(body: &Body) -> GeometryBuilder {
     let mut builder = GeometryBuilder::new();
 
     match body {
-        Body::Sphere { radius } => builder.add(&shapes::Circle {
-            radius: *radius,
-            center: Vec2::zero(),
-        }),
+        Body::Sphere { radius } => {
+            builder.add(&shapes::Circle {
+                radius: *radius,
+                center: Vec2::zero(),
+            });
+        }
+        Body::Capsule {
+            half_segment,
+            radius,
+        } => {
+            let half_segment = *half_segment;
+            let radius = *radius;
+            let mut path = PathBuilder::new();
+            path.move_to(Vec2::new(-radius, half_segment));
+            path.arc(
+                Vec2::new(0.0, half_segment),
+                Vec2::new(radius, radius),
+                -PI,
+                0.0,
+            );
+            path.line_to(Vec2::new(radius, -half_segment));
+            path.arc(
+                Vec2::new(0.0, -half_segment),
+                Vec2::new(radius, radius),
+                -PI,
+                0.0,
+            );
+            path.close();
+            builder.add(&path.build());
+        }
     };
 
     builder
