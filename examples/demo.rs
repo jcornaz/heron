@@ -55,8 +55,9 @@ fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Bod
     };
 
     for mut body in query.iter_mut() {
-        let Body::Sphere { radius } = body.deref_mut();
-        *radius = lerp(*radius, *radius * factor, time.delta_seconds());
+        if let Body::Sphere { radius } = body.deref_mut() {
+            *radius = lerp(*radius, *radius * factor, time.delta_seconds());
+        }
     }
 }
 

@@ -82,10 +82,30 @@ fn base_builder(body: &Body) -> GeometryBuilder {
     let mut builder = GeometryBuilder::new();
 
     match body {
-        Body::Sphere { radius } => builder.add(&shapes::Circle {
-            radius: *radius,
-            center: Vec2::zero(),
-        }),
+        Body::Sphere { radius } => {
+            builder.add(&shapes::Circle {
+                radius: *radius,
+                center: Vec2::zero(),
+            });
+        }
+        Body::Capsule {
+            half_segment,
+            radius,
+        } => {
+            builder.add(&shapes::Rectangle {
+                width: *radius,
+                height: *half_segment,
+                origin: shapes::RectangleOrigin::Center,
+            });
+            builder.add(&shapes::Circle {
+                radius: *radius,
+                center: Vec2::new(0.0, *half_segment),
+            });
+            builder.add(&shapes::Circle {
+                radius: *radius,
+                center: Vec2::new(0.0, -*half_segment),
+            });
+        }
     };
 
     builder
