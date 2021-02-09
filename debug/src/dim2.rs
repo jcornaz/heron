@@ -9,6 +9,7 @@ use bevy_transform::prelude::*;
 use heron_core::Body;
 
 use super::*;
+use bevy_prototype_lyon::shapes::RectangleOrigin;
 use std::f32::consts::PI;
 
 pub(crate) fn create_debug_sprites(
@@ -112,6 +113,13 @@ fn base_builder(body: &Body) -> GeometryBuilder {
             );
             path.close();
             builder.add(&path.build());
+        }
+        Body::Cuboid { half_extends } => {
+            builder.add(&shapes::Rectangle {
+                origin: RectangleOrigin::Center,
+                width: 2.0 * half_extends.x,
+                height: 2.0 * half_extends.y,
+            });
         }
     };
 

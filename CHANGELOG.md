@@ -17,7 +17,7 @@ The required rapier version is now >= 0.5.0 < 0.6.0.
 
 ### ⚠ New collision shapes (breaking)
 
-The variant `Body::Capsule` has been added. It takes a *haf_segment* and a *radius*.
+The variants `Body::Capsule` and `Body::Cuboid` have been added.
 
 ### Fixes
 
