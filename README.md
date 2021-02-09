@@ -67,3 +67,8 @@ Ideally I would like to have the *power* of [rapier] accessible behind a an API 
 [rapier]: https://rapier.rs
 
 [bevy_rapier]: https://github.com/dimforge/bevy_rapier
+
+
+## Contact
+
+You can open issues/discussions here or you can discuss with me (`Jomag#2675`) in the [bevy discord](https://discord.com/invite/gMUk5Ph)
