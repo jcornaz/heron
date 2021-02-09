@@ -1,6 +1,5 @@
 use std::ops::DerefMut;
 
-use bevy::input::system::exit_on_esc_system;
 use bevy::prelude::*;
 
 use heron::*;
@@ -13,7 +12,6 @@ fn main() {
         .add_system(scale.system())
         .add_system(delete.system())
         .add_system(apply_velocity.system())
-        .add_system(exit_on_esc_system.system())
         .run();
 }
 
@@ -21,12 +19,13 @@ fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) 
     commands
         .spawn(Camera2dBundle::default())
         .spawn(SpriteBundle {
-            transform: Transform::from_translation(Vec3::unit_z()),
             sprite: Sprite::new(Vec2::new(100.0, 100.0)),
             material: materials.add(Color::WHITE.into()),
             ..Default::default()
         })
-        .with(Body::Sphere { radius: 50.0 })
+        .with(Body::Cuboid {
+            half_extends: Vec3::new(50.0, 50.0, 0.0),
+        })
         .with(Velocity::from_linear(Vec3::unit_x()));
 }
 
@@ -55,8 +54,8 @@ fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Bod
     };
 
     for mut body in query.iter_mut() {
-        if let Body::Sphere { radius } = body.deref_mut() {
-            *radius = lerp(*radius, *radius * factor, time.delta_seconds());
+        if let Body::Cuboid { half_extends } = body.deref_mut() {
+            *half_extends = half_extends.lerp(*half_extends * factor, time.delta_seconds());
         }
     }
 }
@@ -67,8 +66,4 @@ fn delete(inputs: Res<Input<KeyCode>>, query: Query<Entity, With<Body>>, command
             commands.despawn(entity);
         }
     }
-}
-
-fn lerp(start: f32, end: f32, factor: f32) -> f32 {
-    start + ((end - start) * factor)
 }

@@ -5,6 +5,7 @@
 
 use bevy_ecs::Entity;
 
+use bevy_math::Vec3;
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
@@ -39,6 +40,14 @@ pub enum Body {
 
         /// Radius of the hemispheres
         radius: f32,
+    },
+
+    /// A cuboid/rectangular shape
+    Cuboid {
+        /// The **half** extends on each axis. (x = half width, y = half height, z = half depth)
+        ///
+        /// In 2d the `z` axis is ignored
+        half_extends: Vec3,
     },
 }
 

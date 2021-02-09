@@ -1,4 +1,5 @@
 use bevy_ecs::prelude::*;
+use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
@@ -154,12 +155,26 @@ fn collider_builder(body: &Body) -> ColliderBuilder {
             half_segment: half_height,
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
+        Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
     }
+}
+
+#[inline]
+#[cfg(feature = "2d")]
+fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
+    ColliderBuilder::cuboid(half_extends.x, half_extends.y)
+}
+
+#[inline]
+#[cfg(feature = "3d")]
+fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
+    ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use bevy_math::Vec3;
 
     #[test]
     fn build_sphere() {
@@ -169,6 +184,23 @@ mod tests {
             .as_ball()
             .expect("Created shape was not a ball");
         assert_eq!(ball.radius, 4.2);
+    }
+
+    #[test]
+    fn build_cuboid() {
+        let builder = collider_builder(&Body::Cuboid {
+            half_extends: Vec3::new(1.0, 2.0, 3.0),
+        });
+        let cuboid = builder
+            .shape
+            .as_cuboid()
+            .expect("Created shape was not a cuboid");
+
+        assert_eq!(cuboid.half_extents.x, 1.0);
+        assert_eq!(cuboid.half_extents.y, 2.0);
+
+        #[cfg(feature = "3d")]
+        assert_eq!(cuboid.half_extents.z, 3.0);
     }
 
     #[test]
