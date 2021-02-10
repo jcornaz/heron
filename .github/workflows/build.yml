@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - next-major
+      - next-bevy
 
   pull_request:
     branches:
