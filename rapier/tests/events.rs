@@ -43,7 +43,11 @@ fn collision_events_are_fired() {
         Body::Sphere { radius: 10.0 },
     ));
 
-    let mut reader = EventReader::<CollisionEvent>::default();
+    let mut reader = app
+        .resources
+        .get::<Events<CollisionEvent>>()
+        .unwrap()
+        .get_reader();
 
     app.update();
 
