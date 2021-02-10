@@ -57,7 +57,7 @@ impl Plugin for DebugPlugin {
             .add_stage_before(
                 bevy_app::stage::POST_UPDATE,
                 "heron-debug",
-                SystemStage::serial(),
+                SystemStage::single_threaded(),
             )
             .add_startup_system(create_material.system());
 

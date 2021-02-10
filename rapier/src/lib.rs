@@ -119,7 +119,7 @@ impl Plugin for RapierPlugin {
             .add_stage_after(
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
-                SystemStage::serial()
+                SystemStage::single_threaded()
                     .with_system(bodies::remove.system())
                     .with_system(bodies::update_shape.system())
                     .with_system(bodies::update_rapier_position.system())
@@ -137,7 +137,7 @@ impl Plugin for RapierPlugin {
 
                 schedule.with_stage(
                     stage::STEP,
-                    SystemStage::serial()
+                    SystemStage::single_threaded()
                         .with_system(pipeline::step.system()),
                 )
                     .with_stage(
