@@ -52,7 +52,7 @@ impl Default for DebugPlugin {
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_resource(DebugMaterial::from(self.0))
+        app.insert_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
             .add_stage_before(
                 bevy_app::stage::POST_UPDATE,

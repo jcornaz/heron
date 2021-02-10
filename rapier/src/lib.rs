@@ -110,12 +110,12 @@ impl Plugin for RapierPlugin {
         app.init_resource::<PhysicsPipeline>()
             .init_resource::<HandleMap>()
             .add_event::<CollisionEvent>()
-            .add_resource(self.parameters.clone())
-            .add_resource(BroadPhase::new())
-            .add_resource(NarrowPhase::new())
-            .add_resource(RigidBodySet::new())
-            .add_resource(ColliderSet::new())
-            .add_resource(JointSet::new())
+            .insert_resource(self.parameters.clone())
+            .insert_resource(BroadPhase::new())
+            .insert_resource(NarrowPhase::new())
+            .insert_resource(RigidBodySet::new())
+            .insert_resource(ColliderSet::new())
+            .insert_resource(JointSet::new())
             .add_stage_after(
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
