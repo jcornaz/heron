@@ -14,12 +14,12 @@ default = []
 
 [dependencies]
 heron_core = { path = "../core", version = "^0.1.0-dev"}
-bevy_math = "^0.4.0"
-bevy_ecs = "^0.4.0"
-bevy_app = "^0.4.0"
-bevy_transform = "^0.4.0"
-bevy_render = "^0.4.0"
-bevy_sprite = "^0.4.0"
-bevy_asset = "^0.4.0"
-bevy_prototype_lyon = { version = "0.2.0", optional = true }
+bevy_math = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_ecs = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_app = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_transform = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_render = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_sprite = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_asset = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_prototype_lyon = { git = "https://github.com/Nilirad/bevy_prototype_lyon.git", branch = "bevy_master", optional = true }
 fnv = "^1.0"

@@ -22,11 +22,11 @@ debug = ["heron_debug", "bevy_render"]
 heron_core = { path = "core", version = "^0.1.0-dev" }
 heron_rapier = { path = "rapier", version = "^0.1.0-dev" }
 heron_debug = { path = "debug", version = "^0.1.0-dev", optional = true }
-bevy_app = "^0.4.0"
-bevy_render = { version = "^0.4.0", optional = true }
+bevy_app = { git = "https://github.com/bevyengine/bevy.git" }
+bevy_render = { git = "https://github.com/bevyengine/bevy.git", optional = true }
 
 [dev-dependencies]
-bevy = "^0.4.0"
+bevy = { git = "https://github.com/bevyengine/bevy.git" }
 
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
