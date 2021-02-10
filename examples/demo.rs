@@ -17,7 +17,7 @@ fn main() {
 
 fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands
-        .spawn(Camera2dBundle::default())
+        .spawn(OrthographicCameraBundle::new_2d())
         .spawn(SpriteBundle {
             sprite: Sprite::new(Vec2::new(100.0, 100.0)),
             material: materials.add(Color::WHITE.into()),
