@@ -65,7 +65,8 @@
 //! It is also possible to:
 //! * Define the world's [`Gravity`]
 //! * Listen to [`CollisionEvent`]
-//! * Define body's [`Restitution`]
+//! * Define the [`BodyType`] (static or dynamic)
+//! * Define the [`Restitution`]
 
 use bevy_app::{AppBuilder, Plugin};
 
@@ -83,7 +84,7 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
     };
 }
 
