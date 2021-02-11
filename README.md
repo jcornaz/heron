@@ -29,6 +29,32 @@ fn spawn(commands: &mut Commands) {
 }
 ```
 
+## Install it
+
+
+**For a 3d game:**
+```toml
+bevy = "^0.4.0"
+heron = "^0.1.0-alpha.1"
+```
+
+**For a 2d game:**
+```toml
+bevy = "^0.4.0"
+heron = { version = "^0.1.0-alpha.1", default-features = false, features = ["2d"] }
+```
+
+**With the git version of bevy:**
+```toml
+bevy = { git = "https://github.com/bevyengine/bevy.git" }
+
+# ATTENTION: The code may not compile. And if it does compile, it may not work properly!
+# Be aware, that it might contains unreleased features and breaking changes too.
+# Checkout the changelog: https://github.com/jcornaz/heron/blob/next-bevy/CHANGELOG.md#unreleased
+heron = { git = "https://github.com/jcornaz/heron.git", branch = "next-bevy" }
+```
+
+
 ## Design principles
 
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
