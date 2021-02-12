@@ -3,7 +3,7 @@ use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, Restitution, Velocity};
+use heron_core::{Body, BodyType, Restitution, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
@@ -24,14 +24,22 @@ pub(crate) fn create(
             Entity,
             &Body,
             &GlobalTransform,
+            Option<&BodyType>,
             Option<&Velocity>,
             Option<&Restitution>,
         ),
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, velocity, restitution) in query.iter() {
-        let mut builder = RigidBodyBuilder::new_dynamic()
+    for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
+        let body_type = body_type.cloned().unwrap_or_else(Default::default);
+
+        let mut builder = match body_type {
+            BodyType::Dynamic => RigidBodyBuilder::new_dynamic(),
+            BodyType::Static => RigidBodyBuilder::new_static(),
+        };
+
+        builder = builder
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -173,8 +181,9 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bevy_math::Vec3;
+
+    use super::*;
 
     #[test]
     fn build_sphere() {

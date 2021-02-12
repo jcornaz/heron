@@ -24,7 +24,6 @@ fn test_app() -> App {
 }
 
 #[test]
-#[ignore]
 fn create_static_body() {
     let mut app = test_app();
 
