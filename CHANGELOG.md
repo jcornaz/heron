@@ -17,7 +17,15 @@ The required rapier version is now >= 0.5.0 < 0.6.0.
 
 ### ⚠ New collision shapes (breaking)
 
-The variants `Body::Capsule` and `Body::Cuboid` have been added.
+The variants `Body::Capsule` and `Body::Cuboid` have been added, allowing creating respectively capsule and cuboid
+collision shapes
+
+
+### New `BodyType` component
+
+By default, the rigid-bodies are *dynamic*. They can be made *static* by attaching
+a `BodyType::Static` component to the entity.
+
 
 ### Fixes
 

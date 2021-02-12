@@ -19,13 +19,13 @@ use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
 
 use heron_core::{CollisionEvent, Gravity};
 
-use crate::bodies::HandleMap;
+use crate::body::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
 
-mod bodies;
+mod body;
 pub mod convert;
 mod pipeline;
 mod restitution;
@@ -120,12 +120,13 @@ impl Plugin for RapierPlugin {
                 bevy_app::stage::POST_UPDATE,
                 stage::PRE_STEP,
                 SystemStage::serial()
-                    .with_system(bodies::remove.system())
-                    .with_system(bodies::update_shape.system())
-                    .with_system(bodies::update_rapier_position.system())
+                    .with_system(body::remove.system())
+                    .with_system(body::update_shape.system())
+                    .with_system(body::update_rapier_position.system())
+                    .with_system(body::update_rapier_status.system())
                     .with_system(velocity::update_rapier_velocity.system())
                     .with_system(restitution::update_rapier_restitution.system())
-                    .with_system(bodies::create.system()),
+                    .with_system(body::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {
                 let mut schedule = Schedule::default();
@@ -144,7 +145,7 @@ impl Plugin for RapierPlugin {
                         stage::POST_STEP,
                         SystemStage::parallel()
                             .with_system(
-                                bodies::update_bevy_transform.system().chain(
+                                body::update_bevy_transform.system().chain(
                                     bevy_transform::transform_propagate_system::transform_propagate_system
                                         .system()
                                 )

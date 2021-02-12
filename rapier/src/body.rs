@@ -3,10 +3,12 @@ use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, Restitution, Velocity};
+use heron_core::{Body, BodyType, Restitution, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{
+    BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
+};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
 use crate::BodyHandle;
 
@@ -24,14 +26,15 @@ pub(crate) fn create(
             Entity,
             &Body,
             &GlobalTransform,
+            Option<&BodyType>,
             Option<&Velocity>,
             Option<&Restitution>,
         ),
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, velocity, restitution) in query.iter() {
-        let mut builder = RigidBodyBuilder::new_dynamic()
+    for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
+        let mut builder = RigidBodyBuilder::new(body_status(body_type.cloned()))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -80,6 +83,28 @@ pub(crate) fn update_shape(
             handle.rigid_body,
             &mut bodies,
         );
+    }
+}
+
+pub(crate) fn update_rapier_status(
+    mut bodies: ResMut<'_, RigidBodySet>,
+    with_type_changed: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
+    without_type: Query<'_, &BodyHandle, Without<BodyType>>,
+) {
+    for (body_type, handle) in with_type_changed.iter() {
+        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+            body.body_status = body_status(Some(*body_type));
+        }
+    }
+
+    for entity in without_type.removed::<BodyType>() {
+        if let Some(body) = without_type
+            .get(*entity)
+            .ok()
+            .and_then(|handle| bodies.get_mut(handle.rigid_body))
+        {
+            body.body_status = body_status(None);
+        }
     }
 }
 
@@ -171,10 +196,18 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
 
+fn body_status(body_type: Option<BodyType>) -> BodyStatus {
+    match body_type.unwrap_or_else(Default::default) {
+        BodyType::Dynamic => BodyStatus::Dynamic,
+        BodyType::Static => BodyStatus::Static,
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bevy_math::Vec3;
+
+    use super::*;
 
     #[test]
     fn build_sphere() {
