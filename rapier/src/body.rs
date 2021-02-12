@@ -6,7 +6,9 @@ use fnv::FnvHashMap;
 use heron_core::{Body, BodyType, Restitution, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{
+    BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
+};
 use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
 use crate::BodyHandle;
 
@@ -32,14 +34,7 @@ pub(crate) fn create(
     >,
 ) {
     for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
-        let body_type = body_type.cloned().unwrap_or_else(Default::default);
-
-        let mut builder = match body_type {
-            BodyType::Dynamic => RigidBodyBuilder::new_dynamic(),
-            BodyType::Static => RigidBodyBuilder::new_static(),
-        };
-
-        builder = builder
+        let mut builder = RigidBodyBuilder::new(body_status(body_type.cloned()))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -88,6 +83,17 @@ pub(crate) fn update_shape(
             handle.rigid_body,
             &mut bodies,
         );
+    }
+}
+
+pub(crate) fn update_rapier_status(
+    mut bodies: ResMut<'_, RigidBodySet>,
+    query: Query<'_, (&BodyType, &BodyHandle), Added<BodyType>>,
+) {
+    for (body_type, handle) in query.iter() {
+        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+            body.body_status = body_status(Some(*body_type));
+        }
     }
 }
 
@@ -177,6 +183,13 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[cfg(feature = "3d")]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+}
+
+fn body_status(body_type: Option<BodyType>) -> BodyStatus {
+    match body_type.unwrap_or_else(Default::default) {
+        BodyType::Dynamic => BodyStatus::Dynamic,
+        BodyType::Static => BodyStatus::Static,
+    }
 }
 
 #[cfg(test)]
