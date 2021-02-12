@@ -114,7 +114,27 @@ fn can_change_to_dynamic_after_creation() {
 }
 
 #[test]
-#[ignore]
 fn can_change_to_dynamic_by_removing_type_after_creation() {
-    todo!()
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        BodyType::Static,
+    ));
+
+    app.update();
+
+    app.world.remove_one::<BodyType>(entity).unwrap();
+
+    app.update();
+
+    {
+        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let body = bodies
+            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .unwrap();
+
+        assert!(body.is_dynamic());
+    }
 }

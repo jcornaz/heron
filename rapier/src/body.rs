@@ -88,11 +88,22 @@ pub(crate) fn update_shape(
 
 pub(crate) fn update_rapier_status(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
+    with_type_changed: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
+    without_type: Query<'_, &BodyHandle, Without<BodyType>>,
 ) {
-    for (body_type, handle) in query.iter() {
+    for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
             body.body_status = body_status(Some(*body_type));
+        }
+    }
+
+    for entity in without_type.removed::<BodyType>() {
+        if let Some(body) = without_type
+            .get(*entity)
+            .ok()
+            .and_then(|handle| bodies.get_mut(handle.rigid_body))
+        {
+            body.body_status = body_status(None);
         }
     }
 }
