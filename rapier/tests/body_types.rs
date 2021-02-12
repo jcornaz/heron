@@ -24,6 +24,26 @@ fn test_app() -> App {
 }
 
 #[test]
+fn create_dynamic_body() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        BodyType::Dynamic,
+    ));
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let body = bodies
+        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+        .unwrap();
+
+    assert!(body.is_dynamic())
+}
+
+#[test]
 fn create_static_body() {
     let mut app = test_app();
 
@@ -53,15 +73,6 @@ fn can_change_to_static_after_creation() {
 
     app.update();
 
-    {
-        let bodies = app.resources.get::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
-
-        assert!(body.is_dynamic());
-    }
-
     app.world.insert_one(entity, BodyType::Static).unwrap();
 
     app.update();
@@ -77,9 +88,29 @@ fn can_change_to_static_after_creation() {
 }
 
 #[test]
-#[ignore]
 fn can_change_to_dynamic_after_creation() {
-    todo!()
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        BodyType::Static,
+    ));
+
+    app.update();
+
+    app.world.insert_one(entity, BodyType::Dynamic).unwrap();
+
+    app.update();
+
+    {
+        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let body = bodies
+            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .unwrap();
+
+        assert!(body.is_dynamic());
+    }
 }
 
 #[test]

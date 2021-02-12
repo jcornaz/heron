@@ -88,7 +88,7 @@ pub(crate) fn update_shape(
 
 pub(crate) fn update_rapier_status(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&BodyType, &BodyHandle), Added<BodyType>>,
+    query: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
 ) {
     for (body_type, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
