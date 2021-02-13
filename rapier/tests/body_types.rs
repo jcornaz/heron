@@ -9,6 +9,7 @@ use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Body, BodyType};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
+use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
@@ -61,6 +62,26 @@ fn create_static_body() {
         .unwrap();
 
     assert!(body.is_static())
+}
+
+#[test]
+fn create_sensor_body() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        BodyType::Sensor,
+    ));
+
+    app.update();
+
+    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let body = colliders
+        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
+        .unwrap();
+
+    assert!(body.is_sensor())
 }
 
 #[test]

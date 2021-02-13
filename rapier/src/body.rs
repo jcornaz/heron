@@ -34,7 +34,9 @@ pub(crate) fn create(
     >,
 ) {
     for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
-        let mut builder = RigidBodyBuilder::new(body_status(body_type.cloned()))
+        let body_type = body_type.cloned().unwrap_or_default();
+
+        let mut builder = RigidBodyBuilder::new(body_status(body_type))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -53,7 +55,7 @@ pub(crate) fn create(
 
         let rigid_body = bodies.insert(builder.build());
         let collider = colliders.insert(
-            collider_builder(&body)
+            collider_builder(&body, body_type)
                 .user_data(entity.to_bits().into())
                 .restitution(restitution.map_or(0.0, |it| (*it).into()))
                 .build(),
@@ -74,12 +76,12 @@ pub(crate) fn create(
 pub(crate) fn update_shape(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut query: Query<'_, (&Body, &mut BodyHandle), Mutated<Body>>,
+    mut query: Query<'_, (&Body, &mut BodyHandle, Option<&BodyType>), Mutated<Body>>,
 ) {
-    for (body_def, mut handle) in query.iter_mut() {
+    for (body_def, mut handle, body_type) in query.iter_mut() {
         colliders.remove(handle.collider, &mut bodies, true);
         handle.collider = colliders.insert(
-            collider_builder(&body_def).build(),
+            collider_builder(&body_def, body_type.cloned().unwrap_or_default()).build(),
             handle.rigid_body,
             &mut bodies,
         );
@@ -93,7 +95,7 @@ pub(crate) fn update_rapier_status(
 ) {
     for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.body_status = body_status(Some(*body_type));
+            body.body_status = body_status(*body_type);
         }
     }
 
@@ -103,7 +105,7 @@ pub(crate) fn update_rapier_status(
             .ok()
             .and_then(|handle| bodies.get_mut(handle.rigid_body))
         {
-            body.body_status = body_status(None);
+            body.body_status = body_status(BodyType::default());
         }
     }
 }
@@ -173,15 +175,17 @@ pub(crate) fn remove(
     }
 }
 
-fn collider_builder(body: &Body) -> ColliderBuilder {
-    match body {
+fn collider_builder(body: &Body, body_type: BodyType) -> ColliderBuilder {
+    let builder = match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),
         Body::Capsule {
             half_segment: half_height,
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
-    }
+    };
+
+    builder.sensor(matches!(body_type, BodyType::Sensor))
 }
 
 #[inline]
@@ -196,8 +200,8 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
 
-fn body_status(body_type: Option<BodyType>) -> BodyStatus {
-    match body_type.unwrap_or_else(Default::default) {
+fn body_status(body_type: BodyType) -> BodyStatus {
+    match body_type {
         BodyType::Dynamic => BodyStatus::Dynamic,
         BodyType::Static | BodyType::Sensor => BodyStatus::Static,
     }
@@ -211,7 +215,7 @@ mod tests {
 
     #[test]
     fn build_sphere() {
-        let builder = collider_builder(&Body::Sphere { radius: 4.2 });
+        let builder = collider_builder(&Body::Sphere { radius: 4.2 }, BodyType::default());
         let ball = builder
             .shape
             .as_ball()
@@ -221,9 +225,12 @@ mod tests {
 
     #[test]
     fn build_cuboid() {
-        let builder = collider_builder(&Body::Cuboid {
-            half_extends: Vec3::new(1.0, 2.0, 3.0),
-        });
+        let builder = collider_builder(
+            &Body::Cuboid {
+                half_extends: Vec3::new(1.0, 2.0, 3.0),
+            },
+            BodyType::default(),
+        );
         let cuboid = builder
             .shape
             .as_cuboid()
@@ -238,10 +245,13 @@ mod tests {
 
     #[test]
     fn build_capsule() {
-        let builder = collider_builder(&Body::Capsule {
-            half_segment: 10.0,
-            radius: 5.0,
-        });
+        let builder = collider_builder(
+            &Body::Capsule {
+                half_segment: 10.0,
+                radius: 5.0,
+            },
+            BodyType::default(),
+        );
         let capsule = builder
             .shape
             .as_capsule()
