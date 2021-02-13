@@ -66,23 +66,25 @@ pub enum Body {
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum BodyType {
-    /// A dynamic body is normally affected by physic forces and affect the other bodies too.
+    /// A dynamic body is normally affected by physic forces and affect the other bodies normally too.
     ///
     /// This is the most "natural" type in the sense that, in the real life, everything is dynamic.
+    ///
+    /// It is the default type
     Dynamic,
 
     /// A static body is not affected by physic forces and doesn't move. But it does affect the other bodies.
     ///
     /// This effectively behaves like a dynamic body with infinite mass and zero velocity.
     ///
-    /// It is especially useful to model terrain and static obstacles.
+    /// It is well suited for terrain and static obstacles.
     Static,
 
-    /// A kinematic body is not moved by the physics engine. But it can be moved programmatically and can have velocity.
+    /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
     ///
-    /// It affects the other bodies normally.
+    /// It affects the other bodies normally, and cannot penetrate them.
     ///
-    /// It is especially useful for moving-platforms or player character.
+    /// It is well suited fo moving-platforms and player characters.
     Kinematic,
 
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.
