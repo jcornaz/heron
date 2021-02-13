@@ -199,7 +199,7 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 fn body_status(body_type: Option<BodyType>) -> BodyStatus {
     match body_type.unwrap_or_else(Default::default) {
         BodyType::Dynamic => BodyStatus::Dynamic,
-        BodyType::Static => BodyStatus::Static,
+        BodyType::Static | BodyType::Sensor => BodyStatus::Static,
     }
 }
 
