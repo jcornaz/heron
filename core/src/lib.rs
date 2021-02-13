@@ -78,8 +78,16 @@ pub enum BodyType {
     /// It is especially useful to model terrain and static obstacles.
     Static,
 
+    /// A kinematic body is not moved by the physics engine. But it can be moved programmatically and can have velocity.
+    ///
+    /// It affects the other bodies normally.
+    ///
+    /// It is especially useful for moving-platforms or player character.
+    Kinematic,
+
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.
-    /// Other bodies will be able to penetrate the sensor.
+    ///
+    /// Other bodies will be able to penetrate the sensor. But it still participate in collision events.
     ///
     /// A sensor is useful when we are only interested in collision events.
     /// One may for example add a sensor to detect when the player reach a certain area.

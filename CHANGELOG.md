@@ -23,10 +23,14 @@ collision shapes
 
 ### New `BodyType` component
 
-By default, the rigid-bodies are *dynamic*. A `BodyType` can be attached to make it:
-* Static (with `BodyType::Static`) so that it doesn't move.
-* Sensor (with `BodyType::Sensor`) so it doesn't move and doesn't affect other bodies. (Only useful for listening to collision events)
+The `BodyType` component can be attached to make the rigid body either:
 
+* Dynamic (the default): The body is normally affected by forces and affect other bodies.
+* Static: The body doesn't move, but still affect other bodies.
+* Kinematic: The body can be moved programmatically, but won't be moved by the physics engine.
+* Sensor: The body doesn't move and doesn't affect other bodies. But still trigger collision events.
+
+An entity without the `BodyType` component attached will be considered *dynamic*.
 
 ### Fixes
 
