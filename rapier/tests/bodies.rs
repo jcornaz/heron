@@ -10,11 +10,13 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::Body;
+use heron_core::{Body, BodyType};
 use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
+
+use rstest::rstest;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -200,8 +202,13 @@ fn despawn_body_entity() {
     assert_eq!(colliders.len(), 0);
 }
 
-#[test]
-fn update_bevy_transform() {
+#[rstest(
+    body_type,
+    case(Some(BodyType::Dynamic)),
+    case(Some(BodyType::Kinematic)),
+    case(None)
+)]
+fn update_bevy_transform(body_type: Option<BodyType>) {
     let mut app = test_app();
 
     let entity = app.world.spawn((
@@ -209,6 +216,10 @@ fn update_bevy_transform() {
         Transform::default(),
         GlobalTransform::default(),
     ));
+
+    if let Some(body_type) = body_type {
+        app.world.insert_one(entity, body_type).unwrap();
+    }
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);

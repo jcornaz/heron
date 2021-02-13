@@ -150,7 +150,7 @@ pub(crate) fn update_bevy_transform(
     >,
 ) {
     for (mut local, mut global, handle, body_type) in query.iter_mut() {
-        if !matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic) {
+        if !body_type.cloned().unwrap_or_default().can_have_velocity() {
             continue;
         }
 

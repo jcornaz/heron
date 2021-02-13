@@ -102,6 +102,16 @@ impl Default for BodyType {
     }
 }
 
+impl BodyType {
+    /// Returns true if this body type can be moved by [`Velocity`]
+    pub fn can_have_velocity(self) -> bool {
+        match self {
+            BodyType::Dynamic | BodyType::Kinematic => true,
+            BodyType::Static | BodyType::Sensor => false,
+        }
+    }
+}
+
 /// An event fired when the collision state between two entities changed
 ///
 /// # Example

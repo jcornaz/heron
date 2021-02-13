@@ -39,7 +39,7 @@ pub(crate) fn move_kinematic_bodies(
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
             let (mut translation, mut rotation) = body.position().into_bevy();
             translation += velocity.linear * delta_time;
-            rotation *= Quat::from(velocity.angular * delta_time);
+            rotation = Quat::from(velocity.angular * delta_time) * rotation;
             body.set_next_kinematic_position((translation, rotation).into_rapier())
         }
     }
