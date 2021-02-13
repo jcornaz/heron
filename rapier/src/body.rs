@@ -83,7 +83,7 @@ pub(crate) fn update_shape(
             Option<&BodyType>,
             Option<&Restitution>,
         ),
-        Mutated<Body>,
+        Or<(Mutated<Body>, Changed<BodyType>)>,
     >,
 ) {
     for (entity, body_def, mut handle, body_type, restitution) in query.iter_mut() {

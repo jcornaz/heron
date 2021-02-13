@@ -109,6 +109,30 @@ fn can_change_to_static_after_creation() {
 }
 
 #[test]
+fn can_change_to_sensor_after_creation() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+
+    app.update();
+
+    app.world.insert_one(entity, BodyType::Sensor).unwrap();
+
+    app.update();
+
+    {
+        let colliders = app.resources.get::<ColliderSet>().unwrap();
+        let collider = colliders
+            .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
+            .unwrap();
+
+        assert!(collider.is_sensor());
+    }
+}
+
+#[test]
 fn can_change_to_dynamic_after_creation() {
     let mut app = test_app();
 
