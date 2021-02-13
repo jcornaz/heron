@@ -145,3 +145,36 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 
     assert_eq!(angular, velocity.angular.into());
 }
+
+#[test]
+fn kinematic_bodies_are_moved() {
+    let mut app = test_app();
+
+    let linear = Vec3::new(1.0, 2.0, 3.0);
+    let angular = AxisAngle::new(Vec3::unit_z(), PI);
+
+    let entity = app.world.spawn((
+        GlobalTransform::from_rotation(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
+        Body::Sphere { radius: 1.0 },
+        BodyType::Kinematic,
+        Velocity::from_linear(linear).with_angular(angular),
+    ));
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let body = bodies
+        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+        .unwrap();
+
+    let position = body.position().translation.into_bevy();
+    let rotation = body.position().rotation.into_bevy();
+
+    assert_eq!(position.x, linear.x);
+    assert_eq!(position.y, linear.y);
+
+    #[cfg(feature = "3d")]
+    assert_eq!(position.z, linear.z);
+
+    assert_eq!(rotation, angular.into())
+}

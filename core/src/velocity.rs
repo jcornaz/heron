@@ -1,6 +1,7 @@
 use bevy_math::prelude::*;
 
 use crate::utils::NearZero;
+use std::ops::{Mul, MulAssign};
 
 /// Component that defines the linear and angular velocity.
 ///
@@ -129,6 +130,30 @@ impl From<AxisAngle> for Vec3 {
 impl NearZero for Velocity {
     fn is_near_zero(self) -> bool {
         self.linear.is_near_zero() && self.angular.is_near_zero()
+    }
+}
+
+impl MulAssign<f32> for AxisAngle {
+    fn mul_assign(&mut self, rhs: f32) {
+        self.0 = self.0 * rhs;
+    }
+}
+
+impl Mul<f32> for AxisAngle {
+    type Output = Self;
+
+    fn mul(mut self, rhs: f32) -> Self::Output {
+        self *= rhs;
+        self
+    }
+}
+
+impl Mul<AxisAngle> for f32 {
+    type Output = AxisAngle;
+
+    fn mul(self, mut rhs: AxisAngle) -> Self::Output {
+        rhs *= self;
+        rhs
     }
 }
 

@@ -139,6 +139,7 @@ impl Plugin for RapierPlugin {
                 schedule.with_stage(
                     stage::STEP,
                     SystemStage::serial()
+                        .with_system(velocity::move_kinematic_bodies.system())
                         .with_system(pipeline::step.system()),
                 )
                     .with_stage(

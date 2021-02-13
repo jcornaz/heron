@@ -1,21 +1,46 @@
 use bevy_ecs::prelude::*;
+use bevy_math::prelude::*;
 
 use heron_core::utils::NearZero;
-use heron_core::Velocity;
+use heron_core::{BodyType, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::RigidBodySet;
+use crate::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use crate::BodyHandle;
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    velocities: Query<'_, (&BodyHandle, &Velocity), Changed<Velocity>>,
+    query: Query<'_, (&BodyHandle, Option<&BodyType>, &Velocity), Changed<Velocity>>,
 ) {
-    for (handle, velocity) in velocities.iter() {
+    let dynamic_bodies = query.iter().filter(|(_, body_type, _)| {
+        matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic)
+    });
+
+    for (handle, _, velocity) in dynamic_bodies {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
             let wake_up = !velocity.is_near_zero();
             body.set_linvel(velocity.linear.into_rapier(), wake_up);
             body.set_angvel(velocity.angular.into_rapier(), wake_up);
+        }
+    }
+}
+
+pub(crate) fn move_kinematic_bodies(
+    mut bodies: ResMut<'_, RigidBodySet>,
+    integration_parameters: Res<'_, IntegrationParameters>,
+    query: Query<'_, (&BodyHandle, &BodyType, &Velocity)>,
+) {
+    let delta_time = integration_parameters.dt;
+    let kinematic_bodies = query
+        .iter()
+        .filter(|(_, body_type, _)| matches!(body_type, BodyType::Kinematic));
+
+    for (handle, _, velocity) in kinematic_bodies {
+        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+            let (mut translation, mut rotation) = body.position().into_bevy();
+            translation += velocity.linear * delta_time;
+            rotation *= Quat::from(velocity.angular * delta_time);
+            body.set_next_kinematic_position((translation, rotation).into_rapier())
         }
     }
 }
