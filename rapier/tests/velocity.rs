@@ -151,7 +151,7 @@ fn kinematic_bodies_are_moved() {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), PI);
+    let angular = AxisAngle::new(Vec3::unit_z(), PI * 0.5);
 
     let entity = app.world.spawn((
         GlobalTransform::from_rotation(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
@@ -176,5 +176,9 @@ fn kinematic_bodies_are_moved() {
     #[cfg(feature = "3d")]
     assert_eq!(position.z, linear.z);
 
-    assert_eq!(rotation, angular.into())
+    let angular: Quat = angular.into();
+    assert!((rotation.x - angular.x).abs() < 0.00001);
+    assert!((rotation.y - angular.y).abs() < 0.00001);
+    assert!((rotation.z - angular.z).abs() < 0.00001);
+    assert!((rotation.w - angular.w).abs() < 0.00001);
 }
