@@ -35,7 +35,7 @@ An entity without the `BodyType` component attached will be considered *dynamic*
 ### Fixes
 
 * Misplaced debug render at startup
-
+* Incorrect direction of angular velocities in 2d
 
 ## [0.1.0-alpha.1] - 2021-01-30
 
