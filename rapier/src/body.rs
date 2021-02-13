@@ -139,10 +139,22 @@ pub(crate) fn update_rapier_position(
 
 pub(crate) fn update_bevy_transform(
     bodies: Res<'_, RigidBodySet>,
-    mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
+    mut query: Query<
+        '_,
+        (
+            Option<&mut Transform>,
+            &mut GlobalTransform,
+            &BodyHandle,
+            Option<&BodyType>,
+        ),
+    >,
 ) {
-    for (mut local, mut global, handle) in query.iter_mut() {
-        let body = match bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
+    for (mut local, mut global, handle, body_type) in query.iter_mut() {
+        if !matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic) {
+            continue;
+        }
+
+        let body = match bodies.get(handle.rigid_body) {
             None => continue,
             Some(body) => body,
         };
