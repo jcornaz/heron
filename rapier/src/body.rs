@@ -9,7 +9,7 @@ use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
     BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
 };
-use crate::rapier::geometry::{ColliderBuilder, ColliderSet};
+use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderSet};
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -34,7 +34,9 @@ pub(crate) fn create(
     >,
 ) {
     for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
-        let mut builder = RigidBodyBuilder::new(body_status(body_type.cloned()))
+        let body_type = body_type.cloned().unwrap_or_default();
+
+        let mut builder = RigidBodyBuilder::new(body_status(body_type))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -53,10 +55,7 @@ pub(crate) fn create(
 
         let rigid_body = bodies.insert(builder.build());
         let collider = colliders.insert(
-            collider_builder(&body)
-                .user_data(entity.to_bits().into())
-                .restitution(restitution.map_or(0.0, |it| (*it).into()))
-                .build(),
+            build_collider(entity, &body, body_type, restitution.cloned()),
             rigid_body,
             &mut bodies,
         );
@@ -71,15 +70,31 @@ pub(crate) fn create(
     }
 }
 
+#[allow(clippy::type_complexity)]
 pub(crate) fn update_shape(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut query: Query<'_, (&Body, &mut BodyHandle), Mutated<Body>>,
+    mut query: Query<
+        '_,
+        (
+            Entity,
+            &Body,
+            &mut BodyHandle,
+            Option<&BodyType>,
+            Option<&Restitution>,
+        ),
+        Or<(Mutated<Body>, Changed<BodyType>)>,
+    >,
 ) {
-    for (body_def, mut handle) in query.iter_mut() {
+    for (entity, body_def, mut handle, body_type, restitution) in query.iter_mut() {
         colliders.remove(handle.collider, &mut bodies, true);
         handle.collider = colliders.insert(
-            collider_builder(&body_def).build(),
+            build_collider(
+                entity,
+                &body_def,
+                body_type.cloned().unwrap_or_default(),
+                restitution.cloned(),
+            ),
             handle.rigid_body,
             &mut bodies,
         );
@@ -93,7 +108,7 @@ pub(crate) fn update_rapier_status(
 ) {
     for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.body_status = body_status(Some(*body_type));
+            body.body_status = body_status(*body_type);
         }
     }
 
@@ -103,7 +118,7 @@ pub(crate) fn update_rapier_status(
             .ok()
             .and_then(|handle| bodies.get_mut(handle.rigid_body))
         {
-            body.body_status = body_status(None);
+            body.body_status = body_status(BodyType::default());
         }
     }
 }
@@ -124,10 +139,22 @@ pub(crate) fn update_rapier_position(
 
 pub(crate) fn update_bevy_transform(
     bodies: Res<'_, RigidBodySet>,
-    mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform, &BodyHandle)>,
+    mut query: Query<
+        '_,
+        (
+            Option<&mut Transform>,
+            &mut GlobalTransform,
+            &BodyHandle,
+            Option<&BodyType>,
+        ),
+    >,
 ) {
-    for (mut local, mut global, handle) in query.iter_mut() {
-        let body = match bodies.get(handle.rigid_body).filter(|it| it.is_dynamic()) {
+    for (mut local, mut global, handle, body_type) in query.iter_mut() {
+        if !matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic) {
+            continue;
+        }
+
+        let body = match bodies.get(handle.rigid_body) {
             None => continue,
             Some(body) => body,
         };
@@ -173,15 +200,30 @@ pub(crate) fn remove(
     }
 }
 
-fn collider_builder(body: &Body) -> ColliderBuilder {
-    match body {
+fn build_collider(
+    entity: Entity,
+    body: &Body,
+    body_type: BodyType,
+    restitution: Option<Restitution>,
+) -> Collider {
+    let mut builder = match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),
         Body::Capsule {
             half_segment: half_height,
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
+    };
+
+    builder = builder
+        .user_data(entity.to_bits().into())
+        .sensor(matches!(body_type, BodyType::Sensor));
+
+    if let Some(restitution) = restitution {
+        builder = builder.restitution(restitution.into());
     }
+
+    builder.build()
 }
 
 #[inline]
@@ -196,10 +238,10 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
 
-fn body_status(body_type: Option<BodyType>) -> BodyStatus {
-    match body_type.unwrap_or_else(Default::default) {
+fn body_status(body_type: BodyType) -> BodyStatus {
+    match body_type {
         BodyType::Dynamic => BodyStatus::Dynamic,
-        BodyType::Static => BodyStatus::Static,
+        BodyType::Static | BodyType::Sensor => BodyStatus::Static,
     }
 }
 
@@ -211,9 +253,14 @@ mod tests {
 
     #[test]
     fn build_sphere() {
-        let builder = collider_builder(&Body::Sphere { radius: 4.2 });
+        let builder = build_collider(
+            Entity::new(0),
+            &Body::Sphere { radius: 4.2 },
+            BodyType::default(),
+            None,
+        );
         let ball = builder
-            .shape
+            .shape()
             .as_ball()
             .expect("Created shape was not a ball");
         assert_eq!(ball.radius, 4.2);
@@ -221,11 +268,16 @@ mod tests {
 
     #[test]
     fn build_cuboid() {
-        let builder = collider_builder(&Body::Cuboid {
-            half_extends: Vec3::new(1.0, 2.0, 3.0),
-        });
+        let builder = build_collider(
+            Entity::new(0),
+            &Body::Cuboid {
+                half_extends: Vec3::new(1.0, 2.0, 3.0),
+            },
+            BodyType::default(),
+            None,
+        );
         let cuboid = builder
-            .shape
+            .shape()
             .as_cuboid()
             .expect("Created shape was not a cuboid");
 
@@ -238,12 +290,17 @@ mod tests {
 
     #[test]
     fn build_capsule() {
-        let builder = collider_builder(&Body::Capsule {
-            half_segment: 10.0,
-            radius: 5.0,
-        });
+        let builder = build_collider(
+            Entity::new(0),
+            &Body::Capsule {
+                half_segment: 10.0,
+                radius: 5.0,
+            },
+            BodyType::default(),
+            None,
+        );
         let capsule = builder
-            .shape
+            .shape()
             .as_capsule()
             .expect("Created shape was not a capsule");
 

@@ -60,7 +60,7 @@ pub enum Body {
 /// # use heron_core::*;
 /// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 }) // Make a body (will be dynamic by default)
+///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
 /// }
 /// ```
@@ -77,6 +77,13 @@ pub enum BodyType {
     ///
     /// It is especially useful to model terrain and static obstacles.
     Static,
+
+    /// A sensor is not affected by physics forces and doesn't affect other bodies either.
+    /// Other bodies will be able to penetrate the sensor.
+    ///
+    /// A sensor is useful when we are only interested in collision events.
+    /// One may for example add a sensor to detect when the player reach a certain area.
+    Sensor,
 }
 
 impl Default for BodyType {

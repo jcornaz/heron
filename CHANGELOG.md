@@ -23,8 +23,9 @@ collision shapes
 
 ### New `BodyType` component
 
-By default, the rigid-bodies are *dynamic*. They can be made *static* by attaching
-a `BodyType::Static` component to the entity.
+By default, the rigid-bodies are *dynamic*. A `BodyType` can be attached to make it:
+* Static (with `BodyType::Static`) so that it doesn't move.
+* Sensor (with `BodyType::Sensor`) so it doesn't move and doesn't affect other bodies. (Only useful for listening to collision events)
 
 
 ### Fixes
