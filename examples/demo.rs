@@ -10,6 +10,7 @@ fn main() {
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
         .add_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
         .add_startup_system(spawn.system())
+        .add_system(log_collisions.system())
         .run();
 }
 
@@ -55,4 +56,20 @@ fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) 
         )
         // Define restitution (so that it bounces)
         .with(Restitution::from(0.7));
+}
+
+fn log_collisions(
+    mut reader: Local<EventReader<CollisionEvent>>,
+    events: Res<Events<CollisionEvent>>,
+) {
+    for event in reader.iter(&events) {
+        match event {
+            CollisionEvent::Started(e1, e2) => {
+                println!("Collision started between {:?} and {:?}", e1, e2)
+            }
+            CollisionEvent::Stopped(e1, e2) => {
+                println!("Collision stopped between {:?} and {:?}", e1, e2)
+            }
+        }
+    }
 }
