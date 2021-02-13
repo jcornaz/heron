@@ -242,7 +242,7 @@ fn body_status(body_type: BodyType) -> BodyStatus {
     match body_type {
         BodyType::Dynamic => BodyStatus::Dynamic,
         BodyType::Static | BodyType::Sensor => BodyStatus::Static,
-        BodyType::Kinematic => todo!(),
+        BodyType::Kinematic => BodyStatus::Kinematic,
     }
 }
 

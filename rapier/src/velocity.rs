@@ -13,7 +13,7 @@ pub(crate) fn update_rapier_velocity(
 ) {
     for (handle, velocity) in velocities.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            let wake_up = velocity.is_near_zero();
+            let wake_up = !velocity.is_near_zero();
             body.set_linvel(velocity.linear.into_rapier(), wake_up);
             body.set_angvel(velocity.angular.into_rapier(), wake_up);
         }

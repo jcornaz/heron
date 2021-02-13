@@ -65,6 +65,26 @@ fn create_static_body() {
 }
 
 #[test]
+fn create_kinematic_body() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        BodyType::Kinematic,
+    ));
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let body = bodies
+        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+        .unwrap();
+
+    assert!(body.is_kinematic())
+}
+
+#[test]
 fn create_sensor_body() {
     let mut app = test_app();
 
