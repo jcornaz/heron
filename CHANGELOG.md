@@ -31,7 +31,7 @@ By default, the rigid-bodies are *dynamic*. A `BodyType` can be attached to make
 ### Fixes
 
 * Misplaced debug render at startup
-
+* Incorrect angular velocity in 2d
 
 ## [0.1.0-alpha.1] - 2021-01-30
 

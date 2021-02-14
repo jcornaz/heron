@@ -182,7 +182,11 @@ impl From<Quat> for AxisAngle {
 
 impl From<AxisAngle> for Quat {
     fn from(axis_angle: AxisAngle) -> Self {
-        let angle = axis_angle.0.length();
-        Quat::from_axis_angle(axis_angle.0 / angle, angle)
+        if axis_angle.is_near_zero() {
+            Quat::identity()
+        } else {
+            let angle = axis_angle.0.length();
+            Quat::from_axis_angle(axis_angle.0 / angle, angle)
+        }
     }
 }
