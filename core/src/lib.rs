@@ -104,6 +104,7 @@ impl Default for BodyType {
 
 impl BodyType {
     /// Returns true if this body type can be moved by [`Velocity`]
+    #[must_use]
     pub fn can_have_velocity(self) -> bool {
         match self {
             BodyType::Dynamic | BodyType::Kinematic => true,
