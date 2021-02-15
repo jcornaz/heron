@@ -22,26 +22,34 @@ fn main() {
 
 fn spawn(commands: &mut Commands) {
     commands
-        .spawn(SpriteBundle::default()) // Spawn (and configure) any bundle of your choice. Only make sure there is a `GlobalTransform`
-        .with(Body::Sphere { radius: 10.0 }) // Make it a physics body, by attaching a collision shape
-        .with(Velocity::from(Vec2::unit_x() * 2.0)); // Optionally define the (current) velocity
-        .with(Restitution::from(0.5)); // Optionally define restitution
+
+        // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
+        .spawn(SpriteBundle::default())
+
+       // Make it a physics body, by attaching a collision shape
+        .with(Body::Sphere { radius: 10.0 })
+
+        // Optionally define a type (if absent, the body will be *dynamic*)
+        .with(BodyType::Static)
+        
+        // Optionally define the velocity (works only with dynamic and kinematic bodies)
+        .with(Velocity::from(Vec2::unit_x() * 2.0));
 }
 ```
 
-## Install it
+## Installation
 
 
 **For a 3d game:**
 ```toml
 bevy = "^0.4.0"
-heron = "^0.1.0-alpha.1"
+heron = "^0.1.0"
 ```
 
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "^0.1.0-alpha.1", default-features = false, features = ["2d"] }
+heron = { version = "^0.1.0", default-features = false, features = ["2d"] }
 ```
 
 **With the git version of bevy:**
