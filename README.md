@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/jcornaz/heron)](https://github.com/jcornaz/heron/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/heron)](https://crates.io/crates/heron)
-[![Docs](https://docs.rs/heron/badge.svg?version=0.1.0-alpha.1)](https://docs.rs/heron/0.1.0-alpha.1)
+[![Docs](https://docs.rs/heron/badge.svg)](https://docs.rs/heron)
 [![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 [![Zenhub](https://img.shields.io/badge/workspace-zenhub-%236061be)](https://app.zenhub.com/workspaces/heron-600478067304b1000e27f4c4/board)
 
