@@ -3,5 +3,5 @@
 consolidate-commits = true
 dev-version-ext = "dev"
 tag-prefix = ""
-pre-release-commit-message = "Release"
-post-release-commit-message = "Start next iteration"
+pre-release-commit-message = "chore: Release"
+post-release-commit-message = "chore: Start next iteration"
