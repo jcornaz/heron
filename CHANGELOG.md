@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### ⚠ Fix incorrect internal version requirements
+
+A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
+where requiring invalid version of the other heron crates.
 
 
 ## [0.1.0] - 2021-02-15
