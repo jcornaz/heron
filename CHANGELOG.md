@@ -20,7 +20,7 @@ A problem happened during the release of `0.1.0`, and some crates (incl. the roo
 where requiring invalid version of the other heron crates.
 
 
-## [0.1.0] - 2021-02-15
+## [0.1.0] - 2021-02-15 [YANKED]
 
 ### ⚠ Dependency requirement updated (breaking)
 
