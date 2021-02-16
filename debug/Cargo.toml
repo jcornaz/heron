@@ -1,6 +1,6 @@
 [package]
 name = "heron_debug"
-version = "0.1.0"
+version = "0.1.1-dev"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -13,7 +13,7 @@ default = []
 3d = []
 
 [dependencies]
-heron_core = { path = "../core", version = "^0.1.0-dev"}
+heron_core = { path = "../core", version = "^0.1.1-dev"}
 bevy_math = "^0.4.0"
 bevy_ecs = "^0.4.0"
 bevy_app = "^0.4.0"
