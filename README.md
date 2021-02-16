@@ -43,13 +43,13 @@ fn spawn(commands: &mut Commands) {
 **For a 3d game:**
 ```toml
 bevy = "^0.4.0"
-heron = "^0.1.0"
+heron = "0.1.1"
 ```
 
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "^0.1.0", default-features = false, features = ["2d"] }
+heron = { version = "0.1.1"] }
 ```
 
 **With the git version of bevy:**

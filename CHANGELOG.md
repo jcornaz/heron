@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.1.1] - 2021-02-16
+
 ### ⚠ Fix incorrect internal version requirements
 
 A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
@@ -94,6 +98,7 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.1.0...HEAD
+[Unreleased]: ../../compare/v0.1.1...HEAD
+[0.1.1]: ../../compare/v0.1.0...v0.1.1
 [0.1.0]: ../../compare/v0.1.0-alpha.1...v0.1.0
 [0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1
