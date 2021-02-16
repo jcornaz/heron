@@ -13,7 +13,7 @@ mod gravity;
 pub mod utils;
 mod velocity;
 
-/// Components that define a body subject to physics and collision
+/// Components that defines a body subject to physics and collision
 ///
 /// # Example
 ///
@@ -49,6 +49,47 @@ pub enum Body {
         /// In 2d the `z` axis is ignored
         half_extends: Vec3,
     },
+}
+
+/// Component that defines the *type* of rigid body.
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
+/// }
+/// ```
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum BodyType {
+    /// A dynamic body is normally affected by physic forces and affect the other bodies too.
+    ///
+    /// This is the most "natural" type in the sense that, in the real life, everything is dynamic.
+    Dynamic,
+
+    /// A static body is not affected by physic forces and doesn't move. But it does affect the other bodies.
+    ///
+    /// This effectively behaves like a dynamic body with infinite mass and zero velocity.
+    ///
+    /// It is especially useful to model terrain and static obstacles.
+    Static,
+
+    /// A sensor is not affected by physics forces and doesn't affect other bodies either.
+    /// Other bodies will be able to penetrate the sensor.
+    ///
+    /// A sensor is useful when we are only interested in collision events.
+    /// One may for example add a sensor to detect when the player reach a certain area.
+    Sensor,
+}
+
+impl Default for BodyType {
+    fn default() -> Self {
+        Self::Dynamic
+    }
 }
 
 /// An event fired when the collision state between two entities changed

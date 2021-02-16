@@ -7,9 +7,10 @@
 
 use bevy_math::prelude::*;
 
+use heron_core::AxisAngle;
+
 use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
 use crate::rapier::math::{Isometry, Translation, Vector};
-use heron_core::AxisAngle;
 
 pub trait IntoBevy<T> {
     #[must_use]
@@ -41,7 +42,7 @@ impl IntoBevy<Vec3> for Translation<f32> {
 
 impl IntoBevy<Quat> for UnitComplex<f32> {
     fn into_bevy(self) -> Quat {
-        Quat::from_axis_angle(Vec3::unit_z(), -self.angle())
+        Quat::from_axis_angle(Vec3::unit_z(), self.angle())
     }
 }
 
@@ -83,8 +84,8 @@ impl IntoRapier<Translation<f32>> for Vec3 {
 
 impl IntoRapier<UnitComplex<f32>> for Quat {
     fn into_rapier(self) -> UnitComplex<f32> {
-        let (_, angle) = self.to_axis_angle();
-        nalgebra::UnitComplex::new(-angle)
+        let (Vec3 { z, .. }, angle) = self.to_axis_angle();
+        nalgebra::UnitComplex::new(if z > 0.0 { angle } else { -angle })
     }
 }
 
@@ -102,7 +103,11 @@ impl IntoRapier<Isometry<f32>> for (Vec3, Quat) {
 
 impl IntoRapier<f32> for AxisAngle {
     fn into_rapier(self) -> f32 {
-        self.angle()
+        if self.axis().z > 0.0 {
+            self.angle()
+        } else {
+            -self.angle()
+        }
     }
 }
 
@@ -120,6 +125,33 @@ mod tests {
     use bevy_math::{Quat, Vec3};
 
     use super::*;
+
+    #[cfg(feature = "2d")]
+    mod angle2d {
+        use super::*;
+        use rstest::rstest;
+
+        #[test]
+        fn negative_axis_angle_to_rapier() {
+            let result: f32 = AxisAngle::new(Vec3::unit_z(), -1.0).into_rapier();
+            assert_eq!(result, -1.0);
+        }
+
+        #[rstest(quat,
+            case(Quat::from_axis_angle(Vec3::unit_z(), 2.0)),
+            case(Quat::from_axis_angle(-Vec3::unit_z(), 2.0)),
+            case(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
+        )]
+        fn into_rapier_into_bevy_is_identity(quat: Quat) {
+            let rapier: UnitComplex<f32> = quat.into_rapier();
+            let actual: Quat = rapier.into_bevy();
+
+            assert!((quat.x - actual.x).abs() < 0.0001);
+            assert!((quat.y - actual.y).abs() < 0.0001);
+            assert!((quat.z - actual.z).abs() < 0.0001);
+            assert!((quat.w - actual.w).abs() < 0.0001);
+        }
+    }
 
     mod into_isometry {
         use super::*;

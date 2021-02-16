@@ -10,6 +10,18 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.1.1] - 2021-02-16
+
+### ⚠ Fix incorrect internal version requirements
+
+A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
+where requiring invalid version of the other heron crates.
+
+
+## [0.1.0] - 2021-02-15 [YANKED]
+
 ### ⚠ Dependency requirement updated (breaking)
 
 The required rapier version is now >= 0.5.0 < 0.6.0.
@@ -17,12 +29,21 @@ The required rapier version is now >= 0.5.0 < 0.6.0.
 
 ### ⚠ New collision shapes (breaking)
 
-The variants `Body::Capsule` and `Body::Cuboid` have been added.
+The variants `Body::Capsule` and `Body::Cuboid` have been added, allowing creating respectively capsule and cuboid
+collision shapes
+
+
+### New `BodyType` component
+
+By default, the rigid-bodies are *dynamic*. A `BodyType` can be attached to make it:
+* Static (with `BodyType::Static`) so that it doesn't move.
+* Sensor (with `BodyType::Sensor`) so it doesn't move and doesn't affect other bodies. (Only useful for listening to collision events)
+
 
 ### Fixes
 
 * Misplaced debug render at startup
-
+* Incorrect angular velocity in 2d
 
 ## [0.1.0-alpha.1] - 2021-01-30
 
@@ -77,5 +98,7 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.1.0-alpha.1...HEAD
+[Unreleased]: ../../compare/v0.1.1...HEAD
+[0.1.1]: ../../compare/v0.1.0...v0.1.1
+[0.1.0]: ../../compare/v0.1.0-alpha.1...v0.1.0
 [0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1

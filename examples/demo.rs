@@ -1,4 +1,4 @@
-use std::ops::DerefMut;
+use std::f32::consts::PI;
 
 use bevy::prelude::*;
 
@@ -7,63 +7,69 @@ use heron::*;
 fn main() {
     App::build()
         .add_plugins(DefaultPlugins)
-        .add_plugin(PhysicsPlugin::default())
+        .add_plugin(PhysicsPlugin::default()) // Add the plugin
+        .add_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
         .add_startup_system(spawn.system())
-        .add_system(scale.system())
-        .add_system(delete.system())
-        .add_system(apply_velocity.system())
+        .add_system(log_collisions.system())
         .run();
 }
 
 fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+    commands.spawn(OrthographicCameraBundle::new_2d());
+
+    // The ground
+    let size = Vec2::new(1000.0, 50.0);
     commands
-        .spawn(OrthographicCameraBundle::new_2d())
+        // Spawn a bundle that contains at least a `GlobalTransform`
         .spawn(SpriteBundle {
-            sprite: Sprite::new(Vec2::new(100.0, 100.0)),
+            sprite: Sprite::new(size),
             material: materials.add(Color::WHITE.into()),
+            transform: Transform::from_translation(Vec3::new(0.0, -300.0, 0.0)),
             ..Default::default()
         })
+        // Make it a rigid body by picking a collision shape
         .with(Body::Cuboid {
-            half_extends: Vec3::new(50.0, 50.0, 0.0),
+            half_extends: size.extend(0.0) / 2.0,
         })
-        .with(Velocity::from_linear(Vec3::unit_x()));
+        // Bodies, are "dynamic" by default. Let's make the ground static (doesn't move)
+        .with(BodyType::Static)
+        // Define restitution (so that it bounces)
+        .with(Restitution::from(0.5));
+
+    // The Ball
+    let size = Vec2::new(30.0, 30.0);
+    commands
+        // Spawn a bundle that contains at least a `GlobalTransform`
+        .spawn(SpriteBundle {
+            sprite: Sprite::new(size),
+            material: materials.add(Color::GREEN.into()),
+            transform: Transform::from_translation(Vec3::new(-400.0, 200.0, 0.0)),
+            ..Default::default()
+        })
+        // Make it a rigid body by picking a collision shape
+        .with(Body::Cuboid {
+            half_extends: size.extend(0.0) / 2.0,
+        })
+        // Add an initial velocity. (it is also possible to read/mutate this component later)
+        .with(
+            Velocity::from(Vec2::unit_x() * 300.0).with_angular(AxisAngle::new(Vec3::unit_z(), PI)),
+        )
+        // Define restitution (so that it bounces)
+        .with(Restitution::from(0.7));
 }
 
-fn apply_velocity(inputs: Res<Input<KeyCode>>, mut query: Query<&mut Velocity>) {
-    let linear = Vec3::unit_x()
-        * if inputs.pressed(KeyCode::Left) {
-            -1000.0
-        } else if inputs.pressed(KeyCode::Right) {
-            1000.0
-        } else {
-            0.0
-        };
-
-    for mut velocity in query.iter_mut() {
-        velocity.linear = linear;
-    }
-}
-
-fn scale(inputs: Res<Input<KeyCode>>, time: Res<Time>, mut query: Query<&mut Body>) {
-    let factor = if inputs.pressed(KeyCode::Up) {
-        2.0
-    } else if inputs.pressed(KeyCode::Down) {
-        0.5
-    } else {
-        return;
-    };
-
-    for mut body in query.iter_mut() {
-        if let Body::Cuboid { half_extends } = body.deref_mut() {
-            *half_extends = half_extends.lerp(*half_extends * factor, time.delta_seconds());
-        }
-    }
-}
-
-fn delete(inputs: Res<Input<KeyCode>>, query: Query<Entity, With<Body>>, commands: &mut Commands) {
-    if inputs.pressed(KeyCode::Delete) {
-        for entity in query.iter() {
-            commands.despawn(entity);
+fn log_collisions(
+    mut reader: Local<EventReader<CollisionEvent>>,
+    events: Res<Events<CollisionEvent>>,
+) {
+    for event in reader.iter(&events) {
+        match event {
+            CollisionEvent::Started(e1, e2) => {
+                println!("Collision started between {:?} and {:?}", e1, e2)
+            }
+            CollisionEvent::Stopped(e1, e2) => {
+                println!("Collision stopped between {:?} and {:?}", e1, e2)
+            }
         }
     }
 }

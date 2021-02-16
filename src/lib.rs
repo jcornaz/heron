@@ -5,7 +5,6 @@
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
 ))]
-
 //! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
@@ -17,12 +16,12 @@
 //!
 //! Add the library to `Cargo.toml`
 //! ```toml
-//! heron = "0.1.0-alpha.1"
+//! heron = "0.1.1"
 //! ```
 //!
 //! If you are creating a 2d game, change the default features:
 //! ```toml
-//! heron = { version = "0.1.0-alpha.1", default-features = false, features = ["2d"] }
+//! heron = { version = "0.1.1", default-features = false, features = ["2d"] }
 //! ```
 //!
 //! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
@@ -56,16 +55,42 @@
 //! # use heron::prelude::*;
 //! fn spawn(commands: &mut Commands) {
 //!     commands
-//!         .spawn(SpriteBundle::default()) // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
-//!         .with(Body::Sphere { radius: 10.0 }) // Make it a physics body, by attaching a collision shape
-//!         .with(Velocity::from(Vec2::unit_x() * 2.0)); // Optionally add a velocity component
+//!
+//!         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
+//!         .spawn(SpriteBundle::default())
+//!
+//!        // Make it a physics body, by attaching a collision shape
+//!         .with(Body::Sphere { radius: 10.0 })
+//!
+//!         // Optionally define a type (if absent, the body will be *dynamic*)
+//!         .with(BodyType::Static)
+//!         
+//!         // Optionally define the velocity (works only with dynamic and kinematic bodies)
+//!         .with(Velocity::from(Vec2::unit_x() * 2.0));
 //! }
 //! ```
 //!
-//! It is also possible to:
-//! * Define the world's [`Gravity`]
-//! * Listen to [`CollisionEvent`]
-//! * Define body's [`Restitution`]
+//! ## Control the position
+//!
+//! When creating games, it is often useful to interact with the physics engine and move bodies programatically.
+//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`]
+//!
+//! ### Option 1: Update the Transform (teleport)
+//!
+//! If the `GlobalTransform` is modified (generally as an effect of modifying the `Transform` component),
+//! then the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
+//!
+//! ### Option 2: Use the Velocity component
+//!
+//! For [`BodyType::Dynamic`] bodies **only**, one can add a [`Velocity`] component to the entity,
+//! that will move the body over time. Physics rules will be applied normally.
+//!
+//! ## See also
+//!
+//! * The different [`BodyType`] (dynamic, static or sensor)
+//! * How to define the world's [`Gravity`]
+//! * How to define the [`Restitution`] of a rigid body
+//! * How to listen to [`CollisionEvent`]
 
 use bevy_app::{AppBuilder, Plugin};
 
@@ -83,7 +108,7 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        AxisAngle, Body, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
     };
 }
 

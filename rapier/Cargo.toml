@@ -1,6 +1,6 @@
 [package]
 name = "heron_rapier"
-version = "0.1.0-dev"
+version = "0.1.1"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -13,7 +13,7 @@ default = []
 3d = ["rapier3d"]
 
 [dependencies]
-heron_core = { path = "../core", version = "^0.1.0-dev"}
+heron_core = { path = "../core", version = "^0.1.1" }
 bevy_math = { git = "https://github.com/bevyengine/bevy.git" }
 bevy_core = { git = "https://github.com/bevyengine/bevy.git" }
 bevy_ecs = { git = "https://github.com/bevyengine/bevy.git" }
@@ -26,3 +26,4 @@ crossbeam = "^0.8.0"
 
 [dev-dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy.git", default-features = false }
+rstest = "0.6"

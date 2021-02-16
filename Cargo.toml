@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier"]
 
 [package]
 name = "heron"
-version = "0.1.0-dev"
+version = "0.1.1"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -19,14 +19,18 @@ default = ["3d"]
 debug = ["heron_debug", "bevy_render"]
 
 [dependencies]
-heron_core = { path = "core", version = "^0.1.0-dev" }
-heron_rapier = { path = "rapier", version = "^0.1.0-dev" }
-heron_debug = { path = "debug", version = "^0.1.0-dev", optional = true }
+heron_core = { path = "core", version = "^0.1.1" }
+heron_rapier = { path = "rapier", version = "^0.1.1" }
+heron_debug = { path = "debug", version = "^0.1.1", optional = true }
 bevy_app = { git = "https://github.com/bevyengine/bevy.git" }
 bevy_render = { git = "https://github.com/bevyengine/bevy.git", optional = true }
 
 [dev-dependencies]
 bevy = { git = "https://github.com/bevyengine/bevy.git" }
+
+[[example]]
+name = "demo"
+required-features = ["2d"]
 
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
@@ -59,4 +63,16 @@ prerelease = true
 file = "src/lib.rs"
 search = "//! heron = \\{ version = \"[0-9a-z\\.-]+\""
 replace = "//! heron = { version = \"{{version}}\""
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "README.md"
+search = "heron = \".*\""
+replace = "heron = \"{{version}}\""
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "README.md"
+search = "heron = \\{ version = \".*\""
+replace = "heron = { version = \"{{version}}\""
 prerelease = true
