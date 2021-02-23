@@ -26,7 +26,7 @@ fn spawn(commands: &mut Commands) {
         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
         .spawn(SpriteBundle::default())
 
-       // Make it a physics body, by attaching a collision shape
+        // Make it a physics body, by attaching a collision shape
         .with(Body::Sphere { radius: 10.0 })
 
         // Optionally define a type (if absent, the body will be *dynamic*)
@@ -54,7 +54,7 @@ heron = { version = "0.1.1", default-features = false, features = ["2d"] }
 
 **With the git version of bevy:**
 ```toml
-bevy = { git = "https://github.com/bevyengine/bevy.git" }
+bevy = { git = "https://github.com/bevyengine/bevy.git", branch = "main" }
 
 # ATTENTION: The code may not compile. And if it does compile, it may not work properly!
 # Be aware, that it might contains unreleased features and breaking changes too.
