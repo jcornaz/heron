@@ -49,7 +49,7 @@ heron = "0.1.1"
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "0.1.1"] }
+heron = { version = "0.1.1", default-features = false, features = ["2d"] }
 ```
 
 **With the git version of bevy:**
@@ -93,7 +93,7 @@ One must choose to use either `2d` or `3d` (but not both). If none of theses two
 I think [rapier] is very powerful as a physics engine. But using it directly or via [bevy_rapier] in a [bevy] game is
 not ergonomic enough for my taste.
 
-Ideally I would like to have the *power* of [rapier] accessible behind a an API focused on [bevy] *games*.
+Ideally I would like to have the *power* of [rapier] accessible behind an API focused on [bevy] *games*.
 
 
 [bevy]: https://bevyengine.org
