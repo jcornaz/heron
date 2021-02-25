@@ -55,7 +55,7 @@ impl Plugin for DebugPlugin {
         app.insert_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
             .add_stage_before(
-                bevy_app::stage::POST_UPDATE,
+                bevy_app::CoreStage::PostUpdate,
                 "heron-debug",
                 SystemStage::single_threaded(),
             )

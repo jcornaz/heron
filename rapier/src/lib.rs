@@ -117,7 +117,7 @@ impl Plugin for RapierPlugin {
             .insert_resource(ColliderSet::new())
             .insert_resource(JointSet::new())
             .add_stage_after(
-                bevy_app::stage::POST_UPDATE,
+                bevy_app::CoreStage::PostUpdate,
                 stage::PRE_STEP,
                 SystemStage::single_threaded()
                     .with_system(bodies::remove.system())

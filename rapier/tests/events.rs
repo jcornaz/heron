@@ -21,7 +21,7 @@ fn test_app() -> App {
             parameters: IntegrationParameters::default(),
         })
         .add_system_to_stage(
-            bevy::app::stage::POST_UPDATE,
+            bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),
         );
     builder.app
