@@ -207,7 +207,7 @@ impl From<Quat> for AxisAngle {
 
 impl From<AxisAngle> for Quat {
     fn from(axis_angle: AxisAngle) -> Self {
-        if axis_angle.0.is_near_zero() {
+        if axis_angle.is_near_zero() {
             Quat::identity()
         } else {
             let angle = axis_angle.0.length();

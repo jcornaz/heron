@@ -10,6 +10,18 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.1.1] - 2021-02-16
+
+### ⚠ Fix incorrect internal version requirements
+
+A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
+where requiring invalid version of the other heron crates.
+
+
+## [0.1.0] - 2021-02-15 [YANKED]
+
 ### ⚠ Dependency requirement updated (breaking)
 
 The required rapier version is now >= 0.5.0 < 0.6.0.
@@ -23,19 +35,15 @@ collision shapes
 
 ### New `BodyType` component
 
-The `BodyType` component can be attached to make the rigid body either:
+By default, the rigid-bodies are *dynamic*. A `BodyType` can be attached to make it:
+* Static (with `BodyType::Static`) so that it doesn't move.
+* Sensor (with `BodyType::Sensor`) so it doesn't move and doesn't affect other bodies. (Only useful for listening to collision events)
 
-* Dynamic (the default): The body is normally affected by forces and affect other bodies.
-* Static: The body doesn't move, but still affect other bodies.
-* Kinematic: The body can be moved programmatically, but won't be moved by the physics engine.
-* Sensor: The body doesn't move and doesn't affect other bodies. But still trigger collision events.
-
-An entity without the `BodyType` component attached will be considered *dynamic*.
 
 ### Fixes
 
 * Misplaced debug render at startup
-* Incorrect direction of angular velocities in 2d
+* Incorrect angular velocity in 2d
 
 ## [0.1.0-alpha.1] - 2021-01-30
 
@@ -90,5 +98,7 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.1.0-alpha.1...HEAD
+[Unreleased]: ../../compare/v0.1.1...HEAD
+[0.1.1]: ../../compare/v0.1.0...v0.1.1
+[0.1.0]: ../../compare/v0.1.0-alpha.1...v0.1.0
 [0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1

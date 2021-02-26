@@ -5,7 +5,6 @@
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
 ))]
-
 //! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
@@ -17,12 +16,12 @@
 //!
 //! Add the library to `Cargo.toml`
 //! ```toml
-//! heron = "0.1.0-alpha.1"
+//! heron = "0.1.1"
 //! ```
 //!
 //! If you are creating a 2d game, change the default features:
 //! ```toml
-//! heron = { version = "0.1.0-alpha.1", default-features = false, features = ["2d"] }
+//! heron = { version = "0.1.1", default-features = false, features = ["2d"] }
 //! ```
 //!
 //! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
@@ -60,7 +59,7 @@
 //!         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
 //!         .spawn(SpriteBundle::default())
 //!
-//!        // Make it a physics body, by attaching a collision shape
+//!         // Make it a physics body, by attaching a collision shape
 //!         .with(Body::Sphere { radius: 10.0 })
 //!
 //!         // Optionally define a type (if absent, the body will be *dynamic*)
@@ -83,8 +82,8 @@
 //!
 //! ### Option 2: Use the Velocity component
 //!
-//! For [`BodyType::Dynamic`]  and [`BodyType::Kinematic`]  bodies **only**, one can add a [`Velocity`] component to the entity,
-//! that will move the the rigid body over time. Physics rules will be applied normally.
+//! For [`BodyType::Dynamic`] and [`BodyType::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
+//! that will move the body over time. Physics rules will be applied normally.
 //!
 //! In case of a [`BodyType::Dynamic`] body, the [`Velocity`] component may be be updated by the physics engine (accelerations, collisions, etc.).
 //!
@@ -132,7 +131,7 @@ pub struct PhysicsPlugin {
 impl PhysicsPlugin {
     /// Configure how many times per second the physics world needs to be updated
     ///
-    /// # Panic
+    /// # Panics
     ///
     /// Panic if the number of `steps_per_second` is 0
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {

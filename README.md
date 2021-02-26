@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/github/license/jcornaz/heron)](https://github.com/jcornaz/heron/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/heron)](https://crates.io/crates/heron)
-[![Docs](https://docs.rs/heron/badge.svg?version=0.1.0-alpha.1)](https://docs.rs/heron/0.1.0-alpha.1)
+[![Docs](https://docs.rs/heron/badge.svg)](https://docs.rs/heron)
 [![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 [![Zenhub](https://img.shields.io/badge/workspace-zenhub-%236061be)](https://app.zenhub.com/workspaces/heron-600478067304b1000e27f4c4/board)
 
@@ -22,31 +22,39 @@ fn main() {
 
 fn spawn(commands: &mut Commands) {
     commands
-        .spawn(SpriteBundle::default()) // Spawn (and configure) any bundle of your choice. Only make sure there is a `GlobalTransform`
-        .with(Body::Sphere { radius: 10.0 }) // Make it a physics body, by attaching a collision shape
-        .with(Velocity::from(Vec2::unit_x() * 2.0)); // Optionally define the (current) velocity
-        .with(Restitution::from(0.5)); // Optionally define restitution
+
+        // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
+        .spawn(SpriteBundle::default())
+
+        // Make it a physics body, by attaching a collision shape
+        .with(Body::Sphere { radius: 10.0 })
+
+        // Optionally define a type (if absent, the body will be *dynamic*)
+        .with(BodyType::Static)
+        
+        // Optionally define the velocity (works only with dynamic and kinematic bodies)
+        .with(Velocity::from(Vec2::unit_x() * 2.0));
 }
 ```
 
-## Install it
+## Installation
 
 
 **For a 3d game:**
 ```toml
 bevy = "^0.4.0"
-heron = "^0.1.0-alpha.1"
+heron = "0.1.1"
 ```
 
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "^0.1.0-alpha.1", default-features = false, features = ["2d"] }
+heron = { version = "0.1.1", default-features = false, features = ["2d"] }
 ```
 
 **With the git version of bevy:**
 ```toml
-bevy = { git = "https://github.com/bevyengine/bevy.git" }
+bevy = { git = "https://github.com/bevyengine/bevy.git", branch = "main" }
 
 # ATTENTION: The code may not compile. And if it does compile, it may not work properly!
 # Be aware, that it might contains unreleased features and breaking changes too.
@@ -85,7 +93,7 @@ One must choose to use either `2d` or `3d` (but not both). If none of theses two
 I think [rapier] is very powerful as a physics engine. But using it directly or via [bevy_rapier] in a [bevy] game is
 not ergonomic enough for my taste.
 
-Ideally I would like to have the *power* of [rapier] accessible behind a an API focused on [bevy] *games*.
+Ideally I would like to have the *power* of [rapier] accessible behind an API focused on [bevy] *games*.
 
 
 [bevy]: https://bevyengine.org
@@ -95,6 +103,8 @@ Ideally I would like to have the *power* of [rapier] accessible behind a an API 
 [bevy_rapier]: https://github.com/dimforge/bevy_rapier
 
 
-## Contact
+## Contribute / Contact
 
 You can open issues/discussions here or you can discuss with me (`Jomag#2675`) in the [bevy discord](https://discord.com/invite/gMUk5Ph)
+
+See [how to contribute](https://github.com/jcornaz/heron/blob/main/CONTRIBUTING.md)
