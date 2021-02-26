@@ -49,6 +49,11 @@ pub enum Body {
         /// In 2d the `z` axis is ignored
         half_extends: Vec3,
     },
+
+    TriMesh {
+        positions: Vec<Vec3>,
+        indices: Vec<[u32; 3]>,
+    },
 }
 
 /// An event fired when the collision state between two entities changed

@@ -6,6 +6,7 @@
 //! with implementations for bevy and rapier types
 
 use bevy_math::prelude::*;
+use rapier3d::na::Point3;
 
 use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
 use crate::rapier::math::{Isometry, Translation, Vector};
@@ -30,6 +31,14 @@ impl IntoBevy<Vec3> for Vector2<f32> {
 impl IntoBevy<Vec3> for Vector3<f32> {
     fn into_bevy(self) -> Vec3 {
         Vec3::new(self.x, self.y, self.z)
+    }
+}
+
+impl IntoBevy<Vec<Point3<f32>>> for Vec<Vec3> {
+    fn into_bevy(self) -> Vec<Point3<f32>> {
+        self.iter()
+            .map(|v| Point3::<f32>::new(v.x, v.y, v.z))
+            .collect()
     }
 }
 

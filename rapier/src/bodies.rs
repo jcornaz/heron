@@ -4,6 +4,7 @@ use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
 use heron_core::{Body, Restitution, Velocity};
+use rapier3d::na::Point3;
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet};
@@ -156,6 +157,7 @@ fn collider_builder(body: &Body) -> ColliderBuilder {
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
+        Body::TriMesh { positions, indices } => trimesh_builder(positions.clone(), indices.clone()),
     }
 }
 
@@ -169,6 +171,14 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[cfg(feature = "3d")]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+}
+
+#[inline]
+#[cfg(feature = "3d")]
+fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
+    let nalgebra_points: Vec<Point3<f32>> = vertices.into_bevy();
+
+    ColliderBuilder::trimesh(nalgebra_points, indices)
 }
 
 #[cfg(test)]
