@@ -103,6 +103,8 @@ Ideally I would like to have the *power* of [rapier] accessible behind an API fo
 [bevy_rapier]: https://github.com/dimforge/bevy_rapier
 
 
-## Contact
+## Contribute / Contact
 
 You can open issues/discussions here or you can discuss with me (`Jomag#2675`) in the [bevy discord](https://discord.com/invite/gMUk5Ph)
+
+See [how to contribute](https://github.com/jcornaz/heron/blob/main/CONTRIBUTING.md)
