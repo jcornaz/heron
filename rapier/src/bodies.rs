@@ -176,9 +176,9 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[inline]
 #[cfg(feature = "3d")]
 fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
-    let nalgebra_points: Vec<Point3<f32>> = vertices.into_bevy();
+    let points: Vec<Point3<f32>> = vertices.into_rapier();
 
-    ColliderBuilder::trimesh(nalgebra_points, indices)
+    ColliderBuilder::trimesh(points, indices)
 }
 
 #[cfg(test)]
@@ -234,5 +234,10 @@ mod tests {
         assert_eq!(capsule.segment.a.z, 0.0);
         #[cfg(feature = "3d")]
         assert_eq!(capsule.segment.b.z, 0.0);
+    }
+
+    #[test]
+    fn build_trimesh() {
+        todo!()
     }
 }

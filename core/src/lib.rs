@@ -50,8 +50,12 @@ pub enum Body {
         half_extends: Vec3,
     },
 
+    /// A triangle mesh shape
     TriMesh {
+        /// A vector of Vec3 positions
         positions: Vec<Vec3>,
+
+        /// A vector of &[u32; 3] each u32 represents an indice of a position in the positions vector
         indices: Vec<[u32; 3]>,
     },
 }

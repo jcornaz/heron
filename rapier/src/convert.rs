@@ -34,14 +34,6 @@ impl IntoBevy<Vec3> for Vector3<f32> {
     }
 }
 
-impl IntoBevy<Vec<Point3<f32>>> for Vec<Vec3> {
-    fn into_bevy(self) -> Vec<Point3<f32>> {
-        self.iter()
-            .map(|v| Point3::<f32>::new(v.x, v.y, v.z))
-            .collect()
-    }
-}
-
 impl IntoBevy<Vec3> for Translation<f32> {
     fn into_bevy(self) -> Vec3 {
         self.vector.into_bevy()
@@ -118,6 +110,18 @@ impl IntoRapier<f32> for AxisAngle {
 impl IntoRapier<Vector3<f32>> for AxisAngle {
     fn into_rapier(self) -> Vector3<f32> {
         Vec3::from(self).into_rapier()
+    }
+}
+
+impl IntoRapier<Point3<f32>> for Vec3 {
+    fn into_rapier(self) -> Point3<f32> {
+        Point3::new(self.x, self.y, self.z)
+    }
+}
+
+impl IntoRapier<Vec<Point3<f32>>> for Vec<Vec3> {
+    fn into_rapier(self) -> Vec<Point3<f32>> {
+        self.iter().map(|v| v.into_rapier()).collect()
     }
 }
 
