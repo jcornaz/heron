@@ -4,8 +4,8 @@
 //! Core components and resources to use Heron
 
 use bevy_ecs::Entity;
-
 use bevy_math::Vec3;
+
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
@@ -176,6 +176,12 @@ pub struct Mass {
 
     /// The center-of-mass, relative to the body position
     pub center: Vec3,
+}
+
+impl Default for Mass {
+    fn default() -> Self {
+        Self::from(1.0)
+    }
 }
 
 impl From<f32> for Mass {
