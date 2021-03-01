@@ -153,3 +153,44 @@ impl From<Restitution> for f32 {
         value
     }
 }
+
+/// Components that defines the mass and the center-of-mass of a rigid body
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn spawn(commands: &mut Commands) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 })
+///
+///         // Define the mass of the body
+///         .with(Mass::from(2.0).with_center(Vec3::unit_x()));
+/// }
+/// ```
+#[derive(Debug, Copy, Clone)]
+pub struct Mass {
+    /// The actual mass value
+    pub value: f32,
+
+    /// The center-of-mass, relative to the body position
+    pub center: Vec3,
+}
+
+impl From<f32> for Mass {
+    fn from(value: f32) -> Self {
+        Self {
+            value,
+            center: Vec3::zero(),
+        }
+    }
+}
+
+impl Mass {
+    /// Define the center of mass, relative to the body position
+    pub fn with_center(mut self, center: Vec3) -> Self {
+        self.center = center;
+        self
+    }
+}
