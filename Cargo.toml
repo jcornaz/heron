@@ -32,6 +32,10 @@ bevy = "0.4"
 name = "demo"
 required-features = ["2d"]
 
+[[example]]
+name = "debug"
+required-features = ["2d", "debug"]
+
 [[package.metadata.release.pre-release-replacements]]
 file = "CHANGELOG.md"
 search = "## \\[Unreleased\\]"
