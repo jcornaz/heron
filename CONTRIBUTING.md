@@ -45,7 +45,7 @@ When desiging an API:
 
 ## Open a pull request
 
-* Make sure the change is wanted by discussing it first in the [issues](https://github.com/jcornaz/kwik/heron)
+* Make sure the change is wanted by discussing it first in the [issues](https://github.com/jcornaz/heron)
 * Keep your pull request small, and split it in many smaller ones if necessary
   * a pull request that solves only part of an issue, is perfectly fine.
     It might still be merged and the issue split into many smaller ones.
