@@ -34,8 +34,7 @@ pub(crate) fn step(
         &mut bodies,
         &mut colliders,
         &mut joints,
-        None,
-        None,
+        &(),
         &event_manager.handler,
     );
 
