@@ -27,8 +27,8 @@ use crate::rapier::pipeline::PhysicsPipeline;
 
 mod body;
 pub mod convert;
+mod material;
 mod pipeline;
-mod restitution;
 mod velocity;
 
 #[allow(unused)]
@@ -125,7 +125,7 @@ impl Plugin for RapierPlugin {
                     .with_system(body::update_rapier_position.system())
                     .with_system(body::update_rapier_status.system())
                     .with_system(velocity::update_rapier_velocity.system())
-                    .with_system(restitution::update_rapier_restitution.system())
+                    .with_system(material::update_rapier_restitution.system())
                     .with_system(body::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {

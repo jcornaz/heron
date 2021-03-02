@@ -34,7 +34,10 @@ fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) 
         // Bodies, are "dynamic" by default. Let's make the ground static (doesn't move)
         .with(BodyType::Static)
         // Define restitution (so that it bounces)
-        .with(Restitution::from(0.5));
+        .with(PhysicsMaterial {
+            restitution: 0.5,
+            ..Default::default()
+        });
 
     // The Ball
     let size = Vec2::new(30.0, 30.0);
@@ -55,7 +58,10 @@ fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) 
             Velocity::from(Vec2::unit_x() * 300.0).with_angular(AxisAngle::new(Vec3::unit_z(), PI)),
         )
         // Define restitution (so that it bounces)
-        .with(Restitution::from(0.7));
+        .with(PhysicsMaterial {
+            restitution: 0.7,
+            ..Default::default()
+        });
 }
 
 fn log_collisions(
