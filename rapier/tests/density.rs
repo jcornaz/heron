@@ -12,6 +12,7 @@ use heron_core::{Body, PhysicsMaterial};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
+use rapier3d::dynamics::MassProperties;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -26,7 +27,7 @@ fn test_app() -> App {
 }
 
 #[test]
-fn bodies_are_created_with_a_default_mass() {
+fn bodies_are_created_with_a_default_density() {
     let mut app = test_app();
 
     let entity = app
@@ -46,8 +47,7 @@ fn bodies_are_created_with_a_default_mass() {
 }
 
 #[test]
-#[ignore]
-fn bodies_are_created_with_defined_mass() {
+fn bodies_are_created_with_defined_density() {
     let mut app = test_app();
 
     let entity = app.world.spawn((
@@ -66,13 +66,5 @@ fn bodies_are_created_with_defined_mass() {
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
 
-    assert_eq!(body.mass(), 42.0);
-
-    let center: Vec3 = body.mass_properties().local_com.coords.into_bevy();
-
-    assert_eq!(center.x, 1.0);
-    assert_eq!(center.y, 2.0);
-
-    #[cfg(feature = "3d")]
-    assert_eq!(center.z, 3.0);
+    assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }

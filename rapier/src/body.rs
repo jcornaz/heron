@@ -59,7 +59,7 @@ pub(crate) fn create(
                 entity,
                 &body,
                 body_type,
-                material.cloned().unwrap_or_default().restitution,
+                material.cloned().unwrap_or_default(),
             ),
             rigid_body,
             &mut bodies,
@@ -98,7 +98,7 @@ pub(crate) fn update_shape(
                 entity,
                 &body_def,
                 body_type.cloned().unwrap_or_default(),
-                material.cloned().unwrap_or_default().restitution,
+                material.cloned().unwrap_or_default(),
             ),
             handle.rigid_body,
             &mut bodies,
@@ -205,7 +205,12 @@ pub(crate) fn remove(
     }
 }
 
-fn build_collider(entity: Entity, body: &Body, body_type: BodyType, restitution: f32) -> Collider {
+fn build_collider(
+    entity: Entity,
+    body: &Body,
+    body_type: BodyType,
+    material: PhysicsMaterial,
+) -> Collider {
     let mut builder = match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),
         Body::Capsule {
@@ -218,7 +223,8 @@ fn build_collider(entity: Entity, body: &Body, body_type: BodyType, restitution:
     builder = builder
         .user_data(entity.to_bits().into())
         .sensor(matches!(body_type, BodyType::Sensor))
-        .restitution(restitution);
+        .restitution(material.restitution)
+        .density(material.density);
 
     builder.build()
 }
@@ -254,7 +260,7 @@ mod tests {
             Entity::new(0),
             &Body::Sphere { radius: 4.2 },
             BodyType::default(),
-            0.0,
+            Default::default(),
         );
         let ball = builder
             .shape()
@@ -271,7 +277,7 @@ mod tests {
                 half_extends: Vec3::new(1.0, 2.0, 3.0),
             },
             BodyType::default(),
-            0.0,
+            Default::default(),
         );
         let cuboid = builder
             .shape()
@@ -294,7 +300,7 @@ mod tests {
                 radius: 5.0,
             },
             BodyType::default(),
-            0.0,
+            Default::default(),
         );
         let capsule = builder
             .shape()
