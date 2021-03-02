@@ -68,3 +68,33 @@ fn bodies_are_created_with_defined_density() {
 
     assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }
+
+#[test]
+fn density_can_be_updated_after_creation() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn((GlobalTransform::default(), Body::Sphere { radius: 1.0 }));
+
+    app.update();
+
+    app.world
+        .insert_one(
+            entity,
+            PhysicsMaterial {
+                density: 2.0,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let body = bodies
+        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+        .unwrap();
+
+    assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
+}

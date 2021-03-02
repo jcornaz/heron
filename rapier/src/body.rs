@@ -76,7 +76,7 @@ pub(crate) fn create(
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn update_shape(
+pub(crate) fn recreate_collider(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut query: Query<
@@ -88,7 +88,7 @@ pub(crate) fn update_shape(
             Option<&BodyType>,
             Option<&PhysicsMaterial>,
         ),
-        Or<(Mutated<Body>, Changed<BodyType>)>,
+        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicsMaterial>)>,
     >,
 ) {
     for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {

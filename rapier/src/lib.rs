@@ -27,7 +27,6 @@ use crate::rapier::pipeline::PhysicsPipeline;
 
 mod body;
 pub mod convert;
-mod material;
 mod pipeline;
 mod velocity;
 
@@ -121,11 +120,10 @@ impl Plugin for RapierPlugin {
                 stage::PRE_STEP,
                 SystemStage::serial()
                     .with_system(body::remove.system())
-                    .with_system(body::update_shape.system())
+                    .with_system(body::recreate_collider.system())
                     .with_system(body::update_rapier_position.system())
                     .with_system(body::update_rapier_status.system())
                     .with_system(velocity::update_rapier_velocity.system())
-                    .with_system(material::update_rapier_restitution.system())
                     .with_system(body::create.system()),
             )
             .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {
