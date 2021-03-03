@@ -21,13 +21,15 @@ There is now a `PhysicMaterial` component which can be used to define both the r
 
 In the future it will be extended to define more physics properties, like the friction.
 
+Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
+
 
 ## [0.1.1] - 2021-02-16
 
 ### ⚠ Fix incorrect internal version requirements
 
 A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
-where requiring invalid version of the other heron crates.
+were requiring invalid version of the other heron crates.
 
 
 ## [0.1.0] - 2021-02-15 [YANKED]
