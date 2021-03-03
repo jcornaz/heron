@@ -109,7 +109,7 @@ impl Plugin for RapierPlugin {
         app.init_resource::<PhysicsPipeline>()
             .init_resource::<HandleMap>()
             .add_event::<CollisionEvent>()
-            .add_resource(self.parameters.clone())
+            .add_resource(self.parameters)
             .add_resource(BroadPhase::new())
             .add_resource(NarrowPhase::new())
             .add_resource(RigidBodySet::new())

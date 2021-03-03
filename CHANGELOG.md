@@ -10,11 +10,16 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### ⚠ Dependency requirements updated (breaking)
+
+The required version of rapier is bumped to ^0.6.1
+
+
 ### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
 
 There is now a `PhysicMaterial` component which can be used to define both the restitution (how bouncy) and density (how heavy) the material is.
 
-In the future it will also allow to define the friction.
+In the future it will be extended to define more physics properties, like the friction.
 
 
 ## [0.1.1] - 2021-02-16
