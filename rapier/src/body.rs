@@ -3,7 +3,7 @@ use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicsMaterial, Velocity};
+use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -28,7 +28,7 @@ pub(crate) fn create(
             &GlobalTransform,
             Option<&BodyType>,
             Option<&Velocity>,
-            Option<&PhysicsMaterial>,
+            Option<&PhysicMaterial>,
         ),
         Without<BodyHandle>,
     >,
@@ -86,9 +86,9 @@ pub(crate) fn recreate_collider(
             &Body,
             &mut BodyHandle,
             Option<&BodyType>,
-            Option<&PhysicsMaterial>,
+            Option<&PhysicMaterial>,
         ),
-        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicsMaterial>)>,
+        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicMaterial>)>,
     >,
 ) {
     for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {
@@ -209,7 +209,7 @@ fn build_collider(
     entity: Entity,
     body: &Body,
     body_type: BodyType,
-    material: PhysicsMaterial,
+    material: PhysicMaterial,
 ) -> Collider {
     let mut builder = match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),

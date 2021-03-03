@@ -126,14 +126,14 @@ pub enum CollisionEvent {
 /// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .with(PhysicsMaterial {
+///         .with(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
 ///             density: 2.0, // Define the density. Higher value means heavier.
 ///         });
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct PhysicsMaterial {
+pub struct PhysicMaterial {
     /// Coefficient of restitution. Affect how much it "bounces" when colliding other objects.
     ///
     /// The higher the value, the more "bouncy".
@@ -149,7 +149,7 @@ pub struct PhysicsMaterial {
     pub density: f32,
 }
 
-impl PhysicsMaterial {
+impl PhysicMaterial {
     /// Perfectly inelastic restitution coefficient, all kinematic energy is lost on collision. (Do not bounce at all)
     pub const PERFECTLY_INELASTIC_RESTITUTION: f32 = 0.0;
 
@@ -157,7 +157,7 @@ impl PhysicsMaterial {
     pub const PERFECTLY_ELASTIC_RESTITUTION: f32 = 1.0;
 }
 
-impl Default for PhysicsMaterial {
+impl Default for PhysicMaterial {
     fn default() -> Self {
         Self {
             restitution: Self::PERFECTLY_INELASTIC_RESTITUTION,

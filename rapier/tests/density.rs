@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
-use heron_core::{Body, PhysicsMaterial};
+use heron_core::{Body, PhysicMaterial};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, MassProperties, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
@@ -52,7 +52,7 @@ fn bodies_are_created_with_defined_density() {
     let entity = app.world.spawn((
         GlobalTransform::default(),
         Body::Sphere { radius: 1.0 },
-        PhysicsMaterial {
+        PhysicMaterial {
             density: 2.0,
             ..Default::default()
         },
@@ -81,7 +81,7 @@ fn density_can_be_updated_after_creation() {
     app.world
         .insert_one(
             entity,
-            PhysicsMaterial {
+            PhysicMaterial {
                 density: 2.0,
                 ..Default::default()
             },
