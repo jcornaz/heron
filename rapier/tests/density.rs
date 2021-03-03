@@ -10,9 +10,8 @@ use bevy::reflect::TypeRegistryArc;
 use heron_core::utils::NearZero;
 use heron_core::{Body, PhysicsMaterial};
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
+use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet, MassProperties};
 use heron_rapier::{BodyHandle, RapierPlugin};
-use rapier3d::dynamics::MassProperties;
 
 fn test_app() -> App {
     let mut builder = App::build();
