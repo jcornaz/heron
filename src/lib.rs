@@ -59,7 +59,7 @@
 //!         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
 //!         .spawn(SpriteBundle::default())
 //!
-//!        // Make it a physics body, by attaching a collision shape
+//!         // Make it a physics body, by attaching a collision shape
 //!         .with(Body::Sphere { radius: 10.0 })
 //!
 //!         // Optionally define a type (if absent, the body will be *dynamic*)
@@ -89,7 +89,7 @@
 //!
 //! * The different [`BodyType`] (dynamic, static or sensor)
 //! * How to define the world's [`Gravity`]
-//! * How to define the [`Restitution`] of a rigid body
+//! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 
 use bevy_app::{AppBuilder, Plugin};
@@ -108,7 +108,7 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial, PhysicsPlugin, Velocity,
     };
 }
 

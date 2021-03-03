@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, Restitution};
+use heron_core::{Body, PhysicMaterial};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
@@ -28,11 +28,14 @@ fn test_app() -> App {
 fn restitution_can_be_defined_when_creating_body() {
     let mut app = test_app();
 
-    let coefficient = 0.42;
+    let restitution = 0.42;
     let entity = app.world.spawn((
         GlobalTransform::default(),
         Body::Sphere { radius: 10.0 },
-        Restitution::new(coefficient),
+        PhysicMaterial {
+            restitution,
+            ..Default::default()
+        },
     ));
 
     app.update();
@@ -42,7 +45,7 @@ fn restitution_can_be_defined_when_creating_body() {
         .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
         .unwrap();
 
-    assert_eq!(coefficient, collider.restitution)
+    assert_eq!(restitution, collider.restitution)
 }
 
 #[test]
@@ -55,9 +58,15 @@ fn restitution_can_be_updated() {
 
     app.update();
 
-    let coefficient = 2.0;
+    let restitution = 2.0;
     app.world
-        .insert_one(entity, Restitution::from(coefficient))
+        .insert_one(
+            entity,
+            PhysicMaterial {
+                restitution,
+                ..Default::default()
+            },
+        )
         .unwrap();
 
     app.update();
@@ -67,5 +76,5 @@ fn restitution_can_be_updated() {
         .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
         .unwrap();
 
-    assert_eq!(coefficient, collider.restitution)
+    assert_eq!(restitution, collider.restitution)
 }
