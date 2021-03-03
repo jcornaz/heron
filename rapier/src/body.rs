@@ -3,7 +3,7 @@ use bevy_math::prelude::*;
 use bevy_transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, Restitution, Velocity};
+use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -28,12 +28,12 @@ pub(crate) fn create(
             &GlobalTransform,
             Option<&BodyType>,
             Option<&Velocity>,
-            Option<&Restitution>,
+            Option<&PhysicMaterial>,
         ),
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, body_type, velocity, restitution) in query.iter() {
+    for (entity, body, transform, body_type, velocity, material) in query.iter() {
         let body_type = body_type.cloned().unwrap_or_default();
 
         let mut builder = RigidBodyBuilder::new(body_status(body_type))
@@ -55,7 +55,12 @@ pub(crate) fn create(
 
         let rigid_body = bodies.insert(builder.build());
         let collider = colliders.insert(
-            build_collider(entity, &body, body_type, restitution.cloned()),
+            build_collider(
+                entity,
+                &body,
+                body_type,
+                material.cloned().unwrap_or_default(),
+            ),
             rigid_body,
             &mut bodies,
         );
@@ -71,7 +76,7 @@ pub(crate) fn create(
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn update_shape(
+pub(crate) fn recreate_collider(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut query: Query<
@@ -81,19 +86,19 @@ pub(crate) fn update_shape(
             &Body,
             &mut BodyHandle,
             Option<&BodyType>,
-            Option<&Restitution>,
+            Option<&PhysicMaterial>,
         ),
-        Or<(Mutated<Body>, Changed<BodyType>)>,
+        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicMaterial>)>,
     >,
 ) {
-    for (entity, body_def, mut handle, body_type, restitution) in query.iter_mut() {
+    for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {
         colliders.remove(handle.collider, &mut bodies, true);
         handle.collider = colliders.insert(
             build_collider(
                 entity,
                 &body_def,
                 body_type.cloned().unwrap_or_default(),
-                restitution.cloned(),
+                material.cloned().unwrap_or_default(),
             ),
             handle.rigid_body,
             &mut bodies,
@@ -204,7 +209,7 @@ fn build_collider(
     entity: Entity,
     body: &Body,
     body_type: BodyType,
-    restitution: Option<Restitution>,
+    material: PhysicMaterial,
 ) -> Collider {
     let mut builder = match body {
         Body::Sphere { radius } => ColliderBuilder::ball(*radius),
@@ -217,11 +222,9 @@ fn build_collider(
 
     builder = builder
         .user_data(entity.to_bits().into())
-        .sensor(matches!(body_type, BodyType::Sensor));
-
-    if let Some(restitution) = restitution {
-        builder = builder.restitution(restitution.into());
-    }
+        .sensor(matches!(body_type, BodyType::Sensor))
+        .restitution(material.restitution)
+        .density(material.density);
 
     builder.build()
 }
@@ -257,7 +260,7 @@ mod tests {
             Entity::new(0),
             &Body::Sphere { radius: 4.2 },
             BodyType::default(),
-            None,
+            Default::default(),
         );
         let ball = builder
             .shape()
@@ -274,7 +277,7 @@ mod tests {
                 half_extends: Vec3::new(1.0, 2.0, 3.0),
             },
             BodyType::default(),
-            None,
+            Default::default(),
         );
         let cuboid = builder
             .shape()
@@ -297,7 +300,7 @@ mod tests {
                 radius: 5.0,
             },
             BodyType::default(),
-            None,
+            Default::default(),
         );
         let capsule = builder
             .shape()

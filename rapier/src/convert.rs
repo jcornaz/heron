@@ -9,7 +9,9 @@ use bevy_math::prelude::*;
 
 use heron_core::AxisAngle;
 
-use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
+use crate::nalgebra::{
+    self, Point2, Point3, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3,
+};
 use crate::rapier::math::{Isometry, Translation, Vector};
 
 pub trait IntoBevy<T> {
@@ -73,6 +75,30 @@ impl IntoRapier<Vector2<f32>> for Vec3 {
 impl IntoRapier<Vector3<f32>> for Vec3 {
     fn into_rapier(self) -> Vector3<f32> {
         Vector3::new(self.x, self.y, self.z)
+    }
+}
+
+impl IntoRapier<Point2<f32>> for Vec2 {
+    fn into_rapier(self) -> Point2<f32> {
+        Point2 {
+            coords: self.into_rapier(),
+        }
+    }
+}
+
+impl IntoRapier<Point2<f32>> for Vec3 {
+    fn into_rapier(self) -> Point2<f32> {
+        Point2 {
+            coords: self.into_rapier(),
+        }
+    }
+}
+
+impl IntoRapier<Point3<f32>> for Vec3 {
+    fn into_rapier(self) -> Point3<f32> {
+        Point3 {
+            coords: self.into_rapier(),
+        }
     }
 }
 

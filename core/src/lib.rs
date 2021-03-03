@@ -4,8 +4,8 @@
 //! Core components and resources to use Heron
 
 use bevy_ecs::Entity;
-
 use bevy_math::Vec3;
+
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
@@ -116,40 +116,52 @@ pub enum CollisionEvent {
     Stopped(Entity, Entity),
 }
 
-/// Component that define the [Coefficient of Restitution]
+/// Component that defines the physics properties of the rigid body
 ///
-/// [Coefficient of Restitution]: https://en.wikipedia.org/wiki/Coefficient_of_restitution
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .with(PhysicMaterial {
+///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
+///             density: 2.0, // Define the density. Higher value means heavier.
+///         });
+/// }
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
-pub struct Restitution(f32);
+pub struct PhysicMaterial {
+    /// Coefficient of restitution. Affect how much it "bounces" when colliding other objects.
+    ///
+    /// The higher the value, the more "bouncy".
+    ///
+    /// Typical values are between 0 (perfectly inelastic) and 1 (perfectly elastic)
+    pub restitution: f32,
 
-impl Restitution {
-    /// Perfectly inelastic coefficient, all kinematic energy is lost on collision. (Do not bounce at all)
-    pub const PERFECTLY_INELASTIC: Restitution = Restitution(0.0);
-
-    /// Perfectly elastic coefficient, all kinematic energy is restated in movement. (Very bouncy)
-    pub const PERFECTLY_ELASTIC: Restitution = Restitution(1.0);
-
-    /// Create a new restitution from a coefficient value.
-    #[must_use]
-    pub fn new(coefficient: f32) -> Self {
-        Self(coefficient)
-    }
+    /// Density. Affects how much the body resist to forces.
+    ///
+    /// The higher the value, the heavier.
+    ///
+    /// Value must be greater than 0. Except for sensor and static bodies, in which case the value is ignored.
+    pub density: f32,
 }
 
-impl Default for Restitution {
+impl PhysicMaterial {
+    /// Perfectly inelastic restitution coefficient, all kinematic energy is lost on collision. (Do not bounce at all)
+    pub const PERFECTLY_INELASTIC_RESTITUTION: f32 = 0.0;
+
+    /// Perfectly elastic restitution coefficient, all kinematic energy is restated in movement. (Very bouncy)
+    pub const PERFECTLY_ELASTIC_RESTITUTION: f32 = 1.0;
+}
+
+impl Default for PhysicMaterial {
     fn default() -> Self {
-        Self::PERFECTLY_INELASTIC
-    }
-}
-
-impl From<f32> for Restitution {
-    fn from(value: f32) -> Self {
-        Self(value)
-    }
-}
-
-impl From<Restitution> for f32 {
-    fn from(Restitution(value): Restitution) -> Self {
-        value
+        Self {
+            restitution: Self::PERFECTLY_INELASTIC_RESTITUTION,
+            density: 1.0,
+        }
     }
 }
