@@ -155,7 +155,8 @@ impl Plugin for RapierPlugin {
 }
 
 impl BodyHandle {
-    /// Creates the new BodyHandle
+    /// Creates the new `BodyHandle`
+    #[must_use]
     pub fn new(rigid_body: RigidBodyHandle, collider: ColliderHandle) -> BodyHandle {
         BodyHandle {
             rigid_body,
