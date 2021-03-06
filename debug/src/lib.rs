@@ -15,6 +15,8 @@ use fnv::FnvHashMap;
 #[cfg(feature = "2d")]
 mod dim2;
 
+const DEBUG_STAGE: &str = "heron-debug";
+
 /// Plugin that enables rendering of collision shapes
 #[derive(Debug, Copy, Clone)]
 pub struct DebugPlugin(Color);
@@ -54,9 +56,9 @@ impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
-            .add_stage_before(
-                bevy_app::stage::POST_UPDATE,
-                "heron-debug",
+            .add_stage_after(
+                heron_core::stage::AFTER_PHYSICS_STEP,
+                DEBUG_STAGE,
                 SystemStage::serial(),
             )
             .add_startup_system(create_material.system());
@@ -64,13 +66,13 @@ impl Plugin for DebugPlugin {
         #[cfg(feature = "2d")]
         {
             app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
-                .add_system_to_stage("heron-debug", dim2::delete_debug_sprite.system())
-                .add_system_to_stage("heron-debug", dim2::replace_debug_sprite.system())
-                .add_system_to_stage("heron-debug", dim2::create_debug_sprites.system());
+                .add_system_to_stage(DEBUG_STAGE, dim2::delete_debug_sprite.system())
+                .add_system_to_stage(DEBUG_STAGE, dim2::replace_debug_sprite.system())
+                .add_system_to_stage(DEBUG_STAGE, dim2::create_debug_sprites.system());
         }
 
-        app.add_system_to_stage("heron-debug", track_debug_entities.system())
-            .add_system_to_stage("heron-debug", scale_debug_entities.system());
+        app.add_system_to_stage(DEBUG_STAGE, track_debug_entities.system())
+            .add_system_to_stage(DEBUG_STAGE, scale_debug_entities.system());
     }
 }
 
