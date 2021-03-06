@@ -113,7 +113,7 @@ impl Plugin for RapierPlugin {
             .add_resource(RigidBodySet::new())
             .add_resource(ColliderSet::new())
             .add_resource(JointSet::new())
-            .add_stage_after(bevy_app::stage::POST_UPDATE, "heron", {
+            .add_stage_after(bevy_app::stage::POST_UPDATE, heron_core::stage::PHSYSICS, {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.step_per_second {
@@ -122,8 +122,8 @@ impl Plugin for RapierPlugin {
                 }
 
                 schedule
-                    .with_stage(heron_core::stage::BEFORE_PHYSICS_STEP, SystemStage::parallel())
-                    .with_stage(crate::stage::PRE_STEP,
+                    .with_stage(heron_core::stage::BEFORE_STEP, SystemStage::parallel())
+                    .with_stage("heron-step",
                         SystemStage::serial()
                                     .with_system(bevy_transform::transform_propagate_system::transform_propagate_system.system())
                                     .with_system(body::remove.system())
@@ -132,19 +132,15 @@ impl Plugin for RapierPlugin {
                                     .with_system(body::update_rapier_status.system())
                                     .with_system(velocity::update_rapier_velocity.system())
                                     .with_system(body::create.system())
+                                    .with_system(pipeline::step.system())
                     )
                     .with_stage(
-                    stage::STEP,
-                    SystemStage::serial()
-                        .with_system(pipeline::step.system()),
-                    )
-                    .with_stage(
-                        stage::POST_STEP,
+                        "heron-post-step",
                         SystemStage::parallel()
                             .with_system(body::update_bevy_transform.system())
                             .with_system(velocity::update_velocity_component.system())
                     )
-                    .with_stage(heron_core::stage::AFTER_PHYSICS_STEP, SystemStage::parallel())
+                    .with_stage(heron_core::stage::AFTER_STEP, SystemStage::parallel())
             });
     }
 }

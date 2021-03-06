@@ -54,26 +54,38 @@ impl Default for DebugPlugin {
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
+        #[cfg(feature = "2d")]
+        app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin);
+
         app.add_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
-            .add_stage_after(
-                heron_core::stage::AFTER_PHYSICS_STEP,
-                DEBUG_STAGE,
-                SystemStage::serial(),
-            )
+            .stage(heron_core::stage::PHSYSICS, |schedule: &mut Schedule| {
+                schedule.add_stage_after(
+                    heron_core::stage::AFTER_STEP,
+                    "heron-debug",
+                    debug_stage(),
+                )
+            })
             .add_startup_system(create_material.system());
-
-        #[cfg(feature = "2d")]
-        {
-            app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
-                .add_system_to_stage(DEBUG_STAGE, dim2::delete_debug_sprite.system())
-                .add_system_to_stage(DEBUG_STAGE, dim2::replace_debug_sprite.system())
-                .add_system_to_stage(DEBUG_STAGE, dim2::create_debug_sprites.system());
-        }
-
-        app.add_system_to_stage(DEBUG_STAGE, track_debug_entities.system())
-            .add_system_to_stage(DEBUG_STAGE, scale_debug_entities.system());
     }
+}
+
+fn debug_stage() -> SystemStage {
+    let mut stage = SystemStage::serial();
+
+    #[cfg(feature = "2d")]
+    {
+        stage
+            .add_system(dim2::delete_debug_sprite.system())
+            .add_system(dim2::replace_debug_sprite.system())
+            .add_system(dim2::create_debug_sprites.system());
+    }
+
+    stage
+        .add_system(track_debug_entities.system())
+        .add_system(scale_debug_entities.system());
+
+    stage
 }
 
 impl From<Color> for DebugMaterial {

@@ -20,13 +20,16 @@ mod velocity;
 /// Modifying a rigid body transform or any other heron component should be done in [`stage::BEFORE_PHYSICS_STEP`].
 pub mod stage {
 
-    /// Stage running right before each physics step.
+    /// The root **schedule** stage
+    pub const PHSYSICS: &str = "heron-physics";
+
+    /// System stage running right before each physics step.
     ///
     /// Use this stage to modify rigid-body transforms or any other physics component.
-    pub const BEFORE_PHYSICS_STEP: &str = "heron-before-step";
+    pub const BEFORE_STEP: &str = "heron-before-step";
 
-    /// Stage running right after each physics step.
-    pub const AFTER_PHYSICS_STEP: &str = "heron-after-step";
+    /// System stage running right after each physics step.
+    pub const AFTER_STEP: &str = "heron-after-step";
 }
 
 /// Components that defines a body subject to physics and collision
