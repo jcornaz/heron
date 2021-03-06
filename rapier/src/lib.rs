@@ -30,13 +30,25 @@ pub mod convert;
 mod pipeline;
 mod velocity;
 
+/// Physics stages. Systems in these stages are executed once per physics step.
+///
+/// That usually means they don't run each frame, and may run more than once in a single frame.
+///
+/// Modifying a rigid body transform or any other heron component should be done in [`stage::BEFORE_PHYSICS_STEP`].
 #[allow(unused)]
-mod stage {
-    pub(crate) const START: &str = "heron-start";
+pub mod stage {
+
+    /// Stage running right before each physics step.
+    ///
+    /// Use this stage to modify rigid-body transforms or any other physics component.
+    pub const BEFORE_PHYSICS_STEP: &str = "heron-before-step";
+
+    /// Stage running right after each physics step.
+    pub const AFTER_PHYSICS_STEP: &str = "heron-after-step";
+
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
     pub(crate) const POST_STEP: &str = "heron-post-step";
-    pub(crate) const DEBUG: &str = "heron-debug";
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
@@ -115,18 +127,7 @@ impl Plugin for RapierPlugin {
             .add_resource(RigidBodySet::new())
             .add_resource(ColliderSet::new())
             .add_resource(JointSet::new())
-            .add_stage_after(
-                bevy_app::stage::POST_UPDATE,
-                stage::PRE_STEP,
-                SystemStage::serial()
-                    .with_system(body::remove.system())
-                    .with_system(body::recreate_collider.system())
-                    .with_system(body::update_rapier_position.system())
-                    .with_system(body::update_rapier_status.system())
-                    .with_system(velocity::update_rapier_velocity.system())
-                    .with_system(body::create.system()),
-            )
-            .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {
+            .add_stage_after(bevy_app::stage::POST_UPDATE, "heron", {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.step_per_second {
@@ -134,11 +135,23 @@ impl Plugin for RapierPlugin {
                         schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
                 }
 
-                schedule.with_stage(
+                schedule
+                    .with_stage(stage::BEFORE_PHYSICS_STEP, SystemStage::parallel())
+                    .with_stage(stage::PRE_STEP,
+                        SystemStage::serial()
+                                    .with_system(bevy_transform::transform_propagate_system::transform_propagate_system.system())
+                                    .with_system(body::remove.system())
+                                    .with_system(body::recreate_collider.system())
+                                    .with_system(body::update_rapier_position.system())
+                                    .with_system(body::update_rapier_status.system())
+                                    .with_system(velocity::update_rapier_velocity.system())
+                                    .with_system(body::create.system())
+                    )
+                    .with_stage(
                     stage::STEP,
                     SystemStage::serial()
                         .with_system(pipeline::step.system()),
-                )
+                    )
                     .with_stage(
                         stage::POST_STEP,
                         SystemStage::parallel()
@@ -150,6 +163,7 @@ impl Plugin for RapierPlugin {
                             )
                             .with_system(velocity::update_velocity_component.system())
                     )
+                    .with_stage(stage::AFTER_PHYSICS_STEP, SystemStage::parallel())
             });
     }
 }
