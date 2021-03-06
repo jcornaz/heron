@@ -53,7 +53,7 @@ pub struct RapierPlugin {
     pub parameters: IntegrationParameters,
 }
 
-/// Components automatically register, by the plugin that reference the body in rapier's world
+/// Components automatically register, by the plugin that references the body in rapier's world
 ///
 /// It can be used to get direct access to rapier's world.
 #[derive(Debug, Copy, Clone)]
@@ -155,6 +155,14 @@ impl Plugin for RapierPlugin {
 }
 
 impl BodyHandle {
+    /// Creates the new BodyHandle
+    pub fn new(rigid_body: RigidBodyHandle, collider: ColliderHandle) -> BodyHandle {
+        BodyHandle {
+            rigid_body,
+            collider,
+        }
+    }
+
     /// Returns the rapier's rigid body handle
     #[must_use]
     pub fn rigid_body(&self) -> RigidBodyHandle {
