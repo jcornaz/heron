@@ -15,7 +15,7 @@ pub extern crate rapier3d as rapier;
 
 use bevy_app::{AppBuilder, Plugin};
 use bevy_core::FixedTimestep;
-use bevy_ecs::{IntoSystem, Schedule, SystemStage};
+use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
 
 use heron_core::{CollisionEvent, Gravity};
 
@@ -137,7 +137,9 @@ impl Plugin for RapierPlugin {
                     .with_stage(
                         "heron-post-step",
                         SystemStage::parallel()
-                            .with_system(body::update_bevy_transform.system())
+                            .with_system(body::update_bevy_transform.system().chain(
+                                bevy_transform::transform_propagate_system::transform_propagate_system.system()
+                            ))
                             .with_system(velocity::update_velocity_component.system())
                     )
                     .with_stage(heron_core::stage::AFTER_STEP, SystemStage::parallel())
