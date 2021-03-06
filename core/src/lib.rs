@@ -13,6 +13,22 @@ mod gravity;
 pub mod utils;
 mod velocity;
 
+/// Physics stages for user systems. These stages are executed once per physics step.
+///
+/// That usually means they don't run each frame, and may run more than once in a single frame.
+///
+/// Modifying a rigid body transform or any other heron component should be done in [`stage::BEFORE_PHYSICS_STEP`].
+pub mod stage {
+
+    /// Stage running right before each physics step.
+    ///
+    /// Use this stage to modify rigid-body transforms or any other physics component.
+    pub const BEFORE_PHYSICS_STEP: &str = "heron-before-step";
+
+    /// Stage running right after each physics step.
+    pub const AFTER_PHYSICS_STEP: &str = "heron-after-step";
+}
+
 /// Components that defines a body subject to physics and collision
 ///
 /// # Example

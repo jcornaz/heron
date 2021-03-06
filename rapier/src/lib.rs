@@ -30,22 +30,8 @@ pub mod convert;
 mod pipeline;
 mod velocity;
 
-/// Physics stages. Systems in these stages are executed once per physics step.
-///
-/// That usually means they don't run each frame, and may run more than once in a single frame.
-///
-/// Modifying a rigid body transform or any other heron component should be done in [`stage::BEFORE_PHYSICS_STEP`].
 #[allow(unused)]
-pub mod stage {
-
-    /// Stage running right before each physics step.
-    ///
-    /// Use this stage to modify rigid-body transforms or any other physics component.
-    pub const BEFORE_PHYSICS_STEP: &str = "heron-before-step";
-
-    /// Stage running right after each physics step.
-    pub const AFTER_PHYSICS_STEP: &str = "heron-after-step";
-
+mod stage {
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
     pub(crate) const POST_STEP: &str = "heron-post-step";
@@ -136,8 +122,8 @@ impl Plugin for RapierPlugin {
                 }
 
                 schedule
-                    .with_stage(stage::BEFORE_PHYSICS_STEP, SystemStage::parallel())
-                    .with_stage(stage::PRE_STEP,
+                    .with_stage(heron_core::stage::BEFORE_PHYSICS_STEP, SystemStage::parallel())
+                    .with_stage(crate::stage::PRE_STEP,
                         SystemStage::serial()
                                     .with_system(bevy_transform::transform_propagate_system::transform_propagate_system.system())
                                     .with_system(body::remove.system())
@@ -158,7 +144,7 @@ impl Plugin for RapierPlugin {
                             .with_system(body::update_bevy_transform.system())
                             .with_system(velocity::update_velocity_component.system())
                     )
-                    .with_stage(stage::AFTER_PHYSICS_STEP, SystemStage::parallel())
+                    .with_stage(heron_core::stage::AFTER_PHYSICS_STEP, SystemStage::parallel())
             });
     }
 }
