@@ -23,6 +23,11 @@ In the future it will be extended to define more physics properties, like the fr
 
 Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
 
+### Public constructor to `BodyHandle`
+
+`BodyHandle` now has a public constructor. Advanced users may create rigid bodies and colliders using directly the rapier API (adding them to the `RigidBodySet` and `ColliderSet` resources), and then add a `BodyHandle` component to the entity so that heron's will handle velocity and update the bevy transforms.
+
+Tanks @MGlolenstine
 
 ## [0.1.1] - 2021-02-16
 
