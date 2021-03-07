@@ -13,11 +13,10 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy_app::{AppBuilder, Plugin};
-use bevy_core::FixedTimestep;
-use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
+use bevy::app::{AppBuilder, Plugin};
+use bevy::ecs::{IntoSystem, Schedule, SystemStage};
 
-use heron_core::{CollisionEvent, Gravity};
+use heron_core::CollisionEvent;
 
 use crate::body::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
@@ -28,16 +27,13 @@ use crate::rapier::pipeline::PhysicsPipeline;
 mod body;
 pub mod convert;
 mod pipeline;
-mod restitution;
 mod velocity;
 
 #[allow(unused)]
 mod stage {
-    pub(crate) const START: &str = "heron-start";
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
     pub(crate) const POST_STEP: &str = "heron-post-step";
-    pub(crate) const DEBUG: &str = "heron-debug";
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
@@ -54,7 +50,7 @@ pub struct RapierPlugin {
     pub parameters: IntegrationParameters,
 }
 
-/// Components automatically register, by the plugin that reference the body in rapier's world
+/// Components automatically register, by the plugin that references the body in rapier's world
 ///
 /// It can be used to get direct access to rapier's world.
 #[derive(Debug, Copy, Clone)]
@@ -105,59 +101,56 @@ impl From<IntegrationParameters> for RapierPlugin {
 
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.resources_mut().get_or_insert_with(Gravity::default);
-
-        app.init_resource::<PhysicsPipeline>()
-            .init_resource::<HandleMap>()
-            .add_event::<CollisionEvent>()
-            .add_resource(self.parameters.clone())
-            .add_resource(BroadPhase::new())
-            .add_resource(NarrowPhase::new())
-            .add_resource(RigidBodySet::new())
-            .add_resource(ColliderSet::new())
-            .add_resource(JointSet::new())
-            .add_stage_after(
-                bevy_app::stage::POST_UPDATE,
-                stage::PRE_STEP,
-                SystemStage::serial()
-                    .with_system(body::remove.system())
-                    .with_system(body::update_shape.system())
-                    .with_system(body::update_rapier_position.system())
-                    .with_system(body::update_rapier_status.system())
-                    .with_system(velocity::update_rapier_velocity.system())
-                    .with_system(restitution::update_rapier_restitution.system())
-                    .with_system(body::create.system()),
-            )
-            .add_stage_after(stage::PRE_STEP, "heron-step-and-post-step", {
-                let mut schedule = Schedule::default();
-
-                if let Some(steps_per_second) = self.step_per_second {
-                    schedule =
-                        schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
-                }
-
-                schedule.with_stage(
-                    stage::STEP,
+        app.add_plugin(heron_core::CorePlugin {
+            steps_per_second: self.step_per_second,
+        })
+        .init_resource::<PhysicsPipeline>()
+        .init_resource::<HandleMap>()
+        .add_event::<CollisionEvent>()
+        .add_resource(self.parameters)
+        .add_resource(BroadPhase::new())
+        .add_resource(NarrowPhase::new())
+        .add_resource(RigidBodySet::new())
+        .add_resource(ColliderSet::new())
+        .add_resource(JointSet::new())
+        .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+            schedule
+                .add_stage(
+                    "heron-step",
                     SystemStage::serial()
+                        .with_system(
+                            bevy::transform::transform_propagate_system::transform_propagate_system
+                                .system(),
+                        )
+                        .with_system(body::remove.system())
+                        .with_system(body::recreate_collider.system())
+                        .with_system(body::update_rapier_position.system())
+                        .with_system(body::update_rapier_status.system())
+                        .with_system(body::create.system())
+                        .with_system(velocity::update_rapier_velocity.system())
                         .with_system(velocity::move_kinematic_bodies.system())
                         .with_system(pipeline::step.system()),
                 )
-                    .with_stage(
-                        stage::POST_STEP,
-                        SystemStage::parallel()
-                            .with_system(
-                                body::update_bevy_transform.system().chain(
-                                    bevy_transform::transform_propagate_system::transform_propagate_system
-                                        .system()
-                                )
-                            )
-                            .with_system(velocity::update_velocity_component.system())
-                    )
-            });
+                .add_stage(
+                    "heron-post-step",
+                    SystemStage::parallel()
+                        .with_system(body::update_bevy_transform.system())
+                        .with_system(velocity::update_velocity_component.system()),
+                )
+        });
     }
 }
 
 impl BodyHandle {
+    /// Creates the new `BodyHandle`
+    #[must_use]
+    pub fn new(rigid_body: RigidBodyHandle, collider: ColliderHandle) -> BodyHandle {
+        BodyHandle {
+            rigid_body,
+            collider,
+        }
+    }
+
     /// Returns the rapier's rigid body handle
     #[must_use]
     pub fn rigid_body(&self) -> RigidBodyHandle {

@@ -16,7 +16,7 @@ The state of issues (backlog, todo, in progress, etc.) is tracked in a [zenhub w
 
 You don't *need* to find an open issue to contribute a PR. But it is better to make sure the change is actually desirable.
 
-Issues marked [up-for-grabs](https://github.com/jcornaz/heron/labels/up-for-grab) should to be easy and isolated enough to be done by anyone having interest in contributing.
+Issues marked [up-for-grabs](https://github.com/jcornaz/heron/labels/up-for-grabs) should to be easy and isolated enough to be done by anyone having interest in contributing.
 
 I assign myself to issues when I am working on them. So you can safely pick any
 [unassigned issue](https://github.com/jcornaz/heron/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+no%3Aassignee+).
@@ -45,7 +45,7 @@ When desiging an API:
 
 ## Open a pull request
 
-* Make sure the change is wanted by discussing it first in the [issues](https://github.com/jcornaz/kwik/heron)
+* Make sure the change is wanted by discussing it first in the [issues](https://github.com/jcornaz/heron)
 * Keep your pull request small, and split it in many smaller ones if necessary
   * a pull request that solves only part of an issue, is perfectly fine.
     It might still be merged and the issue split into many smaller ones.

@@ -93,10 +93,10 @@
 //!
 //! * The different [`BodyType`] (dynamic, static, kinematic or sensor)
 //! * How to define the world's [`Gravity`]
-//! * How to define the [`Restitution`] of a rigid body
+//! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 
-use bevy_app::{AppBuilder, Plugin};
+use bevy::app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
@@ -112,7 +112,8 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicsPlugin, Restitution, Velocity,
+        ext::*, stage, AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial,
+        PhysicsPlugin, Velocity,
     };
 }
 
@@ -140,7 +141,7 @@ impl PhysicsPlugin {
 
     /// Returns a version using the given color to render collision shapes
     #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy_render::color::Color) -> Self {
+    pub fn with_debug_color(mut self, color: bevy::render::color::Color) -> Self {
         self.debug = color.into();
         self
     }

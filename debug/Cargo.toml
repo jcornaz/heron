@@ -14,12 +14,6 @@ default = []
 
 [dependencies]
 heron_core = { path = "../core", version = "^0.1.1"}
-bevy_math = "^0.4.0"
-bevy_ecs = "^0.4.0"
-bevy_app = "^0.4.0"
-bevy_transform = "^0.4.0"
-bevy_render = "^0.4.0"
-bevy_sprite = "^0.4.0"
-bevy_asset = "^0.4.0"
+bevy = { version = "^0.4.0", default-features = false }
 bevy_prototype_lyon = { version = "0.2.0", optional = true }
 fnv = "^1.0"

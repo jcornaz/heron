@@ -1,5 +1,5 @@
-use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
+use bevy::ecs::prelude::*;
+use bevy::math::prelude::*;
 
 use heron_core::utils::NearZero;
 use heron_core::{BodyType, Velocity};
@@ -56,7 +56,7 @@ pub(crate) fn update_velocity_component(
             #[cfg(feature = "2d")]
             {
                 velocity.angular =
-                    heron_core::AxisAngle::from(bevy_math::Vec3::unit_z() * body.angvel());
+                    heron_core::AxisAngle::from(bevy::math::Vec3::unit_z() * body.angvel());
             }
 
             #[cfg(feature = "3d")]

@@ -5,11 +5,13 @@
 //! Provides the [`IntoBevy`](IntoBevy) and [`IntoRapier`](IntoRapier)
 //! with implementations for bevy and rapier types
 
-use bevy_math::prelude::*;
+use bevy::math::prelude::*;
 
 use heron_core::AxisAngle;
 
-use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
+use crate::nalgebra::{
+    self, Point2, Point3, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3,
+};
 use crate::rapier::math::{Isometry, Translation, Vector};
 
 pub trait IntoBevy<T> {
@@ -76,6 +78,30 @@ impl IntoRapier<Vector3<f32>> for Vec3 {
     }
 }
 
+impl IntoRapier<Point2<f32>> for Vec2 {
+    fn into_rapier(self) -> Point2<f32> {
+        Point2 {
+            coords: self.into_rapier(),
+        }
+    }
+}
+
+impl IntoRapier<Point2<f32>> for Vec3 {
+    fn into_rapier(self) -> Point2<f32> {
+        Point2 {
+            coords: self.into_rapier(),
+        }
+    }
+}
+
+impl IntoRapier<Point3<f32>> for Vec3 {
+    fn into_rapier(self) -> Point3<f32> {
+        Point3 {
+            coords: self.into_rapier(),
+        }
+    }
+}
+
 impl IntoRapier<Translation<f32>> for Vec3 {
     fn into_rapier(self) -> Translation<f32> {
         <Vec3 as IntoRapier<Vector<f32>>>::into_rapier(self).into()
@@ -122,7 +148,7 @@ mod tests {
     #[cfg(feature = "3d")]
     use std::f32::consts::PI;
 
-    use bevy_math::{Quat, Vec3};
+    use bevy::math::{Quat, Vec3};
 
     use super::*;
 

@@ -1,4 +1,5 @@
-use bevy_math::prelude::*;
+use bevy::math::prelude::*;
+use bevy::reflect::prelude::*;
 
 use crate::utils::NearZero;
 use std::ops::{Mul, MulAssign};
@@ -24,7 +25,7 @@ use std::ops::{Mul, MulAssign};
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     pub linear: Vec3,
@@ -36,7 +37,7 @@ pub struct Velocity {
 /// An [axis-angle] representation
 ///
 /// [axis-angle]: https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct AxisAngle(Vec3);
 
 impl Velocity {

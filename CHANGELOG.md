@@ -10,6 +10,46 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### ⚠ Physics update stage and `add_physics_system`
+
+The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
+
+But a user may want to (and sometime have to) run system synchronously with the physics step.
+
+This is why two stages are now public:
+* `stage::ROOT`: the root **schedule** stage that contains the physics step and run at a fixed rate (60 updates per second by default)
+* `stage::UPDATE`: a **child** (parallel) system stage that runs before each physics step
+
+It also add the `add_physics_system` extension function on `AppBuilder`. So that it is still simple to add systems that should be synchronized with the physics step.
+
+**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies must now be done in the physics update stage. Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`
+
+
+### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
+
+There is now a `PhysicMaterial` component which can be used to define both the restitution (how bouncy) and density (how heavy) the material is.
+
+In the future it will be extended to define more physics properties, like the friction.
+
+Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
+
+
+### ⚠ Dependency requirements updated (breaking)
+
+The required version of rapier is bumped to ^0.6.1
+
+### Register all components for reflection
+
+All components now implement `Default` and `Reflect`, so it should be possible to use heron components in serialized scene.
+
+This should be especially helpful for hot-reloading.
+
+
+### Public constructor to `BodyHandle`
+
+`BodyHandle` now has a public constructor. Advanced users may create rigid bodies and colliders using directly the rapier API (adding them to the `RigidBodySet` and `ColliderSet` resources), and then add a `BodyHandle` component to the entity so that heron's will handle velocity and update the bevy transforms.
+
+Tanks @MGlolenstine
 
 
 ## [0.1.1] - 2021-02-16
@@ -17,7 +57,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 ### ⚠ Fix incorrect internal version requirements
 
 A problem happened during the release of `0.1.0`, and some crates (incl. the root crate `heron`)
-where requiring invalid version of the other heron crates.
+were requiring invalid version of the other heron crates.
 
 
 ## [0.1.0] - 2021-02-15 [YANKED]
