@@ -10,9 +10,19 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
-### ⚠ Dependency requirements updated (breaking)
+### ⚠ Physics update stage and `add_physics_system`
 
-The required version of rapier is bumped to ^0.6.1
+The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
+
+But a user may want to (and sometime have to) run system synchronously with the physics step.
+
+This is why two stages are now public:
+* `stage::ROOT`: the root **schedule** stage that contains the physics step and run at a fixed rate (60 updates per second by default)
+* `stage::UPDATE`: a **child** (parallel) system stage that runs before each physics step
+
+It also add the `add_physics_system` extension function on `AppBuilder`. So that it is still simple to add systems that should be synchronized with the physics step.
+
+**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies must now be done in the physics update stage. Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`
 
 
 ### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
@@ -22,6 +32,12 @@ There is now a `PhysicMaterial` component which can be used to define both the r
 In the future it will be extended to define more physics properties, like the friction.
 
 Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
+
+
+### ⚠ Dependency requirements updated (breaking)
+
+The required version of rapier is bumped to ^0.6.1
+
 
 ### Public constructor to `BodyHandle`
 

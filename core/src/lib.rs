@@ -3,15 +3,92 @@
 
 //! Core components and resources to use Heron
 
-use bevy_ecs::Entity;
+use bevy_app::{AppBuilder, Plugin};
+use bevy_core::FixedTimestep;
+use bevy_ecs::{Entity, Schedule, SystemStage};
 use bevy_math::Vec3;
 
+pub use ext::*;
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
+pub mod ext;
 mod gravity;
 pub mod utils;
 mod velocity;
+
+/// Physics stages for user systems. These stages are executed once per physics step.
+///
+/// That usually means they don't run each frame, and may run more than once in a single frame.
+///
+/// In general end-users shouldn't have to deal with these stages directly.
+///
+/// Instead, it is possible to call the [`add_physiscs_system`](ext::AppBuilderExt::add_physics_system) extension function on `AppBuilder`
+/// to register systems that should run during the physics update.
+pub mod stage {
+
+    /// The root **[`Schedule`](bevy_ecs::Schedule)** stage
+    pub const ROOT: &str = "heron-physics";
+
+    /// A **child** [`SystemStage`](bevy_ecs::SystemStage) running before each physics step.
+    ///
+    /// Use this stage to modify rigid-body transforms or any other physics component.
+    ///
+    /// **This is not a root stage**. So you cannot simply call `add_system_to_stage` on bevy's app builder.
+    /// Instead consider calling the [`add_physiscs_system`](crate::ext::AppBuilderExt::add_physics_system) extension function.
+    pub const UPDATE: &str = "heron-before-step";
+}
+
+/// Plugin that register stage resources and components.
+///
+/// It does **NOT** enable physics behavior.
+#[derive(Debug, Copy, Clone)]
+pub struct CorePlugin {
+    /// Number of physics step per second. `None` means to run physics step as part of the application update instead.
+    pub steps_per_second: Option<f64>,
+}
+
+impl Default for CorePlugin {
+    fn default() -> Self {
+        Self::from_steps_per_second(60)
+    }
+}
+
+impl CorePlugin {
+    /// Configure how many times per second the physics world needs to be updated
+    ///
+    /// # Panics
+    ///
+    /// Panic if the number of `steps_per_second` is 0
+    #[must_use]
+    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
+        assert!(
+            steps_per_second > 0,
+            "Invalid number of step per second: {}",
+            steps_per_second
+        );
+        Self {
+            steps_per_second: Some(steps_per_second.into()),
+        }
+    }
+}
+
+impl Plugin for CorePlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.resources_mut().get_or_insert_with(Gravity::default);
+
+        app.add_stage_after(bevy_app::stage::UPDATE, crate::stage::ROOT, {
+            let mut schedule = Schedule::default();
+
+            if let Some(steps_per_second) = self.steps_per_second {
+                schedule =
+                    schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
+            }
+
+            schedule.with_stage(crate::stage::UPDATE, SystemStage::parallel())
+        });
+    }
+}
 
 /// Components that defines a body subject to physics and collision
 ///
