@@ -2,8 +2,8 @@
 
 //! Extensions to bevy API
 
-use bevy_app::AppBuilder;
-use bevy_ecs::{Schedule, System};
+use bevy::app::AppBuilder;
+use bevy::ecs::{Schedule, System};
 
 /// Extensions for the app builder
 pub trait AppBuilderExt {

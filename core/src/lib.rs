@@ -3,10 +3,8 @@
 
 //! Core components and resources to use Heron
 
-use bevy_app::{AppBuilder, Plugin};
-use bevy_core::FixedTimestep;
-use bevy_ecs::{Entity, Schedule, SystemStage};
-use bevy_math::Vec3;
+use bevy::core::FixedTimestep;
+use bevy::prelude::*;
 
 pub use ext::*;
 pub use gravity::Gravity;
@@ -27,10 +25,10 @@ mod velocity;
 /// to register systems that should run during the physics update.
 pub mod stage {
 
-    /// The root **[`Schedule`](bevy_ecs::Schedule)** stage
+    /// The root **[`Schedule`](bevy_::ecs::Schedule)** stage
     pub const ROOT: &str = "heron-physics";
 
-    /// A **child** [`SystemStage`](bevy_ecs::SystemStage) running before each physics step.
+    /// A **child** [`SystemStage`](bevy_::ecs::SystemStage) running before each physics step.
     ///
     /// Use this stage to modify rigid-body transforms or any other physics component.
     ///
@@ -77,16 +75,20 @@ impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.resources_mut().get_or_insert_with(Gravity::default);
 
-        app.add_stage_after(bevy_app::stage::UPDATE, crate::stage::ROOT, {
-            let mut schedule = Schedule::default();
+        app.register_type::<Body>()
+            .register_type::<BodyType>()
+            .register_type::<PhysicMaterial>()
+            .register_type::<Velocity>()
+            .add_stage_after(bevy::app::stage::UPDATE, crate::stage::ROOT, {
+                let mut schedule = Schedule::default();
 
-            if let Some(steps_per_second) = self.steps_per_second {
-                schedule =
-                    schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
-            }
+                if let Some(steps_per_second) = self.steps_per_second {
+                    schedule = schedule
+                        .with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
+                }
 
-            schedule.with_stage(crate::stage::UPDATE, SystemStage::parallel())
-        });
+                schedule.with_stage(crate::stage::UPDATE, SystemStage::parallel())
+            });
     }
 }
 
@@ -102,7 +104,7 @@ impl Plugin for CorePlugin {
 ///         .with(Body::Sphere { radius: 1.0 });
 /// }
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Reflect)]
 pub enum Body {
     /// A sphere (or circle in 2d) shape defined by its radius
     Sphere {
@@ -128,6 +130,12 @@ pub enum Body {
     },
 }
 
+impl Default for Body {
+    fn default() -> Self {
+        Self::Sphere { radius: 1.0 }
+    }
+}
+
 /// Component that defines the *type* of rigid body.
 ///
 /// # Example
@@ -141,7 +149,7 @@ pub enum Body {
 ///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
 pub enum BodyType {
     /// A dynamic body is normally affected by physic forces and affect the other bodies too.
     ///
@@ -209,7 +217,7 @@ pub enum CollisionEvent {
 ///         });
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Reflect)]
 pub struct PhysicMaterial {
     /// Coefficient of restitution. Affect how much it "bounces" when colliding other objects.
     ///
