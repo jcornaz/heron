@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.2.0] - 2021-03-07
+
 ### ⚠ Physics systems
 
 The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
@@ -146,7 +150,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.1.1...HEAD
+[Unreleased]: ../../compare/v0.2.0...HEAD
+[0.2.0]: ../../compare/v0.1.1...v0.2.0
 [0.1.1]: ../../compare/v0.1.0...v0.1.1
 [0.1.0]: ../../compare/v0.1.0-alpha.1...v0.1.0
 [0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1
