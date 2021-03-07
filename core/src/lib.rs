@@ -8,9 +8,11 @@ use bevy_core::FixedTimestep;
 use bevy_ecs::{Entity, Schedule, SystemStage};
 use bevy_math::Vec3;
 
+pub use ext::*;
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
+pub mod ext;
 mod gravity;
 pub mod utils;
 mod velocity;
@@ -19,15 +21,21 @@ mod velocity;
 ///
 /// That usually means they don't run each frame, and may run more than once in a single frame.
 ///
-/// Modifying a rigid body transform or any other heron component should be done in [`stage::BEFORE_PHYSICS_STEP`].
+/// In general end-users shouldn't have to deal with these stages directly.
+///
+/// Instead, it is possible to call the [`add_physiscs_system`](ext::AppBuilderExt::add_physics_system) extension function on `AppBuilder`
+/// to register systems that should run during the physics update.
 pub mod stage {
 
-    /// The root **schedule** stage
+    /// The root **[`Schedule`](bevy_ecs::Schedule)** stage
     pub const ROOT: &str = "heron-physics";
 
-    /// System stage running right before each physics step.
+    /// A **child** [`SystemStage`](bevy_ecs::SystemStage) running before each physics step.
     ///
     /// Use this stage to modify rigid-body transforms or any other physics component.
+    ///
+    /// **This is not a root stage**. So you cannot simply call `add_system_to_stage` on bevy's app builder.
+    /// Instead consider calling the [`add_physiscs_system`](crate::ext::AppBuilderExt::add_physics_system) extension function.
     pub const UPDATE: &str = "heron-before-step";
 }
 
