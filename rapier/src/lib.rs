@@ -116,7 +116,7 @@ impl Plugin for RapierPlugin {
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
-                    "heron-step",
+                    "heron-pre-step",
                     SystemStage::serial()
                         .with_system(
                             bevy::transform::transform_propagate_system::transform_propagate_system
@@ -125,10 +125,14 @@ impl Plugin for RapierPlugin {
                         .with_system(body::remove.system())
                         .with_system(body::recreate_collider.system())
                         .with_system(body::update_rapier_position.system())
-                        .with_system(body::update_rapier_status.system())
-                        .with_system(body::create.system())
                         .with_system(velocity::update_rapier_velocity.system())
-                        .with_system(velocity::move_kinematic_bodies.system())
+                        .with_system(body::update_rapier_status.system())
+                        .with_system(body::create.system()),
+                )
+                .add_stage(
+                    "heron-step",
+                    SystemStage::serial()
+                        .with_system(velocity::apply_velocity_to_kinematic_bodies.system())
                         .with_system(pipeline::step.system()),
                 )
                 .add_stage(

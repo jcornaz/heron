@@ -25,7 +25,7 @@ pub(crate) fn update_rapier_velocity(
     }
 }
 
-pub(crate) fn move_kinematic_bodies(
+pub(crate) fn apply_velocity_to_kinematic_bodies(
     mut bodies: ResMut<'_, RigidBodySet>,
     integration_parameters: Res<'_, IntegrationParameters>,
     query: Query<'_, (&BodyHandle, &BodyType, &Velocity)>,

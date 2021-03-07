@@ -147,7 +147,7 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 }
 
 #[test]
-fn kinematic_bodies_are_moved() {
+fn velocity_can_move_kinematic_bodies() {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
