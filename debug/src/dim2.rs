@@ -1,10 +1,10 @@
-use bevy_asset::prelude::*;
-use bevy_ecs::prelude::*;
-use bevy_math::{Vec2, Vec3};
+use bevy::asset::prelude::*;
+use bevy::ecs::prelude::*;
+use bevy::math::{Vec2, Vec3};
+use bevy::sprite::prelude::*;
+use bevy::transform::prelude::*;
 use bevy_prototype_lyon::entity::ShapeBundle;
 use bevy_prototype_lyon::prelude::*;
-use bevy_sprite::prelude::*;
-use bevy_transform::prelude::*;
 
 use heron_core::Body;
 

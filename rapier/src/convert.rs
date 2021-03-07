@@ -5,7 +5,7 @@
 //! Provides the [`IntoBevy`](IntoBevy) and [`IntoRapier`](IntoRapier)
 //! with implementations for bevy and rapier types
 
-use bevy_math::prelude::*;
+use bevy::math::prelude::*;
 
 use heron_core::AxisAngle;
 
@@ -148,7 +148,7 @@ mod tests {
     #[cfg(feature = "3d")]
     use std::f32::consts::PI;
 
-    use bevy_math::{Quat, Vec3};
+    use bevy::math::{Quat, Vec3};
 
     use super::*;
 

@@ -2,7 +2,7 @@
 
 //! Utility traits and extensions
 
-use bevy_math::Vec3;
+use bevy::math::Vec3;
 
 pub trait NearZero: Copy {
     fn is_near_zero(self) -> bool;

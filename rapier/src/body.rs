@@ -1,6 +1,6 @@
-use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::ecs::prelude::*;
+use bevy::math::prelude::*;
+use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
 use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
@@ -250,7 +250,7 @@ fn body_status(body_type: BodyType) -> BodyStatus {
 
 #[cfg(test)]
 mod tests {
-    use bevy_math::Vec3;
+    use bevy::math::Vec3;
 
     use super::*;
 
