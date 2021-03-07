@@ -134,10 +134,12 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.set_position(
-                (transform.translation, transform.rotation).into_rapier(),
-                true,
-            );
+            let isometry = (transform.translation, transform.rotation).into_rapier();
+            if body.is_kinematic() {
+                body.set_next_kinematic_position(isometry);
+            } else {
+                body.set_position(isometry, true);
+            }
         }
     }
 }
@@ -155,7 +157,7 @@ pub(crate) fn update_bevy_transform(
     >,
 ) {
     for (mut local, mut global, handle, body_type) in query.iter_mut() {
-        if !matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic) {
+        if !body_type.cloned().unwrap_or_default().can_have_velocity() {
             continue;
         }
 
@@ -245,6 +247,7 @@ fn body_status(body_type: BodyType) -> BodyStatus {
     match body_type {
         BodyType::Dynamic => BodyStatus::Dynamic,
         BodyType::Static | BodyType::Sensor => BodyStatus::Static,
+        BodyType::Kinematic => BodyStatus::Kinematic,
     }
 }
 

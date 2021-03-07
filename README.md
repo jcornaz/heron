@@ -30,7 +30,7 @@ fn spawn(commands: &mut Commands) {
         .with(Body::Sphere { radius: 10.0 })
 
         // Optionally define a type (if absent, the body will be *dynamic*)
-        .with(BodyType::Static)
+        .with(BodyType::Kinematic)
         
         // Optionally define the velocity (works only with dynamic and kinematic bodies)
         .with(Velocity::from(Vec2::unit_x() * 2.0));

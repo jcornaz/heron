@@ -151,20 +151,35 @@ impl Default for Body {
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
 pub enum BodyType {
-    /// A dynamic body is normally affected by physic forces and affect the other bodies too.
+    /// A dynamic body is normally affected by physic forces and affect the other bodies normally too.
     ///
     /// This is the most "natural" type in the sense that, in the real life, everything is dynamic.
+    ///
+    /// It is the default type.
     Dynamic,
 
     /// A static body is not affected by physic forces and doesn't move. But it does affect the other bodies.
     ///
     /// This effectively behaves like a dynamic body with infinite mass and zero velocity.
     ///
-    /// It is especially useful to model terrain and static obstacles.
+    /// It is well suited for terrain and static obstacles.
     Static,
 
+    /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
+    ///
+    /// It affects the other bodies normally, but is not affected by them.
+    ///
+    /// If the transform is updated, then a velocity will be automatically calculated, producing
+    /// realistic interaction with other bodies.
+    ///
+    /// It can also have a velocity be applied.
+    ///
+    /// It is well suited fo moving-platforms.
+    Kinematic,
+
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.
-    /// Other bodies will be able to penetrate the sensor.
+    ///
+    /// Other bodies will be able to penetrate the sensor. But it still participate in collision events.
     ///
     /// A sensor is useful when we are only interested in collision events.
     /// One may for example add a sensor to detect when the player reach a certain area.
@@ -174,6 +189,17 @@ pub enum BodyType {
 impl Default for BodyType {
     fn default() -> Self {
         Self::Dynamic
+    }
+}
+
+impl BodyType {
+    /// Returns true if this body type can be moved by [`Velocity`]
+    #[must_use]
+    pub fn can_have_velocity(self) -> bool {
+        match self {
+            BodyType::Dynamic | BodyType::Kinematic => true,
+            BodyType::Static | BodyType::Sensor => false,
+        }
     }
 }
 
