@@ -10,7 +10,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
-### ⚠ Physics update stage and `add_physics_system`
+### ⚠ Physics systems
 
 The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
 
@@ -20,9 +20,12 @@ This is why two stages are now public:
 * `stage::ROOT`: the root **schedule** stage that contains the physics step and run at a fixed rate (60 updates per second by default)
 * `stage::UPDATE`: a **child** (parallel) system stage that runs before each physics step
 
-It also add the `add_physics_system` extension function on `AppBuilder`. So that it is still simple to add systems that should be synchronized with the physics step.
+But most of the time, users shouldn't have to use the stage directly,
+because an `add_physics_system` extension function on `AppBuilder` is provided and can be used like `add_system`, except
+systems added with `add_physics_system` will run during the physics update.
 
-**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies must now be done in the physics update stage. Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`
+**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies **must** be done in the physics update stage.
+Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`.
 
 
 ### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
@@ -44,11 +47,10 @@ bot is not affected by them.
 
 The required version of rapier is bumped to ^0.6.1
 
-### Register all components for reflection
+### All components are registered for reflection
 
-All components now implement `Default` and `Reflect`, so it should be possible to use heron components in serialized scene.
-
-This should be especially helpful for hot-reloading.
+All components now implement `Default` and `Reflect` and are registered to bevy reflect system.
+That should make be possible to use heron components in serialized scene for hot-reloading.
 
 
 ### Public constructor to `BodyHandle`
