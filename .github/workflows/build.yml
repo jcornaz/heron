@@ -121,46 +121,6 @@ jobs:
       - name: Run tests
         run: cargo test --workspace --no-default-features --features "${{ matrix.feature-set }}"
 
-  wasm-check:
-    needs: test
-    timeout-minutes: 20
-    runs-on: ubuntu-latest
-    env:
-      RUSTFLAGS: "-D warnings"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Global cache
-        uses: actions/cache@v2.1.4
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable-wasm
-
-      - name: Target Cache
-        uses: actions/cache@v2.1.4
-        with:
-          path: ./target
-          key: target-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
-          restore-keys: |
-            target-ubuntu-latest-stable-wasm-${{ hashFiles('**/Cargo.toml') }}
-            target-ubuntu-latest-stable-wasm
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: wasm32-unknown-unknown
-          override: true
-
-      - name: Check WASM
-        run: cargo check --workspace --target wasm32-unknown-unknown
-
   ignored-tests:
     needs: test
     runs-on: ubuntu-latest
