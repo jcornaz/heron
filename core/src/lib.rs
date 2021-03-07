@@ -155,7 +155,7 @@ pub enum BodyType {
     ///
     /// This is the most "natural" type in the sense that, in the real life, everything is dynamic.
     ///
-    /// It is the default type
+    /// It is the default type.
     Dynamic,
 
     /// A static body is not affected by physic forces and doesn't move. But it does affect the other bodies.
@@ -167,9 +167,14 @@ pub enum BodyType {
 
     /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
     ///
-    /// It affects the other bodies normally, and cannot penetrate them.
+    /// It affects the other bodies normally, but is not affected by them.
     ///
-    /// It is well suited fo moving-platforms and player characters.
+    /// If the transform is updated, then a velocity will be automatically calculated, producing
+    /// realistic interaction with other bodies.
+    ///
+    /// It can also have a velocity be applied.
+    ///
+    /// It is well suited fo moving-platforms.
     Kinematic,
 
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.

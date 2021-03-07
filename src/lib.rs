@@ -70,24 +70,57 @@
 //! }
 //! ```
 //!
+//! ## Run systems synchronously with the physics step
+//!
+//! The physics step runs at fixed rate (60 times per second by default) and is out of sync of the
+//! bevy frame.
+//!
+//! But modifying any physics component (such as the transform or velocity) **must** be done synchronously with
+//! the physics step.
+//!
+//! The simplest way is to add these systems with `add_physics_system`:
+//!
+//! ```no_run
+//! # use bevy::prelude::*;
+//! # use heron::prelude::*;
+//! App::build()
+//!     .add_plugins(DefaultPlugins)
+//!     .add_plugin(PhysicsPlugin::default())
+//!
+//!     // This system should NOT update transforms, velocities and other physics components
+//!     // In other game engines this would be the "update" function
+//!     .add_system(cannot_update_physics.system())
+//!
+//!     // This system can update transforms, velocities and other physics components
+//!     // In other game engines this would be the "physics update" function
+//!     .add_physics_system(update_velocities.system())
+//! #    .run();
+//! # fn cannot_update_physics() {}
+//! # fn update_velocities() {}
+//! ```
+//!
 //! ## Control the position
 //!
 //! When creating games, it is often useful to interact with the physics engine and move bodies programatically.
-//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`]
+//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`].
 //!
-//! ### Option 1: Update the Transform (teleport)
+//! ### Option 1: Update the Transform
 //!
-//! If the `GlobalTransform` is modified (generally as an effect of modifying the `Transform` component),
-//! then the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
+//! For kinematic bodies ([`BodyType::Kinematic`]), if the transform is udpated,
+//! the body is moved and get an automatically calculated velocity. Physics rules will be applied normally.
+//! Updating the transform is a good way to move a kinematic body.
+//!
+//! For other type of bodies, if the transform is updated,
+//! the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
 //!
 //! ### Option 2: Use the Velocity component
 //!
 //! For [`BodyType::Dynamic`] and [`BodyType::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
 //! that will move the body over time. Physics rules will be applied normally.
 //!
-//! In case of a [`BodyType::Dynamic`] body, the [`Velocity`] component may be be updated by the physics engine (accelerations, collisions, etc.).
+//! Note that the velocity component is updated by heron to always reflects the current velocity.
 //!
-//! In case of a [`BodyType::Kinematic`] body, the [`Velocity`] component will not be modified by the physics engine. It represent the velocity that the budy must *try* to have. (But it may not effectively move at that velocity, if there are static obstacles)
+//! Defining/updating the velocity is a good way to interact with dynamic bodies.
 //!
 //! ## See also
 //!
