@@ -15,8 +15,6 @@ use fnv::FnvHashMap;
 #[cfg(feature = "2d")]
 mod dim2;
 
-const DEBUG_STAGE: &str = "heron-debug";
-
 /// Plugin that enables rendering of collision shapes
 #[derive(Debug, Copy, Clone)]
 pub struct DebugPlugin(Color);
