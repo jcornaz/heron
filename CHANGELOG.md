@@ -33,6 +33,12 @@ In the future it will be extended to define more physics properties, like the fr
 
 Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
 
+### ⚠ Kinematic bodies
+
+There is a new variant to `BodyType`: `Kinematic`. That makes possible to create "kinematic" bodies.
+A kinematic body is controlled programmatically (usually by updating the transform) and affect the other bodies normally, 
+bot is not affected by them.
+
 
 ### ⚠ Dependency requirements updated (breaking)
 
