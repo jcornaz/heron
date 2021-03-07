@@ -1,3 +1,5 @@
+#![allow(clippy::module_name_repetitions)]
+
 //! Extensions to bevy API
 
 use bevy_app::AppBuilder;
