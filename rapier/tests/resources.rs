@@ -3,10 +3,10 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
+use bevy::app::prelude::*;
 use bevy::core::CorePlugin;
+use bevy::math::prelude::*;
 use bevy::reflect::TypeRegistryArc;
-use bevy_app::prelude::*;
-use bevy_math::prelude::*;
 
 use heron_core::Gravity;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};

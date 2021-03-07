@@ -4,12 +4,7 @@
 
 //! Rendering of Heron's collision shapes for debugging purposes
 
-use bevy_app::{AppBuilder, Plugin};
-use bevy_asset::prelude::*;
-use bevy_ecs::prelude::*;
-use bevy_render::prelude::*;
-use bevy_sprite::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::prelude::*;
 use fnv::FnvHashMap;
 
 #[cfg(feature = "2d")]
@@ -44,7 +39,7 @@ impl From<Color> for DebugPlugin {
 
 impl Default for DebugPlugin {
     fn default() -> Self {
-        let mut color = bevy_render::color::Color::BLUE;
+        let mut color = bevy::render::color::Color::BLUE;
         color.set_a(0.2);
         Self(color)
     }

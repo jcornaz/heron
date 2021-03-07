@@ -1,6 +1,6 @@
-use bevy_app::Events;
-use bevy_ecs::prelude::*;
-use bevy_math::Vec3;
+use bevy::app::Events;
+use bevy::ecs::prelude::*;
+use bevy::math::Vec3;
 use crossbeam::channel::Receiver;
 
 use heron_core::{CollisionEvent, Gravity};

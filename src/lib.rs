@@ -92,7 +92,7 @@
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 
-use bevy_app::{AppBuilder, Plugin};
+use bevy::app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
@@ -137,7 +137,7 @@ impl PhysicsPlugin {
 
     /// Returns a version using the given color to render collision shapes
     #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy_render::color::Color) -> Self {
+    pub fn with_debug_color(mut self, color: bevy::render::color::Color) -> Self {
         self.debug = color.into();
         self
     }
