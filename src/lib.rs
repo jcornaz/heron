@@ -99,7 +99,7 @@
 //! # fn update_velocities() {}
 //! ```
 //!
-//! ## Control the position
+//! ## Move rigid bodies programatically
 //!
 //! When creating games, it is often useful to interact with the physics engine and move bodies programatically.
 //! For this, you have two options: Updating the `Transform` or applying a [`Velocity`].
