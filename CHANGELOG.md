@@ -12,17 +12,17 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ### ⚠ Physics update stage and `add_physics_system`
 
-The physics steps run at a fixed rate (60 updates per second by default). They are therefore not in sync with the frame update (that runs as many times per second as possible).
+The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
 
-But a user may want (and sometime have to) run system synchronously with the physics step. Generally either before (when modifying position/velocities) or after the physiscs step (when reading the output).
+But a user may want to (and sometime have to) run system synchronously with the physics step.
 
-This PR exposes the following stages:
-* `stage::ROOT`  **schedule** stage that runs at a fixed rate (60 updates per second by default)
-* `stage::UPDATE` a **child** (parallel) system stage that runs before the physics step.
+This is why two stages are now public:
+* `stage::ROOT`: the root **schedule** stage that contains the physics step and run at a fixed rate (60 updates per second by default)
+* `stage::UPDATE`: a **child** (parallel) system stage that runs before each physics step
 
-It also add the `add_physiscs_system` extension function on `AppBuilder`: to make simpler to add systems that should be synchronized with the physics steps.
+It also add the `add_physics_system` extension function on `AppBuilder`. So that it is still simple to add systems that should be synchronized with the physics step.
 
-**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies must now be done in the physics update stage. Make sure to add this systems using the new `add_physics_system` extension function on `AppBuilder`
+**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies must now be done in the physics update stage. Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`
 
 
 ### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
