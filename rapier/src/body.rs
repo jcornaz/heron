@@ -134,10 +134,12 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.set_position(
-                (transform.translation, transform.rotation).into_rapier(),
-                true,
-            );
+            let isometry = (transform.translation, transform.rotation).into_rapier();
+            if body.is_kinematic() {
+                body.set_next_kinematic_position(isometry);
+            } else {
+                body.set_position(isometry, true);
+            }
         }
     }
 }
