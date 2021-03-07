@@ -57,12 +57,8 @@ impl Plugin for DebugPlugin {
 
         app.add_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
-            .stage(heron_core::stage::PHSYSICS, |schedule: &mut Schedule| {
-                schedule.add_stage_after(
-                    heron_core::stage::AFTER_STEP,
-                    "heron-debug",
-                    debug_stage(),
-                )
+            .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+                schedule.add_stage_after(heron_core::stage::UPDATE, "heron-debug", debug_stage())
             })
             .add_startup_system(create_material.system());
     }

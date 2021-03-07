@@ -14,10 +14,9 @@ pub extern crate rapier2d as rapier;
 pub extern crate rapier3d as rapier;
 
 use bevy_app::{AppBuilder, Plugin};
-use bevy_core::FixedTimestep;
-use bevy_ecs::{IntoChainSystem, IntoSystem, Schedule, SystemStage};
+use bevy_ecs::{IntoSystem, Schedule, SystemStage};
 
-use heron_core::{CollisionEvent, Gravity};
+use heron_core::CollisionEvent;
 
 use crate::body::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
@@ -102,48 +101,42 @@ impl From<IntegrationParameters> for RapierPlugin {
 
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.resources_mut().get_or_insert_with(Gravity::default);
-
-        app.init_resource::<PhysicsPipeline>()
-            .init_resource::<HandleMap>()
-            .add_event::<CollisionEvent>()
-            .add_resource(self.parameters)
-            .add_resource(BroadPhase::new())
-            .add_resource(NarrowPhase::new())
-            .add_resource(RigidBodySet::new())
-            .add_resource(ColliderSet::new())
-            .add_resource(JointSet::new())
-            .add_stage_after(bevy_app::stage::POST_UPDATE, heron_core::stage::PHSYSICS, {
-                let mut schedule = Schedule::default();
-
-                if let Some(steps_per_second) = self.step_per_second {
-                    schedule =
-                        schedule.with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
-                }
-
-                schedule
-                    .with_stage(heron_core::stage::BEFORE_STEP, SystemStage::parallel())
-                    .with_stage("heron-step",
-                        SystemStage::serial()
-                                    .with_system(bevy_transform::transform_propagate_system::transform_propagate_system.system())
-                                    .with_system(body::remove.system())
-                                    .with_system(body::recreate_collider.system())
-                                    .with_system(body::update_rapier_position.system())
-                                    .with_system(body::update_rapier_status.system())
-                                    .with_system(velocity::update_rapier_velocity.system())
-                                    .with_system(body::create.system())
-                                    .with_system(pipeline::step.system())
-                    )
-                    .with_stage(
-                        "heron-post-step",
-                        SystemStage::parallel()
-                            .with_system(body::update_bevy_transform.system().chain(
-                                bevy_transform::transform_propagate_system::transform_propagate_system.system()
-                            ))
-                            .with_system(velocity::update_velocity_component.system())
-                    )
-                    .with_stage(heron_core::stage::AFTER_STEP, SystemStage::parallel())
-            });
+        app.add_plugin(heron_core::CorePlugin {
+            steps_per_second: self.step_per_second,
+        })
+        .init_resource::<PhysicsPipeline>()
+        .init_resource::<HandleMap>()
+        .add_event::<CollisionEvent>()
+        .add_resource(self.parameters)
+        .add_resource(BroadPhase::new())
+        .add_resource(NarrowPhase::new())
+        .add_resource(RigidBodySet::new())
+        .add_resource(ColliderSet::new())
+        .add_resource(JointSet::new())
+        .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+            schedule
+                .add_stage(
+                    "heron-step",
+                    SystemStage::serial()
+                        .with_system(
+                            bevy_transform::transform_propagate_system::transform_propagate_system
+                                .system(),
+                        )
+                        .with_system(body::remove.system())
+                        .with_system(body::recreate_collider.system())
+                        .with_system(body::update_rapier_position.system())
+                        .with_system(body::update_rapier_status.system())
+                        .with_system(velocity::update_rapier_velocity.system())
+                        .with_system(body::create.system())
+                        .with_system(pipeline::step.system()),
+                )
+                .add_stage(
+                    "heron-post-step",
+                    SystemStage::parallel()
+                        .with_system(body::update_bevy_transform.system())
+                        .with_system(velocity::update_velocity_component.system()),
+                )
+        });
     }
 }
 
