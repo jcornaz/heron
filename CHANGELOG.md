@@ -10,6 +10,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+The default color for debug shape is less transparent. That should make easier to see the debug shapes.
 
 
 ## [0.2.0] - 2021-03-07
