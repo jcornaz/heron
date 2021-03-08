@@ -123,7 +123,7 @@ fn base_builder(body: &Body) -> GeometryBuilder {
         }
         Body::ConvexHull { points } => {
             builder.add(&shapes::Polygon {
-                points: points.iter().map(|p| (*p).into()).collect(),
+                points: points.iter().cloned().map(Into::into).collect(),
                 closed: true,
             });
         }
