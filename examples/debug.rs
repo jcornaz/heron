@@ -53,5 +53,6 @@ fn spawn(commands: &mut Commands) {
                 Vec3::new(50.0, 0.0, 0.0),
                 Vec3::new(-50.0, 0.0, 0.0),
             ],
-        });
+        })
+        .with(BodyType::Static);
 }
