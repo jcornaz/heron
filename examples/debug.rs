@@ -41,4 +41,17 @@ fn spawn(commands: &mut Commands) {
             half_segment: 50.0,
         })
         .with(BodyType::Static);
+
+    commands
+        .spawn((
+            Transform::from_translation(Vec3::unit_y() * 150.0),
+            GlobalTransform::default(),
+        ))
+        .with(Body::ConvexHull {
+            points: vec![
+                Vec3::new(0.0, -50.0, 0.0),
+                Vec3::new(50.0, 0.0, 0.0),
+                Vec3::new(-50.0, 0.0, 0.0),
+            ],
+        });
 }

@@ -121,6 +121,12 @@ fn base_builder(body: &Body) -> GeometryBuilder {
                 height: 2.0 * half_extends.y,
             });
         }
+        Body::ConvexHull { points } => {
+            builder.add(&shapes::Polygon {
+                points: points.iter().map(|p| (*p).into()).collect(),
+                closed: true,
+            });
+        }
     };
 
     builder
