@@ -44,7 +44,7 @@ Since the restitution is now defined in `PhysicMaterial`, the `Restitution` comp
 
 There is a new variant to `BodyType`: `Kinematic`. That makes possible to create "kinematic" bodies.
 A kinematic body is controlled programmatically (usually by updating the transform) and affect the other bodies normally, 
-bot is not affected by them.
+but is not affected by them.
 
 
 ### ⚠ Dependency requirements updated (breaking)
