@@ -7,7 +7,7 @@ use std::ops::{Mul, MulAssign};
 /// Component that defines the linear and angular velocity.
 ///
 /// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
-/// The angular part is in radians per second around an axis, represented as a `Quat`
+/// The angular part is in radians per second around an axis, represented as a `Quat`.
 ///
 /// # Example
 ///
