@@ -49,17 +49,7 @@ heron = "0.2.0"
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "0.2.0"] }
-```
-
-**With the git version of bevy:**
-```toml
-bevy = { git = "https://github.com/bevyengine/bevy.git", branch = "main" }
-
-# ATTENTION: The code may not compile. And if it does compile, it may not work properly!
-# Be aware, that it might contains unreleased features and breaking changes too.
-# Checkout the changelog: https://github.com/jcornaz/heron/blob/next-bevy/CHANGELOG.md#unreleased
-heron = { git = "https://github.com/jcornaz/heron.git", branch = "next-bevy" }
+heron = { version = "0.2.0", default-features = false, features = ["2d"] }
 ```
 
 
