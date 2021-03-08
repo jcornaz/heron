@@ -247,11 +247,8 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 
 #[inline]
 fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
-    let mut converted_points: Vec<Point<f32>> = Vec::with_capacity(points.len());
-    for point in points.iter() {
-        converted_points.push(point.into_rapier());
-    }
-    ColliderBuilder::convex_hull(converted_points.as_slice()).expect("Failed to create convex-hull")
+    let points: Vec<Point<f32>> = points.into_rapier();
+    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
 }
 
 fn body_status(body_type: BodyType) -> BodyStatus {
