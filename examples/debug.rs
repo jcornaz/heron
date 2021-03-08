@@ -42,6 +42,7 @@ fn spawn(commands: &mut Commands) {
         })
         .with(BodyType::Static);
 
+    // ConvexHull, in this case describing a triangle
     commands
         .spawn((
             Transform::from_translation(Vec3::unit_y() * 150.0),
