@@ -79,6 +79,7 @@ impl Plugin for CorePlugin {
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
+            .register_type::<RotationConstraints>()
             .add_stage_after(bevy::app::stage::UPDATE, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
@@ -218,6 +219,7 @@ impl BodyType {
 ///         }   
 ///     }   
 /// }
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CollisionEvent {
     /// The two entities started to collide
@@ -273,6 +275,43 @@ impl Default for PhysicMaterial {
         Self {
             restitution: Self::PERFECTLY_INELASTIC_RESTITUTION,
             density: 1.0,
+        }
+    }
+}
+
+/// Component that restrict the rotations caused by forces
+///
+/// Note that angular velocity may still be applied programmatically.
+#[derive(Debug, Copy, Clone, Reflect)]
+pub struct RotationConstraints {
+    /// Set to true to prevent rotations around the x axis
+    pub allow_x: bool,
+
+    /// Set to true to prevent rotations around the y axis
+    pub allow_y: bool,
+
+    /// Set to true to prevent rotations around the Z axis
+    pub allow_z: bool,
+}
+
+impl Default for RotationConstraints {
+    fn default() -> Self {
+        Self {
+            allow_x: true,
+            allow_y: true,
+            allow_z: true,
+        }
+    }
+}
+
+impl RotationConstraints {
+    /// Lock rotations around all axes
+    #[must_use]
+    pub fn lock() -> Self {
+        Self {
+            allow_x: false,
+            allow_y: false,
+            allow_z: false,
         }
     }
 }
