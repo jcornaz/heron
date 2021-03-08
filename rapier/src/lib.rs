@@ -50,7 +50,7 @@ pub struct RapierPlugin {
     pub parameters: IntegrationParameters,
 }
 
-/// Components automatically register, by the plugin that references the body in rapier's world
+/// Components automatically register, by the plugin that references the body in rapier's world.
 ///
 /// It can be used to get direct access to rapier's world.
 #[derive(Debug, Copy, Clone)]
@@ -60,11 +60,11 @@ pub struct BodyHandle {
 }
 
 impl RapierPlugin {
-    /// Configure how many times per second the physics world needs to be updated
+    /// Configure how many times per second the physics world needs to be updated.
     ///
     /// # Panics
     ///
-    /// Panic if the number of `steps_per_second` is 0
+    /// Panic if the number of `steps_per_second` is 0.
     pub fn from_steps_per_second(steps_per_second: u8) -> Self {
         assert!(
             steps_per_second > 0,
@@ -146,7 +146,7 @@ impl Plugin for RapierPlugin {
 }
 
 impl BodyHandle {
-    /// Creates the new `BodyHandle`
+    /// Creates the new `BodyHandle`.
     #[must_use]
     pub fn new(rigid_body: RigidBodyHandle, collider: ColliderHandle) -> BodyHandle {
         BodyHandle {
@@ -155,13 +155,13 @@ impl BodyHandle {
         }
     }
 
-    /// Returns the rapier's rigid body handle
+    /// Returns the rapier's rigid body handle.
     #[must_use]
     pub fn rigid_body(&self) -> RigidBodyHandle {
         self.rigid_body
     }
 
-    /// Returns the rapier's collider handle
+    /// Returns the rapier's collider handle.
     #[must_use]
     pub fn collider(&self) -> ColliderHandle {
         self.collider

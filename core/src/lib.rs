@@ -17,9 +17,9 @@ mod velocity;
 
 /// Physics stages for user systems. These stages are executed once per physics step.
 ///
-/// That usually means they don't run each frame, and may run more than once in a single frame.
+/// That usually means they don't run each frame and may run more than once in a single frame.
 ///
-/// In general end-users shouldn't have to deal with these stages directly.
+/// In general, end-users shouldn't have to deal with these stages directly.
 ///
 /// Instead, it is possible to call the [`add_physiscs_system`](ext::AppBuilderExt::add_physics_system) extension function on `AppBuilder`
 /// to register systems that should run during the physics update.
@@ -37,7 +37,7 @@ pub mod stage {
     pub const UPDATE: &str = "heron-before-step";
 }
 
-/// Plugin that register stage resources and components.
+/// Plugin that registers stage resources and components.
 ///
 /// It does **NOT** enable physics behavior.
 #[derive(Debug, Copy, Clone)]
@@ -153,7 +153,7 @@ impl Default for Body {
 pub enum BodyType {
     /// A dynamic body is normally affected by physic forces and affect the other bodies normally too.
     ///
-    /// This is the most "natural" type in the sense that, in the real life, everything is dynamic.
+    /// This is the most "natural" type in the sense that, in real life, everything is dynamic.
     ///
     /// It is the default type.
     Dynamic,
@@ -167,22 +167,22 @@ pub enum BodyType {
 
     /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
     ///
-    /// It affects the other bodies normally, but is not affected by them.
+    /// It affects the other bodies normally but is not affected by them.
     ///
     /// If the transform is updated, then a velocity will be automatically calculated, producing
     /// realistic interaction with other bodies.
     ///
     /// It can also have a velocity be applied.
     ///
-    /// It is well suited fo moving-platforms.
+    /// It is well-suited for moving platforms.
     Kinematic,
 
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.
     ///
-    /// Other bodies will be able to penetrate the sensor. But it still participate in collision events.
+    /// Other bodies will be able to penetrate the sensor. But it still participates in collision events.
     ///
     /// A sensor is useful when we are only interested in collision events.
-    /// One may for example add a sensor to detect when the player reach a certain area.
+    /// One may, for example, add a sensor to detect when the player reaches a certain area.
     Sensor,
 }
 
@@ -245,14 +245,14 @@ pub enum CollisionEvent {
 /// ```
 #[derive(Debug, Copy, Clone, PartialEq, Reflect)]
 pub struct PhysicMaterial {
-    /// Coefficient of restitution. Affect how much it "bounces" when colliding other objects.
+    /// Coefficient of restitution. Affect how much it "bounces" when colliding with other objects.
     ///
     /// The higher the value, the more "bouncy".
     ///
     /// Typical values are between 0 (perfectly inelastic) and 1 (perfectly elastic)
     pub restitution: f32,
 
-    /// Density. Affects how much the body resist to forces.
+    /// Density. It affects how much the body resists forces.
     ///
     /// The higher the value, the heavier.
     ///
