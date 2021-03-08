@@ -24,11 +24,11 @@
 //! heron = { version = "0.2.0", default-features = false, features = ["2d"] }
 //! ```
 //!
-//! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
+//! Note: when debugging, you may consider enabling the `debug` feature to render the collision shapes (works only for 2d, at the moment).
 //!
 //! ## Install the plugin
 //!
-//! To enable physics and collision detection, the [`PhysicsPlugin`] should be installed
+//! The [`PhysicsPlugin`] should be installed to enable physics and collision detection.
 //!
 //! ```no_run
 //! use bevy::prelude::*;
@@ -48,7 +48,7 @@
 //! To create a rigid body, add the component `Body` to the entity, choosing a collision shape.
 //! It will turn the entity into a dynamic rigid body affected by physics.
 //!
-//! The position, and rotation is defined by the bevy `GlobalTransform` component.
+//! The position and rotation are defined by the bevy `GlobalTransform` component.
 //!
 //! ```
 //! # use bevy::prelude::*;
@@ -72,10 +72,10 @@
 //!
 //! ## Run systems synchronously with the physics step
 //!
-//! The physics step runs at fixed rate (60 times per second by default) and is out of sync of the
+//! The physics step runs at a fixed rate (60 times per second by default) and is out of sync of the
 //! bevy frame.
 //!
-//! But modifying any physics component (such as the transform or velocity) **must** be done synchronously with
+//! But modifying any physics component (such as the transform or velocity), **must** be done synchronously with
 //! the physics step.
 //!
 //! The simplest way is to add these systems with `add_physics_system`:
@@ -99,18 +99,18 @@
 //! # fn update_velocities() {}
 //! ```
 //!
-//! ## Move rigid bodies programatically
+//! ## Move rigid bodies programmatically
 //!
-//! When creating games, it is often useful to interact with the physics engine and move bodies programatically.
+//! When creating games, it is often useful to interact with the physics engine and move bodies programmatically.
 //! For this, you have two options: Updating the `Transform` or applying a [`Velocity`].
 //!
 //! ### Option 1: Update the Transform
 //!
-//! For kinematic bodies ([`BodyType::Kinematic`]), if the transform is udpated,
+//! For kinematic bodies ([`BodyType::Kinematic`]), if the transform is updated,
 //! the body is moved and get an automatically calculated velocity. Physics rules will be applied normally.
 //! Updating the transform is a good way to move a kinematic body.
 //!
-//! For other type of bodies, if the transform is updated,
+//! For other types of bodies, if the transform is updated,
 //! the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
 //!
 //! ### Option 2: Use the Velocity component
@@ -137,7 +137,7 @@ use heron_rapier::RapierPlugin;
 
 /// Physics behavior powered by [rapier](https://rapier.rs)
 ///
-/// Allow to access the underlying physics world directly
+/// Allow access to the underlying physics world directly
 pub mod rapier_plugin {
     pub use heron_rapier::*;
 }
@@ -150,7 +150,7 @@ pub mod prelude {
     };
 }
 
-/// Plugin to install in order to enable collision detection and physics behavior.
+/// Plugin to install to enable collision detection and physics behavior.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
