@@ -6,11 +6,11 @@ use fnv::FnvHashMap;
 use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::nalgebra::{Point2, Point3};
 use crate::rapier::dynamics::{
     BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
 };
 use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderSet};
+use crate::rapier::math::Point;
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -246,23 +246,12 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 }
 
 #[inline]
-#[cfg(feature = "2d")]
 fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
-    let mut converted_points: Vec<Point2<f32>> = vec![];
+    let mut converted_points: Vec<Point<f32>> = Vec::with_capacity(points.len());
     for point in points.iter() {
-        converted_points.push(Point2::new(point.x, point.y));
+        converted_points.push(point.into_rapier());
     }
-    ColliderBuilder::convex_hull(converted_points.as_slice()).unwrap()
-}
-
-#[inline]
-#[cfg(feature = "3d")]
-fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
-    let mut converted_points: Vec<Point3<f32>> = vec![];
-    for point in points.iter() {
-        converted_points.push(Point3::new(point.x, point.y, point.z));
-    }
-    ColliderBuilder::convex_hull(converted_points.as_slice()).unwrap()
+    ColliderBuilder::convex_hull(converted_points.as_slice()).expect("Failed to create convex-hull")
 }
 
 fn body_status(body_type: BodyType) -> BodyStatus {
