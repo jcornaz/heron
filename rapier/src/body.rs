@@ -3,7 +3,7 @@ use bevy::math::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
+use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -29,16 +29,36 @@ pub(crate) fn create(
             Option<&BodyType>,
             Option<&Velocity>,
             Option<&PhysicMaterial>,
+            Option<&RotationConstraints>,
         ),
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, body_type, velocity, material) in query.iter() {
+    for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
+        query.iter()
+    {
         let body_type = body_type.cloned().unwrap_or_default();
 
         let mut builder = RigidBodyBuilder::new(body_status(body_type))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
+
+        #[allow(unused_variables)]
+        if let Some(RotationConstraints {
+            allow_x,
+            allow_y,
+            allow_z,
+        }) = rotation_constraints.cloned()
+        {
+            #[cfg(feature = "2d")]
+            if !allow_z {
+                builder = builder.lock_rotations();
+            }
+            #[cfg(feature = "3d")]
+            {
+                builder = builder.restrict_rotations(allow_x, allow_y, allow_z);
+            }
+        }
 
         if let Some(v) = velocity {
             #[cfg(feature = "2d")]
@@ -76,33 +96,33 @@ pub(crate) fn create(
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn recreate_collider(
+pub(crate) fn remove_bodies(
+    commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut query: Query<
+    mut joints: ResMut<'_, JointSet>,
+    changed: Query<
         '_,
-        (
-            Entity,
-            &Body,
-            &mut BodyHandle,
-            Option<&BodyType>,
-            Option<&PhysicMaterial>,
-        ),
-        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicMaterial>)>,
+        (Entity, &BodyHandle),
+        Or<(
+            Mutated<Body>,
+            Changed<RotationConstraints>,
+            Changed<BodyType>,
+            Changed<PhysicMaterial>,
+        )>,
     >,
+    removed: Query<'_, (Entity, &BodyHandle), Without<RotationConstraints>>,
 ) {
-    for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {
-        colliders.remove(handle.collider, &mut bodies, true);
-        handle.collider = colliders.insert(
-            build_collider(
-                entity,
-                &body_def,
-                body_type.cloned().unwrap_or_default(),
-                material.cloned().unwrap_or_default(),
-            ),
-            handle.rigid_body,
-            &mut bodies,
-        );
+    for (entity, handle) in changed.iter() {
+        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+        commands.remove_one::<BodyHandle>(entity);
+    }
+
+    for entity in removed.removed::<RotationConstraints>() {
+        if let Ok((entity, handle)) = removed.get(*entity) {
+            bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+            commands.remove_one::<BodyHandle>(entity);
+        }
     }
 }
 
