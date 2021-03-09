@@ -95,12 +95,22 @@ pub(crate) fn create(
     }
 }
 
-pub(crate) fn remove_invalid_bodies(
+#[allow(clippy::type_complexity)]
+pub(crate) fn remove_bodies(
     commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
-    changed: Query<'_, (Entity, &BodyHandle), Changed<RotationConstraints>>,
+    changed: Query<
+        '_,
+        (Entity, &BodyHandle),
+        Or<(
+            Mutated<Body>,
+            Changed<RotationConstraints>,
+            Changed<BodyType>,
+            Changed<PhysicMaterial>,
+        )>,
+    >,
     removed: Query<'_, (Entity, &BodyHandle), Without<RotationConstraints>>,
 ) {
     for (entity, handle) in changed.iter() {
@@ -113,37 +123,6 @@ pub(crate) fn remove_invalid_bodies(
             bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
             commands.remove_one::<BodyHandle>(entity);
         }
-    }
-}
-
-#[allow(clippy::type_complexity)]
-pub(crate) fn recreate_collider(
-    mut bodies: ResMut<'_, RigidBodySet>,
-    mut colliders: ResMut<'_, ColliderSet>,
-    mut query: Query<
-        '_,
-        (
-            Entity,
-            &Body,
-            &mut BodyHandle,
-            Option<&BodyType>,
-            Option<&PhysicMaterial>,
-        ),
-        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicMaterial>)>,
-    >,
-) {
-    for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {
-        colliders.remove(handle.collider, &mut bodies, true);
-        handle.collider = colliders.insert(
-            build_collider(
-                entity,
-                &body_def,
-                body_type.cloned().unwrap_or_default(),
-                material.cloned().unwrap_or_default(),
-            ),
-            handle.rigid_body,
-            &mut bodies,
-        );
     }
 }
 

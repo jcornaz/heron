@@ -117,7 +117,7 @@ impl Plugin for RapierPlugin {
             schedule
                 .add_stage(
                     "heron-remove-invalid-bodies",
-                    SystemStage::serial().with_system(body::remove_invalid_bodies.system()),
+                    SystemStage::serial().with_system(body::remove_bodies.system()),
                 )
                 .add_stage(
                     "heron-pre-step",
@@ -127,7 +127,6 @@ impl Plugin for RapierPlugin {
                                 .system(),
                         )
                         .with_system(body::remove.system())
-                        .with_system(body::recreate_collider.system())
                         .with_system(body::update_rapier_position.system())
                         .with_system(velocity::update_rapier_velocity.system())
                         .with_system(body::update_rapier_status.system())
