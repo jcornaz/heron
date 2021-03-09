@@ -1,5 +1,6 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
 
 //! Core components and resources to use Heron
 

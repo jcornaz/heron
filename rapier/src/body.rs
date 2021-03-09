@@ -109,7 +109,7 @@ pub(crate) fn remove_invalid_bodies(
     }
 
     for entity in removed.removed::<RotationConstraints>() {
-        if let Some((entity, handle)) = removed.get(*entity).ok() {
+        if let Ok((entity, handle)) = removed.get(*entity) {
             bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
             commands.remove_one::<BodyHandle>(entity);
         }
