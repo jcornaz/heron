@@ -95,6 +95,27 @@ pub(crate) fn create(
     }
 }
 
+pub(crate) fn remove_invalid_bodies(
+    commands: &mut Commands,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut joints: ResMut<'_, JointSet>,
+    changed: Query<'_, (Entity, &BodyHandle), Changed<RotationConstraints>>,
+    removed: Query<'_, (Entity, &BodyHandle), Without<RotationConstraints>>,
+) {
+    for (entity, handle) in changed.iter() {
+        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+        commands.remove_one::<BodyHandle>(entity);
+    }
+
+    for entity in removed.removed::<RotationConstraints>() {
+        if let Some((entity, handle)) = removed.get(*entity).ok() {
+            bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+            commands.remove_one::<BodyHandle>(entity);
+        }
+    }
+}
+
 #[allow(clippy::type_complexity)]
 pub(crate) fn recreate_collider(
     mut bodies: ResMut<'_, RigidBodySet>,

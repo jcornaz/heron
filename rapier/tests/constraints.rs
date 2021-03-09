@@ -65,7 +65,6 @@ fn rotation_can_be_locked_at_creation() {
 }
 
 #[test]
-#[ignore]
 fn rotation_can_be_locked_after_creation() {
     let mut app = test_app();
 
@@ -89,5 +88,32 @@ fn rotation_can_be_locked_after_creation() {
             .unwrap()
             .effective_world_inv_inertia_sqrt,
         0.0
+    );
+}
+
+#[test]
+fn rotation_is_unlocked_if_component_is_removed() {
+    let mut app = test_app();
+
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        RotationConstraints::lock(),
+    ));
+
+    app.update();
+
+    app.world.remove_one::<RotationConstraints>(entity).unwrap();
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+
+    assert!(
+        bodies
+            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .unwrap()
+            .effective_world_inv_inertia_sqrt
+            > 0.0
     );
 }

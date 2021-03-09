@@ -116,6 +116,10 @@ impl Plugin for RapierPlugin {
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
+                    "heron-remove-invalid-bodies",
+                    SystemStage::serial().with_system(body::remove_invalid_bodies.system()),
+                )
+                .add_stage(
                     "heron-pre-step",
                     SystemStage::serial()
                         .with_system(
