@@ -12,7 +12,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ### RotationConstraints component
 
-A new `RotationConstraints` component make possible to prevent rotation around the given axes (incl. fully lock rotation)
+A new `RotationConstraints` component make possible to prevent rotation around the given axes.
 
 ### Others
 
