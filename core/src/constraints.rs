@@ -1,8 +1,22 @@
 use bevy::reflect::Reflect;
 
-/// Component that restrict the rotations caused by forces
+/// Component that restrict what rotations can be caused by forces.
 ///
-/// Note that angular velocity may still be applied programmatically.
+/// Note that angular velocity may still be applied programmatically. This only restrict how rotation
+/// can change when force/torques are applied.
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+///
+/// fn spawn(commands: &mut Commands) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 })
+///         .with(RotationConstraints::lock()); // Prevent rotation caused by forces
+/// }
+/// ```
 #[derive(Debug, Copy, Clone, Reflect)]
 pub struct RotationConstraints {
     /// Set to true to prevent rotations around the x axis
