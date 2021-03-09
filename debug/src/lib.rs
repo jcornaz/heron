@@ -40,7 +40,7 @@ impl From<Color> for DebugPlugin {
 impl Default for DebugPlugin {
     fn default() -> Self {
         let mut color = bevy::render::color::Color::BLUE;
-        color.set_a(0.3);
+        color.set_a(0.4);
         Self(color)
     }
 }
