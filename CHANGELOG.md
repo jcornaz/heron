@@ -10,7 +10,13 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
-The default color for debug shape is less transparent. That should make easier to see the debug shapes.
+### RotationConstraints component
+
+A new `RotationConstraints` component make possible to prevent rotation around the given axes (incl. fully lock rotation)
+
+### Others
+
+* The opacity has been increased for the default color of debug shapes.
 
 
 ## [0.2.0] - 2021-03-07
