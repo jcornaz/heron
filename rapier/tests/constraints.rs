@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, PhysicMaterial};
+use heron_core::{Body, PhysicMaterial, RotationConstraints};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::math::AngVector;
@@ -26,6 +26,7 @@ fn test_app() -> App {
 }
 
 #[test]
+#[cfg(feature = "2d")]
 fn rotation_is_not_constrained_without_the_component() {
     let mut app = test_app();
 
@@ -36,30 +37,36 @@ fn rotation_is_not_constrained_without_the_component() {
     app.update();
 
     let bodies = app.resources.get::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
 
-    let inv_angular_inertia: Vec3 =
-        vec3_from_angle_vector(body.mass_properties().inv_principal_inertia_sqrt);
-
-    let inv_angular_inertia: Vec3 = inv_angular_inertia.into();
-
-    #[cfg(feature = "3d")]
-    assert!(inv_angular_inertia.x > 0.0);
-
-    #[cfg(feature = "3d")]
-    assert!(inv_angular_inertia.y > 0.0);
-
-    assert!(inv_angular_inertia.z > 0.0);
+    assert!(
+        bodies
+            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .unwrap()
+            .effective_world_inv_inertia_sqrt
+            > 0.0
+    );
 }
 
+#[test]
 #[cfg(feature = "2d")]
-fn vec3_from_angle_vector(vector: AngVector<f32>) -> Vec3 {
-    Vec3::unit_z() * vector
-}
+fn rotation_can_be_locked_on_creation() {
+    let mut app = test_app();
 
-#[cfg(feature = "3d")]
-fn vec3_from_angle_vector(vector: AngVector<f32>) -> Vec3 {
-    vector.into_bevy()
+    let entity = app.world.spawn((
+        GlobalTransform::default(),
+        Body::Sphere { radius: 10.0 },
+        RotationConstraints::lock(),
+    ));
+
+    app.update();
+
+    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+
+    assert_eq!(
+        bodies
+            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .unwrap()
+            .effective_world_inv_inertia_sqrt,
+        0.0
+    );
 }

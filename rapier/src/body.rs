@@ -34,7 +34,8 @@ pub(crate) fn create(
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, body_type, velocity, material, restrict_rotation) in query.iter()
+    for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
+        query.iter()
     {
         let body_type = body_type.cloned().unwrap_or_default();
 
@@ -47,7 +48,7 @@ pub(crate) fn create(
             allow_x,
             allow_y,
             allow_z,
-        }) = restrict_rotation.cloned()
+        }) = rotation_constraints.cloned()
         {
             #[cfg(feature = "2d")]
             if !allow_z {
