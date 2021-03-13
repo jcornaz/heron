@@ -240,6 +240,12 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 }
 
 #[inline]
+#[cfg(feature = "2d")]
+fn trimesh_builder(vertices: Vec<Vec2>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
+    todo!();
+}
+
+#[inline]
 #[cfg(feature = "3d")]
 fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
     ColliderBuilder::trimesh(vertices.into_rapier(), indices)

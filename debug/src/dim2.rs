@@ -121,6 +121,9 @@ fn base_builder(body: &Body) -> GeometryBuilder {
                 height: 2.0 * half_extends.y,
             });
         }
+        Body::TriMesh { positions, indices } => {
+            todo!();
+        }
     };
 
     builder
