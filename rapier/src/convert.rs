@@ -114,6 +114,18 @@ impl IntoRapier<Vec<Point3<f32>>> for &[Vec3] {
     }
 }
 
+impl IntoBevy<Vec2> for Point2<f32> {
+    fn into_bevy(self) -> Vec2 {
+        Vec2::new(self.x, self.y)
+    }
+}
+
+impl IntoBevy<Vec<Vec2>> for &[Point2<f32>] {
+    fn into_bevy(self) -> Vec<Vec2> {
+        self.iter().cloned().map(IntoBevy::into_bevy).collect()
+    }
+}
+
 impl IntoRapier<Translation<f32>> for Vec3 {
     fn into_rapier(self) -> Translation<f32> {
         <Vec3 as IntoRapier<Vector<f32>>>::into_rapier(self).into()
