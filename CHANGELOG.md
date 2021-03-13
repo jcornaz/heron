@@ -15,6 +15,8 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 There is a new variant in the `Body` enum: `ConvexHull`. It takes a list of points, and the body shape will be the
 smallest possible convex shape that includes all the given points.
 
+Thanks @faassen
+
 ### RotationConstraints component
 
 A new `RotationConstraints` component make possible to prevent rotation around the given axes.
