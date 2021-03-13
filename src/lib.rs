@@ -124,7 +124,8 @@
 //!
 //! ## See also
 //!
-//! * The different [`BodyType`] (dynamic, static, kinematic or sensor)
+//! * How to choose a [collision shape](Body)
+//! * How to define a [`BodyType`] (dynamic, static, kinematic or sensor)
 //! * How to define the world's [`Gravity`]
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
