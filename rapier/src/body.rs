@@ -213,6 +213,7 @@ fn build_collider(
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
+        Body::TriMesh { positions, indices } => trimesh_builder(positions.clone(), indices.clone())
     };
 
     builder = builder
@@ -236,6 +237,12 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[cfg(feature = "3d")]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+}
+
+#[inline]
+#[cfg(feature = "3d")]
+fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
+    ColliderBuilder::trimesh(vertices.into_rapier(), indices)
 }
 
 fn body_status(body_type: BodyType) -> BodyStatus {
@@ -314,5 +321,10 @@ mod tests {
         assert_eq!(capsule.segment.a.z, 0.0);
         #[cfg(feature = "3d")]
         assert_eq!(capsule.segment.b.z, 0.0);
+    }
+
+    #[test]
+    fn build_trimesh() {
+        todo!();
     }
 }

@@ -49,6 +49,15 @@ pub enum Body {
         /// In 2d the `z` axis is ignored
         half_extends: Vec3,
     },
+
+    /// A shape made of triangles
+    TriMesh {
+        /// A vector of points that define the shape
+        positions: Vec<Vec3>,
+
+        /// A vector of slices of size 3. each value in the slice is the index of a position in the positions vector that together define a triangle
+        indices: Vec<[u32; 3]>
+    }
 }
 
 /// Component that defines the *type* of rigid body.

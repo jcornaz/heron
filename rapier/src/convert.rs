@@ -8,6 +8,7 @@
 use bevy_math::prelude::*;
 
 use heron_core::AxisAngle;
+use rapier::na::Point3;
 
 use crate::nalgebra::{self, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3};
 use crate::rapier::math::{Isometry, Translation, Vector};
@@ -114,6 +115,18 @@ impl IntoRapier<f32> for AxisAngle {
 impl IntoRapier<Vector3<f32>> for AxisAngle {
     fn into_rapier(self) -> Vector3<f32> {
         Vec3::from(self).into_rapier()
+    }
+}
+
+impl IntoRapier<Point3<f32>> for Vec3 {
+    fn into_rapier(self) -> Point3<f32> {
+        Point3::<f32>::new(self.x, self.y, self.z)
+    }
+}
+
+impl IntoRapier<Vec<Point3<f32>>> for Vec<Vec3> {
+    fn into_rapier(self) -> Vec<Point3<f32>> {
+        self.iter().map(|v| v.into_rapier()).collect()
     }
 }
 
