@@ -10,6 +10,7 @@ use crate::rapier::dynamics::{
     BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
 };
 use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderSet};
+use crate::rapier::math::Point;
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -240,6 +241,7 @@ fn build_collider(
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
+        Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
     };
 
     builder = builder
@@ -261,6 +263,12 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[cfg(feature = "3d")]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+}
+
+#[inline]
+fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
+    let points: Vec<Point<f32>> = points.into_rapier();
+    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
 }
 
 fn body_status(body_type: BodyType) -> BodyStatus {

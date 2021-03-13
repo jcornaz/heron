@@ -102,6 +102,30 @@ impl IntoRapier<Point3<f32>> for Vec3 {
     }
 }
 
+impl IntoRapier<Vec<Point2<f32>>> for &[Vec3] {
+    fn into_rapier(self) -> Vec<Point2<f32>> {
+        self.iter().cloned().map(IntoRapier::into_rapier).collect()
+    }
+}
+
+impl IntoRapier<Vec<Point3<f32>>> for &[Vec3] {
+    fn into_rapier(self) -> Vec<Point3<f32>> {
+        self.iter().cloned().map(IntoRapier::into_rapier).collect()
+    }
+}
+
+impl IntoBevy<Vec2> for Point2<f32> {
+    fn into_bevy(self) -> Vec2 {
+        Vec2::new(self.x, self.y)
+    }
+}
+
+impl IntoBevy<Vec<Vec2>> for &[Point2<f32>] {
+    fn into_bevy(self) -> Vec<Vec2> {
+        self.iter().cloned().map(IntoBevy::into_bevy).collect()
+    }
+}
+
 impl IntoRapier<Translation<f32>> for Vec3 {
     fn into_rapier(self) -> Translation<f32> {
         <Vec3 as IntoRapier<Vector<f32>>>::into_rapier(self).into()
@@ -154,8 +178,9 @@ mod tests {
 
     #[cfg(feature = "2d")]
     mod angle2d {
-        use super::*;
         use rstest::rstest;
+
+        use super::*;
 
         #[test]
         fn negative_axis_angle_to_rapier() {

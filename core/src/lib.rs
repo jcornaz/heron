@@ -132,6 +132,12 @@ pub enum Body {
         /// In 2d the `z` axis is ignored
         half_extends: Vec3,
     },
+
+    /// A convex polygon/polyhedron shape
+    ConvexHull {
+        /// A vector of points describing the convex hull
+        points: Vec<Vec3>,
+    },
 }
 
 impl Default for Body {
