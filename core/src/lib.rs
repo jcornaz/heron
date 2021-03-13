@@ -1,15 +1,18 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
 
 //! Core components and resources to use Heron
 
 use bevy::core::FixedTimestep;
 use bevy::prelude::*;
 
+pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
 pub use velocity::{AxisAngle, Velocity};
 
+mod constraints;
 pub mod ext;
 mod gravity;
 pub mod utils;
@@ -79,6 +82,7 @@ impl Plugin for CorePlugin {
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
+            .register_type::<RotationConstraints>()
             .add_stage_after(bevy::app::stage::UPDATE, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
@@ -224,6 +228,7 @@ impl BodyType {
 ///         }   
 ///     }   
 /// }
+/// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CollisionEvent {
     /// The two entities started to collide

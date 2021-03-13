@@ -4,6 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/v/heron)](https://crates.io/crates/heron)
 [![Docs](https://docs.rs/heron/badge.svg)](https://docs.rs/heron)
 [![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
+[![dependency status](https://deps.rs/repo/github/jcornaz/heron/status.svg)](https://deps.rs/repo/github/jcornaz/heron)
 [![Zenhub](https://img.shields.io/badge/workspace-zenhub-%236061be)](https://app.zenhub.com/workspaces/heron-600478067304b1000e27f4c4/board)
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
@@ -49,17 +50,7 @@ heron = "0.2.0"
 **For a 2d game:**
 ```toml
 bevy = "^0.4.0"
-heron = { version = "0.2.0"] }
-```
-
-**With the git version of bevy:**
-```toml
-bevy = { git = "https://github.com/bevyengine/bevy.git", branch = "main" }
-
-# ATTENTION: The code may not compile. And if it does compile, it may not work properly!
-# Be aware, that it might contains unreleased features and breaking changes too.
-# Checkout the changelog: https://github.com/jcornaz/heron/blob/next-bevy/CHANGELOG.md#unreleased
-heron = { git = "https://github.com/jcornaz/heron.git", branch = "next-bevy" }
+heron = { version = "0.2.0", default-features = false, features = ["2d"] }
 ```
 
 

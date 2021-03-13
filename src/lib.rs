@@ -128,6 +128,7 @@
 //! * How to define the world's [`Gravity`]
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
+//! * How to define [`RotationConstraints`]
 
 use bevy::app::{AppBuilder, Plugin};
 
@@ -146,7 +147,7 @@ pub mod rapier_plugin {
 pub mod prelude {
     pub use crate::{
         ext::*, stage, AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial,
-        PhysicsPlugin, Velocity,
+        PhysicsPlugin, RotationConstraints, Velocity,
     };
 }
 

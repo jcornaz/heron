@@ -76,6 +76,6 @@ prerelease = true
 
 [[package.metadata.release.pre-release-replacements]]
 file = "README.md"
-search = "heron = \\{ version = \".*\""
+search = "heron = \\{ version = \"[0-9a-z\\.-]+\","
 replace = "heron = { version = \"{{version}}\""
 prerelease = true
