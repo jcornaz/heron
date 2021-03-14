@@ -213,7 +213,7 @@ fn build_collider(
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
-        Body::TriMesh { positions, indices } => trimesh_builder(positions.clone(), indices.clone())
+        Body::TriMesh { positions, indices } => trimesh_builder(positions.clone(), indices.clone()),
     };
 
     builder = builder
@@ -241,8 +241,10 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 
 #[inline]
 #[cfg(feature = "2d")]
-fn trimesh_builder(vertices: Vec<Vec2>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
-    todo!();
+fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
+    let vertices: Vec<Vec2> = vertices.iter().map(|v| Vec2::new(v.x, v.y) ).collect();
+
+    ColliderBuilder::trimesh(vertices.into_rapier(), indices)
 }
 
 #[inline]
