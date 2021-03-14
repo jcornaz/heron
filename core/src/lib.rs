@@ -7,7 +7,7 @@ use bevy_ecs::Entity;
 use bevy_math::Vec3;
 
 pub use gravity::Gravity;
-pub use velocity::{AxisAngle, Velocity};
+pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod gravity;
 pub mod utils;
