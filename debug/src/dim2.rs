@@ -122,7 +122,14 @@ fn base_builder(body: &Body) -> GeometryBuilder {
             });
         }
         Body::TriMesh { positions, indices } => {
-            todo!();
+            let mut path = PathBuilder::new();
+            for triangle in indices {
+                path.move_to(positions[triangle[0]]);
+                path.line_to(positions[triangle[1]]);
+                path.line_to(positions[triangle[2]]);
+            }
+            path.close();
+            builder.add(&path.build());
         }
     };
 

@@ -56,8 +56,8 @@ pub enum Body {
         positions: Vec<Vec3>,
 
         /// A vector of slices of size 3. each value in the slice is the index of a position in the positions vector that together define a triangle
-        indices: Vec<[u32; 3]>
-    }
+        indices: Vec<[u32; 3]>,
+    },
 }
 
 /// Component that defines the *type* of rigid body.

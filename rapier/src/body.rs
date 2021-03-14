@@ -242,7 +242,7 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 #[inline]
 #[cfg(feature = "2d")]
 fn trimesh_builder(vertices: Vec<Vec3>, indices: Vec<[u32; 3]>) -> ColliderBuilder {
-    let vertices: Vec<Vec2> = vertices.iter().map(|v| Vec2::new(v.x, v.y) ).collect();
+    let vertices: Vec<Vec2> = vertices.iter().map(|v| Vec2::new(v.x, v.y)).collect();
 
     ColliderBuilder::trimesh(vertices.into_rapier(), indices)
 }
@@ -333,6 +333,63 @@ mod tests {
 
     #[test]
     fn build_trimesh() {
-        todo!();
+        let positions = vec![
+            //Cube 1
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 1.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 1.0),
+            Vec3::new(1.0, 1.0, 0.0),
+            Vec3::new(1.0, 1.0, 1.0),
+        ];
+
+        let indices = vec![
+            [0, 1, 2],
+            [1, 3, 2],
+            [1, 5, 3],
+            [5, 7, 3],
+            [5, 4, 7],
+            [4, 6, 7],
+            [4, 0, 6],
+            [0, 2, 6],
+        ];
+
+        let builder_1 = build_collider(
+            Entity::new(0),
+            &Body::TriMesh {
+                positions: positions.clone(),
+                indices: indices.clone(),
+            },
+            BodyType::default(),
+            None,
+        );
+
+        let builder_2 = build_collider(
+            Entity::new(1),
+            &Body::TriMesh {
+                positions: positions
+                    .clone()
+                    .iter()
+                    .map(|p| Vec3::new(p.x + 0.5, p.y, p.z))
+                    .collect(),
+                indices,
+            },
+            BodyType::default(),
+            None,
+        );
+
+        let trimesh_1 = builder_1
+            .shape()
+            .as_trimesh()
+            .expect("Created shape was not a trimesh");
+
+        let trimesh_2 = builder_2
+            .shape()
+            .as_trimesh()
+            .expect("Created shape was not a trimesh");
+
+        //Collision check ??
     }
 }
