@@ -147,8 +147,8 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        ext::*, stage, AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial,
-        PhysicsPlugin, RotationConstraints, Velocity,
+        ext::*, stage, Acceleration, AxisAngle, Body, BodyType, CollisionEvent, Gravity,
+        PhysicMaterial, PhysicsPlugin, RotationConstraints, Velocity,
     };
 }
 
