@@ -17,6 +17,13 @@ smallest possible convex shape that includes all the given points.
 
 Thanks @faassen
 
+### Acceleration component
+
+A new `Acceleration` component make possible to apply and linear and angular accelerations.
+It is by extension also possible to apply a force if you know the mass: `acceleration.linear = force / mass`.
+
+Thanks @ryo33
+
 ### RotationConstraints component
 
 A new `RotationConstraints` component make possible to prevent rotation around the given axes.
