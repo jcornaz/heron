@@ -11,12 +11,16 @@ description = "An ergonomic physics API for 2d and 3d bevy games. (powered by ra
 repository = "https://github.com/jcornaz/heron/"
 keywords = ["game", "gamedev", "physics", "collision", "bevy"]
 categories = ["game-development", "simulation"]
+build = "build.rs"
 
 [features]
 default = ["3d"]
 2d = ["heron_rapier/2d", "heron_debug/2d"]
 3d = ["heron_rapier/3d", "heron_debug/3d"]
 debug = ["heron_debug"]
+
+[build-dependencies]
+skeptic = "0.13"
 
 [dependencies]
 heron_core = { path = "core", version = "^0.2.0"}
@@ -26,6 +30,7 @@ bevy = { version = "^0.4.0", default-features = false }
 
 [dev-dependencies]
 bevy = "0.4"
+skeptic = "0.13"
 
 [[example]]
 name = "demo"

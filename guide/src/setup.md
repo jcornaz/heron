@@ -19,6 +19,7 @@ heron = { version = "0.2.0", default-features = false, features = ["2d"] }
 ```rust,no_run
 use bevy::prelude::*;
 use heron::prelude::*;
+
 fn main() {
   App::build()
     .add_plugins(DefaultPlugins)

@@ -2,6 +2,7 @@
 /target
 /.cargo/*.toml
 /Cargo.lock
+*.rmeta
 
 # IDE
 /.idea
