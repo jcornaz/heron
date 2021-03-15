@@ -22,7 +22,7 @@ pub(crate) fn update_rapier_force_and_torque(
     }
 }
 
-pub(crate) fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
+fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
     let wake_up = !acceleration.is_near_zero();
     let linear_acceleration: Vector<Real> = acceleration.linear.into_rapier();
     let angular_acceleration: AngVector<f32> = acceleration.angular.into_rapier();

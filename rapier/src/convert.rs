@@ -30,17 +30,9 @@ impl IntoBevy<Vec3> for Vector2<f32> {
     }
 }
 
-#[cfg(feature = "3d")]
 impl IntoBevy<Vec3> for Vector3<f32> {
     fn into_bevy(self) -> Vec3 {
         Vec3::new(self.x, self.y, self.z)
-    }
-}
-
-#[cfg(feature = "2d")]
-impl IntoBevy<f32> for f32 {
-    fn into_bevy(self) -> f32 {
-        self
     }
 }
 
