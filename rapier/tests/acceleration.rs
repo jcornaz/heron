@@ -42,7 +42,7 @@ fn body_is_created_with_acceleration() {
     #[cfg(feature = "2d")]
     let linear = Vec3::new(1.0, 2.0, 0.0);
 
-    let angular = AxisAngle::new(Vec3::unit_y(), 1.0);
+    let angular = AxisAngle::new(Vec3::unit_z(), 1.0);
 
     let entity = app.world.spawn((
         Transform::default(),
