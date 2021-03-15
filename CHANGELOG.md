@@ -10,9 +10,40 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
-### ⚠ Dependency requirements updated (breaking)
+### ⚠ ConvexHull collision shape
 
-The required version of rapier is bumped to ^0.6.1
+There is a new variant in the `Body` enum: `ConvexHull`. It takes a list of points, and the body shape will be the
+smallest possible convex shape that includes all the given points.
+
+Thanks @faassen
+
+### RotationConstraints component
+
+A new `RotationConstraints` component make possible to prevent rotation around the given axes.
+
+### Others
+
+* The opacity has been increased for the default color of debug shapes.
+
+
+## [0.2.0] - 2021-03-07
+
+### ⚠ Physics systems
+
+The physics step run at a fixed rate (60 updates per second by default). Therefore, it is not in sync with the frame update (that runs as many times per second as possible).
+
+But a user may want to (and sometime have to) run system synchronously with the physics step.
+
+This is why two stages are now public:
+* `stage::ROOT`: the root **schedule** stage that contains the physics step and run at a fixed rate (60 updates per second by default)
+* `stage::UPDATE`: a **child** (parallel) system stage that runs before each physics step
+
+But most of the time, users shouldn't have to use the stage directly,
+because an `add_physics_system` extension function on `AppBuilder` is provided and can be used like `add_system`, except
+systems added with `add_physics_system` will run during the physics update.
+
+**This is a breaking change:** Updating the transforms/velocities or any other physics component of rigid bodies **must** be done in the physics update stage.
+Make sure to add theses systems using the new `add_physics_system` extension function on `AppBuilder`.
 
 
 ### ⚠ New `PhysicMaterial` component that replaces `Restitution` (breaking)
@@ -23,11 +54,29 @@ In the future it will be extended to define more physics properties, like the fr
 
 Since the restitution is now defined in `PhysicMaterial`, the `Restitution` component has been removed.
 
+### ⚠ Kinematic bodies
+
+There is a new variant to `BodyType`: `Kinematic`. That makes possible to create "kinematic" bodies.
+A kinematic body is controlled programmatically (usually by updating the transform) and affect the other bodies normally, 
+but is not affected by them.
+
+
+### ⚠ Dependency requirements updated (breaking)
+
+The required version of rapier is bumped to ^0.6.1
+
+### All components are registered for reflection
+
+All components now implement `Default` and `Reflect` and are registered to bevy reflect system.
+That should make be possible to use heron components in serialized scene for hot-reloading.
+
+
 ### Public constructor to `BodyHandle`
 
 `BodyHandle` now has a public constructor. Advanced users may create rigid bodies and colliders using directly the rapier API (adding them to the `RigidBodySet` and `ColliderSet` resources), and then add a `BodyHandle` component to the entity so that heron's will handle velocity and update the bevy transforms.
 
 Tanks @MGlolenstine
+
 
 ## [0.1.1] - 2021-02-16
 
@@ -115,7 +164,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.1.1...HEAD
+[Unreleased]: ../../compare/v0.2.0...HEAD
+[0.2.0]: ../../compare/v0.1.1...v0.2.0
 [0.1.1]: ../../compare/v0.1.0...v0.1.1
 [0.1.0]: ../../compare/v0.1.0-alpha.1...v0.1.0
 [0.1.0-alpha.1]: ../../compare/...v0.1.0-alpha.1

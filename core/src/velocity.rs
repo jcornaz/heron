@@ -1,12 +1,14 @@
-use bevy_math::prelude::*;
+use bevy::math::prelude::*;
+use bevy::reflect::prelude::*;
 use duplicate::duplicate;
 
 use crate::utils::NearZero;
+use std::ops::{Mul, MulAssign};
 
 /// Component that defines the linear and angular velocity.
 ///
 /// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
-/// The angular part is in radians per second around an axis, represented as a `Quat`
+/// The angular part is in radians per second around an axis, represented as a `Quat`.
 ///
 /// # Example
 ///
@@ -24,7 +26,7 @@ use crate::utils::NearZero;
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     pub linear: Vec3,
@@ -66,7 +68,7 @@ pub struct Acceleration {
 /// An [axis-angle] representation
 ///
 /// [axis-angle]: https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct AxisAngle(Vec3);
 
 impl Velocity {
@@ -240,6 +242,30 @@ impl From<AxisAngle> for f32 {
 impl NearZero for Velocity {
     fn is_near_zero(self) -> bool {
         self.linear.is_near_zero() && self.angular.is_near_zero()
+    }
+}
+
+impl MulAssign<f32> for AxisAngle {
+    fn mul_assign(&mut self, rhs: f32) {
+        self.0 = self.0 * rhs;
+    }
+}
+
+impl Mul<f32> for AxisAngle {
+    type Output = Self;
+
+    fn mul(mut self, rhs: f32) -> Self::Output {
+        self *= rhs;
+        self
+    }
+}
+
+impl Mul<AxisAngle> for f32 {
+    type Output = AxisAngle;
+
+    fn mul(self, mut rhs: AxisAngle) -> Self::Output {
+        rhs *= self;
+        rhs
     }
 }
 

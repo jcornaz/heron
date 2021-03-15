@@ -4,12 +4,7 @@
 
 //! Rendering of Heron's collision shapes for debugging purposes
 
-use bevy_app::{AppBuilder, Plugin};
-use bevy_asset::prelude::*;
-use bevy_ecs::prelude::*;
-use bevy_render::prelude::*;
-use bevy_sprite::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::prelude::*;
 use fnv::FnvHashMap;
 
 #[cfg(feature = "2d")]
@@ -44,34 +39,42 @@ impl From<Color> for DebugPlugin {
 
 impl Default for DebugPlugin {
     fn default() -> Self {
-        let mut color = bevy_render::color::Color::BLUE;
-        color.set_a(0.2);
+        let mut color = bevy::render::color::Color::BLUE;
+        color.set_a(0.4);
         Self(color)
     }
 }
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
+        #[cfg(feature = "2d")]
+        app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin);
+
         app.add_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
-            .add_stage_before(
-                bevy_app::stage::POST_UPDATE,
-                "heron-debug",
-                SystemStage::serial(),
-            )
+            .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+                schedule.add_stage_after(heron_core::stage::UPDATE, "heron-debug", debug_stage())
+            })
             .add_startup_system(create_material.system());
-
-        #[cfg(feature = "2d")]
-        {
-            app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
-                .add_system_to_stage("heron-debug", dim2::delete_debug_sprite.system())
-                .add_system_to_stage("heron-debug", dim2::replace_debug_sprite.system())
-                .add_system_to_stage("heron-debug", dim2::create_debug_sprites.system());
-        }
-
-        app.add_system_to_stage("heron-debug", track_debug_entities.system())
-            .add_system_to_stage("heron-debug", scale_debug_entities.system());
     }
+}
+
+fn debug_stage() -> SystemStage {
+    let mut stage = SystemStage::serial();
+
+    #[cfg(feature = "2d")]
+    {
+        stage
+            .add_system(dim2::delete_debug_sprite.system())
+            .add_system(dim2::replace_debug_sprite.system())
+            .add_system(dim2::create_debug_sprites.system());
+    }
+
+    stage
+        .add_system(track_debug_entities.system())
+        .add_system(scale_debug_entities.system());
+
+    stage
 }
 
 impl From<Color> for DebugMaterial {

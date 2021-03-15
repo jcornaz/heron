@@ -1,15 +1,16 @@
-use bevy_ecs::prelude::*;
-use bevy_math::prelude::*;
-use bevy_transform::prelude::*;
+use bevy::ecs::prelude::*;
+use bevy::math::prelude::*;
+use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicMaterial, Velocity};
+use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
     BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
 };
 use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderSet};
+use crate::rapier::math::Point;
 use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
@@ -29,16 +30,36 @@ pub(crate) fn create(
             Option<&BodyType>,
             Option<&Velocity>,
             Option<&PhysicMaterial>,
+            Option<&RotationConstraints>,
         ),
         Without<BodyHandle>,
     >,
 ) {
-    for (entity, body, transform, body_type, velocity, material) in query.iter() {
+    for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
+        query.iter()
+    {
         let body_type = body_type.cloned().unwrap_or_default();
 
         let mut builder = RigidBodyBuilder::new(body_status(body_type))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
+
+        #[allow(unused_variables)]
+        if let Some(RotationConstraints {
+            allow_x,
+            allow_y,
+            allow_z,
+        }) = rotation_constraints.cloned()
+        {
+            #[cfg(feature = "2d")]
+            if !allow_z {
+                builder = builder.lock_rotations();
+            }
+            #[cfg(feature = "3d")]
+            {
+                builder = builder.restrict_rotations(allow_x, allow_y, allow_z);
+            }
+        }
 
         if let Some(v) = velocity {
             #[cfg(feature = "2d")]
@@ -76,33 +97,33 @@ pub(crate) fn create(
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn recreate_collider(
+pub(crate) fn remove_bodies(
+    commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut query: Query<
+    mut joints: ResMut<'_, JointSet>,
+    changed: Query<
         '_,
-        (
-            Entity,
-            &Body,
-            &mut BodyHandle,
-            Option<&BodyType>,
-            Option<&PhysicMaterial>,
-        ),
-        Or<(Mutated<Body>, Changed<BodyType>, Changed<PhysicMaterial>)>,
+        (Entity, &BodyHandle),
+        Or<(
+            Mutated<Body>,
+            Changed<RotationConstraints>,
+            Changed<BodyType>,
+            Changed<PhysicMaterial>,
+        )>,
     >,
+    removed: Query<'_, (Entity, &BodyHandle), Without<RotationConstraints>>,
 ) {
-    for (entity, body_def, mut handle, body_type, material) in query.iter_mut() {
-        colliders.remove(handle.collider, &mut bodies, true);
-        handle.collider = colliders.insert(
-            build_collider(
-                entity,
-                &body_def,
-                body_type.cloned().unwrap_or_default(),
-                material.cloned().unwrap_or_default(),
-            ),
-            handle.rigid_body,
-            &mut bodies,
-        );
+    for (entity, handle) in changed.iter() {
+        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+        commands.remove_one::<BodyHandle>(entity);
+    }
+
+    for entity in removed.removed::<RotationConstraints>() {
+        if let Ok((entity, handle)) = removed.get(*entity) {
+            bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
+            commands.remove_one::<BodyHandle>(entity);
+        }
     }
 }
 
@@ -134,10 +155,12 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.set_position(
-                (transform.translation, transform.rotation).into_rapier(),
-                true,
-            );
+            let isometry = (transform.translation, transform.rotation).into_rapier();
+            if body.is_kinematic() {
+                body.set_next_kinematic_position(isometry);
+            } else {
+                body.set_position(isometry, true);
+            }
         }
     }
 }
@@ -155,7 +178,7 @@ pub(crate) fn update_bevy_transform(
     >,
 ) {
     for (mut local, mut global, handle, body_type) in query.iter_mut() {
-        if !matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic) {
+        if !body_type.cloned().unwrap_or_default().can_have_velocity() {
             continue;
         }
 
@@ -218,6 +241,7 @@ fn build_collider(
             radius,
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
+        Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
     };
 
     builder = builder
@@ -241,16 +265,23 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
 
+#[inline]
+fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
+    let points: Vec<Point<f32>> = points.into_rapier();
+    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
+}
+
 fn body_status(body_type: BodyType) -> BodyStatus {
     match body_type {
         BodyType::Dynamic => BodyStatus::Dynamic,
         BodyType::Static | BodyType::Sensor => BodyStatus::Static,
+        BodyType::Kinematic => BodyStatus::Kinematic,
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use bevy_math::Vec3;
+    use bevy::math::Vec3;
 
     use super::*;
 

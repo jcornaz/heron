@@ -16,19 +16,19 @@
 //!
 //! Add the library to `Cargo.toml`
 //! ```toml
-//! heron = "0.1.1"
+//! heron = "0.2.0"
 //! ```
 //!
 //! If you are creating a 2d game, change the default features:
 //! ```toml
-//! heron = { version = "0.1.1", default-features = false, features = ["2d"] }
+//! heron = { version = "0.2.0", default-features = false, features = ["2d"] }
 //! ```
 //!
-//! Note: when debugging you may consider enabling the `debug` feature, to render the collision shapes (works only for 2d, at the moment).
+//! Note: when debugging, you may consider enabling the `debug` feature to render the collision shapes (works only for 2d, at the moment).
 //!
 //! ## Install the plugin
 //!
-//! To enable physics and collision detection, the [`PhysicsPlugin`] should be installed
+//! The [`PhysicsPlugin`] should be installed to enable physics and collision detection.
 //!
 //! ```no_run
 //! use bevy::prelude::*;
@@ -48,7 +48,7 @@
 //! To create a rigid body, add the component `Body` to the entity, choosing a collision shape.
 //! It will turn the entity into a dynamic rigid body affected by physics.
 //!
-//! The position, and rotation is defined by the bevy `GlobalTransform` component.
+//! The position and rotation are defined by the bevy `GlobalTransform` component.
 //!
 //! ```
 //! # use bevy::prelude::*;
@@ -63,36 +63,75 @@
 //!         .with(Body::Sphere { radius: 10.0 })
 //!
 //!         // Optionally define a type (if absent, the body will be *dynamic*)
-//!         .with(BodyType::Static)
+//!         .with(BodyType::Kinematic)
 //!         
 //!         // Optionally define the velocity (works only with dynamic and kinematic bodies)
 //!         .with(Velocity::from(Vec2::unit_x() * 2.0));
 //! }
 //! ```
 //!
-//! ## Control the position
+//! ## Run systems synchronously with the physics step
 //!
-//! When creating games, it is often useful to interact with the physics engine and move bodies programatically.
-//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`]
+//! The physics step runs at a fixed rate (60 times per second by default) and is out of sync of the
+//! bevy frame.
 //!
-//! ### Option 1: Update the Transform (teleport)
+//! But modifying any physics component (such as the transform or velocity), **must** be done synchronously with
+//! the physics step.
 //!
-//! If the `GlobalTransform` is modified (generally as an effect of modifying the `Transform` component),
-//! then the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
+//! The simplest way is to add these systems with `add_physics_system`:
+//!
+//! ```no_run
+//! # use bevy::prelude::*;
+//! # use heron::prelude::*;
+//! App::build()
+//!     .add_plugins(DefaultPlugins)
+//!     .add_plugin(PhysicsPlugin::default())
+//!
+//!     // This system should NOT update transforms, velocities and other physics components
+//!     // In other game engines this would be the "update" function
+//!     .add_system(cannot_update_physics.system())
+//!
+//!     // This system can update transforms, velocities and other physics components
+//!     // In other game engines this would be the "physics update" function
+//!     .add_physics_system(update_velocities.system())
+//! #    .run();
+//! # fn cannot_update_physics() {}
+//! # fn update_velocities() {}
+//! ```
+//!
+//! ## Move rigid bodies programmatically
+//!
+//! When creating games, it is often useful to interact with the physics engine and move bodies programmatically.
+//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`].
+//!
+//! ### Option 1: Update the Transform
+//!
+//! For kinematic bodies ([`BodyType::Kinematic`]), if the transform is updated,
+//! the body is moved and get an automatically calculated velocity. Physics rules will be applied normally.
+//! Updating the transform is a good way to move a kinematic body.
+//!
+//! For other types of bodies, if the transform is updated,
+//! the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
 //!
 //! ### Option 2: Use the Velocity component
 //!
-//! For [`BodyType::Dynamic`] bodies **only**, one can add a [`Velocity`] component to the entity,
+//! For [`BodyType::Dynamic`] and [`BodyType::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
 //! that will move the body over time. Physics rules will be applied normally.
+//!
+//! Note that the velocity component is updated by heron to always reflects the current velocity.
+//!
+//! Defining/updating the velocity is a good way to interact with dynamic bodies.
 //!
 //! ## See also
 //!
-//! * The different [`BodyType`] (dynamic, static or sensor)
+//! * How to choose a [collision shape](Body)
+//! * How to define a [`BodyType`] (dynamic, static, kinematic or sensor)
 //! * How to define the world's [`Gravity`]
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
+//! * How to define [`RotationConstraints`]
 
-use bevy_app::{AppBuilder, Plugin};
+use bevy::app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
@@ -100,7 +139,7 @@ use heron_rapier::RapierPlugin;
 
 /// Physics behavior powered by [rapier](https://rapier.rs)
 ///
-/// Allow to access the underlying physics world directly
+/// Allow access to the underlying physics world directly
 pub mod rapier_plugin {
     pub use heron_rapier::*;
 }
@@ -108,11 +147,12 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial, PhysicsPlugin, Velocity,
+        ext::*, stage, AxisAngle, Body, BodyType, CollisionEvent, Gravity, PhysicMaterial,
+        PhysicsPlugin, RotationConstraints, Velocity,
     };
 }
 
-/// Plugin to install in order to enable collision detection and physics behavior.
+/// Plugin to install to enable collision detection and physics behavior.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
 /// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
@@ -136,7 +176,7 @@ impl PhysicsPlugin {
 
     /// Returns a version using the given color to render collision shapes
     #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy_render::color::Color) -> Self {
+    pub fn with_debug_color(mut self, color: bevy::render::color::Color) -> Self {
         self.debug = color.into();
         self
     }

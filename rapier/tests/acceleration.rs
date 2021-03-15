@@ -3,13 +3,13 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
+use bevy::core::CorePlugin;
+use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
-use bevy_app::App;
-use bevy_core::CorePlugin;
-use bevy_math::Vec3;
 use heron_core::{Acceleration, AxisAngle, Body};
 use heron_rapier::convert::IntoBevy;
+
 #[cfg(feature = "3d")]
 use heron_rapier::rapier::math::Vector;
 use heron_rapier::{

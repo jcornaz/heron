@@ -1,6 +1,6 @@
 [package]
 name = "heron_rapier"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -13,12 +13,8 @@ default = []
 3d = ["rapier3d"]
 
 [dependencies]
-heron_core = { path = "../core", version = "^0.1.1" }
-bevy_math = "^0.4.0"
-bevy_core = "^0.4.0"
-bevy_ecs = "^0.4.0"
-bevy_app = "^0.4.0"
-bevy_transform = "^0.4.0"
+heron_core = { path = "../core", version = "^0.2.0"}
+bevy = { version = "^0.4.0", default-features = false }
 rapier2d = { version = "^0.6.1", optional = true, features = ["simd-stable"] }
 rapier3d = { version = "^0.6.1", optional = true, features = ["simd-stable"] }
 fnv = "^1.0"

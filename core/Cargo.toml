@@ -1,6 +1,6 @@
 [package]
 name = "heron_core"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -8,9 +8,5 @@ description = "Core components and resources to use Heron"
 repository = "https://github.com/jcornaz/heron/"
 
 [dependencies]
-bevy_math = "^0.4.0"
-bevy_ecs = "^0.4.0"
-duplicate = "0.2.9"
-
-[dev-dependencies]
-bevy = { version = "0.4", default-features = false }
+bevy = { version = "^0.4.0", default-features = false }
+duplicate = "^0.2.9"
