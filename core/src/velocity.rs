@@ -38,7 +38,7 @@ pub struct Velocity {
 /// Component that defines the linear and angular acceleration.
 ///
 /// The linear part is in "unit" per second squared on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
-/// The angular part is in radians per second squared around an axis, represented as a `Quat`
+/// The angular part is in radians per second squared around an axis, represented as an [`AxisAngle`]
 ///
 /// # Example
 ///
