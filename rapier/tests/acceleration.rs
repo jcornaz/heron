@@ -62,7 +62,7 @@ fn body_is_created_with_acceleration() {
 
         println!("{:?}", body);
         assert_eq!(body.linvel().into_bevy(), Vec3::zero());
-        assert_eq_anguler(body.angvel(), AxisAngle::from(Vec3::zero()));
+        assert_eq_angular(body.angvel(), AxisAngle::from(Vec3::zero()));
     }
 
     app.update();
@@ -75,7 +75,7 @@ fn body_is_created_with_acceleration() {
 
     println!("{:?}", body);
     assert_eq!(body.linvel().into_bevy(), linear);
-    assert_eq_anguler(body.angvel(), angular);
+    assert_eq_angular(body.angvel(), angular);
 }
 
 #[test]
@@ -110,15 +110,20 @@ fn acceleration_may_be_added_after_creating_the_body() {
         .unwrap();
 
     assert_eq!(body.linvel().into_bevy(), linear);
-    assert_eq_anguler(body.angvel(), angular);
+    assert_eq_angular(body.angvel(), angular);
 }
 
 #[cfg(feature = "3d")]
-fn assert_eq_anguler(rapier: &Vector<f32>, bevy: AxisAngle) {
-    assert_eq!(rapier.into_bevy(), bevy.into());
+fn assert_eq_angular(actual: &Vector<f32>, expected: AxisAngle) {
+    assert_eq!(actual.into_bevy(), expected.into());
 }
 
 #[cfg(feature = "2d")]
-fn assert_eq_anguler(rapier: f32, bevy: AxisAngle) {
-    assert_eq!(rapier.into_bevy(), bevy.angle());
+fn assert_eq_angular(expected: f32, actual: AxisAngle) {
+    assert!(
+        (expected - actual.angle()).abs() < 0.00001,
+        "actual rapier angle ({}) doesn't match expected axis-angle: {:?}",
+        expected,
+        actual
+    );
 }
