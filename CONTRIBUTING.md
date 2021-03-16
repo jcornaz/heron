@@ -36,10 +36,10 @@ This is a standard `cargo` setup, and you shouldn't be too surprised.
 
 As long as you run `cargo fmt` and clippy doesn't complain, you should be good to go ;-)
 
-When desiging an API: 
+When designing an API: 
 
 * Think about how it would look like if the physics engine was 100% made with bevy.
-* Consider Ergonomy/Simplificy/Safety *Before* considering too much performances. (Although performances remains important)
+* Consider Ergonomy/Simplicity/Safety *Before* considering too much the performances. (Although performances remains important)
 * Discuss the API in the issues.
 
 
@@ -58,5 +58,7 @@ When desiging an API:
   * help to read and understand the code changes
   * point parts that requires special attention or consideration
 * Update documentation if necessary
+  * A guide has been started (but not yet published) in the `guide` directory. 
+  * It uses [mdbook](https://github.com/rust-lang/mdBook) (`cargo install mdbook`) and can be served with `mdbook serve guide`.
 
 **In case you are not sure about something, it is better to open a pull request early (as a draft) and discuss it ;-)**

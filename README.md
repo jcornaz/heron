@@ -11,7 +11,10 @@ An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
 ## How it looks like
 
-```rust
+```rust,no_run
+use bevy::prelude::*;
+use heron::prelude::*;
+
 fn main() {
   App::build()
     .add_plugins(DefaultPlugins)

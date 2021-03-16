@@ -1,0 +1,6 @@
+[book]
+authors = ["Jonathan Cornaz"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Heron - User Guide"
