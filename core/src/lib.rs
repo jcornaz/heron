@@ -10,7 +10,7 @@ use bevy::prelude::*;
 pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
-pub use velocity::{AxisAngle, Velocity};
+pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 pub mod ext;

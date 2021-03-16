@@ -24,6 +24,7 @@ use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPha
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
 
+mod acceleration;
 mod body;
 pub mod convert;
 mod pipeline;
@@ -130,6 +131,7 @@ impl Plugin for RapierPlugin {
                         .with_system(body::update_rapier_position.system())
                         .with_system(velocity::update_rapier_velocity.system())
                         .with_system(body::update_rapier_status.system())
+                        .with_system(acceleration::update_rapier_force_and_torque.system())
                         .with_system(body::create.system()),
                 )
                 .add_stage(

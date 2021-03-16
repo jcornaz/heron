@@ -1,5 +1,6 @@
 use bevy::math::prelude::*;
 use bevy::reflect::prelude::*;
+use duplicate::duplicate;
 
 use crate::utils::NearZero;
 use std::ops::{Mul, MulAssign};
@@ -31,6 +32,36 @@ pub struct Velocity {
     pub linear: Vec3,
 
     /// Angular velocity in radians-per-second around an axis
+    pub angular: AxisAngle,
+}
+
+/// Component that defines the linear and angular acceleration.
+///
+/// The linear part is in "unit" per second squared on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
+/// The angular part is in radians per second squared around an axis, represented as an [`AxisAngle`]
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// # use std::f32::consts::PI;
+///
+/// fn spawn(commands: &mut Commands) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Sphere { radius: 1.0 })
+///         .with(
+///             Acceleration::from_linear(Vec3::unit_x() * 1.0)
+///                 .with_angular(AxisAngle::new(Vec3::unit_z(), 0.05 * PI))
+///         );
+/// }
+/// ```
+#[derive(Debug, Copy, Clone, PartialEq, Default)]
+pub struct Acceleration {
+    /// Linear acceleration in units-per-second-squared on each axis
+    pub linear: Vec3,
+
+    /// Angular acceleration in radians-per-second-squared around an axis
     pub angular: AxisAngle,
 }
 
@@ -74,42 +105,111 @@ impl Velocity {
     }
 }
 
+impl Acceleration {
+    /// Returns a linear acceleration from a vector
+    #[must_use]
+    pub fn from_linear(linear: Vec3) -> Self {
+        Self {
+            linear,
+            angular: AxisAngle::default(),
+        }
+    }
+
+    /// Returns an angular acceleration from a vector
+    #[must_use]
+    pub fn from_angular(angular: AxisAngle) -> Self {
+        Self {
+            angular,
+            linear: Vec3::zero(),
+        }
+    }
+
+    /// Returns a new version with the given linear acceleration
+    #[must_use]
+    pub fn with_linear(mut self, linear: Vec3) -> Self {
+        self.linear = linear;
+        self
+    }
+
+    /// Returns a new version with the given angular acceleration
+    #[must_use]
+    pub fn with_angular(mut self, angular: AxisAngle) -> Self {
+        self.angular = angular;
+        self
+    }
+}
+
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Vec2> for Velocity {
     fn from(v: Vec2) -> Self {
         Self::from_linear(v.extend(0.0))
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Vec3> for Velocity {
     fn from(linear: Vec3) -> Self {
         Self::from_linear(linear)
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Velocity> for Vec3 {
     fn from(Velocity { linear, .. }: Velocity) -> Self {
         linear
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<AxisAngle> for Velocity {
     fn from(angular: AxisAngle) -> Self {
         Self::from_angular(angular)
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Quat> for Velocity {
     fn from(quat: Quat) -> Self {
         Self::from_angular(quat.into())
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Velocity> for AxisAngle {
     fn from(Velocity { angular, .. }: Velocity) -> Self {
         angular
     }
 }
 
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl From<Velocity> for Quat {
     fn from(Velocity { angular, .. }: Velocity) -> Self {
         angular.into()
@@ -128,6 +228,17 @@ impl From<AxisAngle> for Vec3 {
     }
 }
 
+impl From<AxisAngle> for f32 {
+    fn from(AxisAngle(v): AxisAngle) -> Self {
+        v.length()
+    }
+}
+
+#[duplicate(
+  Velocity;
+  [ Velocity ];
+  [ Acceleration ];
+)]
 impl NearZero for Velocity {
     fn is_near_zero(self) -> bool {
         self.linear.is_near_zero() && self.angular.is_near_zero()
