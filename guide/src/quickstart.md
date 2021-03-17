@@ -3,7 +3,7 @@
 Here is a basic example of using Heron with 2d graphics. It draws a green box
 that falls down due to gravity:
 
-```rust
+```rust,no_run
 use bevy::prelude::*;
 use heron::*;
 
