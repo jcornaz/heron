@@ -132,7 +132,8 @@ impl Plugin for RapierPlugin {
                         .with_system(velocity::update_rapier_velocity.system())
                         .with_system(body::update_rapier_status.system())
                         .with_system(acceleration::update_rapier_force_and_torque.system())
-                        .with_system(body::create.system()),
+                        .with_system(body::create.system())
+                        .with_system(body::create2.system()),
                 )
                 .add_stage(
                     "heron-step",

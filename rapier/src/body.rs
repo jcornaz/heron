@@ -3,7 +3,7 @@ use bevy::math::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
+use heron_core::{Body, Body2, BodyType, PhysicMaterial, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -77,6 +77,87 @@ pub(crate) fn create(
         let rigid_body = bodies.insert(builder.build());
         let collider = colliders.insert(
             build_collider(
+                entity,
+                &body,
+                body_type,
+                material.cloned().unwrap_or_default(),
+            ),
+            rigid_body,
+            &mut bodies,
+        );
+        handles.insert(entity, rigid_body);
+        commands.insert_one(
+            entity,
+            BodyHandle {
+                rigid_body,
+                collider,
+            },
+        );
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn create2(
+    commands: &mut Commands,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut handles: ResMut<'_, HandleMap>,
+    query: Query<
+        '_,
+        (
+            Entity,
+            &Body2,
+            &GlobalTransform,
+            Option<&BodyType>,
+            Option<&Velocity>,
+            Option<&PhysicMaterial>,
+            Option<&RotationConstraints>,
+        ),
+        Without<BodyHandle>,
+    >,
+) {
+    for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
+        query.iter()
+    {
+        let body_type = body_type.cloned().unwrap_or_default();
+
+        let mut builder = RigidBodyBuilder::new(body_status(body_type))
+            .user_data(entity.to_bits().into())
+            .position((transform.translation, transform.rotation).into_rapier());
+
+        #[allow(unused_variables)]
+        if let Some(RotationConstraints {
+            allow_x,
+            allow_y,
+            allow_z,
+        }) = rotation_constraints.cloned()
+        {
+            #[cfg(feature = "2d")]
+            if !allow_z {
+                builder = builder.lock_rotations();
+            }
+            #[cfg(feature = "3d")]
+            {
+                builder = builder.restrict_rotations(allow_x, allow_y, allow_z);
+            }
+        }
+
+        if let Some(v) = velocity {
+            #[cfg(feature = "2d")]
+            {
+                builder = builder.linvel(v.linear.x, v.linear.y);
+            }
+            #[cfg(feature = "3d")]
+            {
+                builder = builder.linvel(v.linear.x, v.linear.y, v.linear.z);
+            }
+
+            builder = builder.angvel(v.angular.into_rapier());
+        }
+
+        let rigid_body = bodies.insert(builder.build());
+        let collider = colliders.insert(
+            build_collider2(
                 entity,
                 &body,
                 body_type,
@@ -242,6 +323,30 @@ fn build_collider(
         } => ColliderBuilder::capsule_y(*half_height, *radius),
         Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
         Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
+    };
+
+    builder = builder
+        .user_data(entity.to_bits().into())
+        .sensor(matches!(body_type, BodyType::Sensor))
+        .restitution(material.restitution)
+        .density(material.density);
+
+    builder.build()
+}
+
+fn build_collider2(
+    entity: Entity,
+    body: &Body2,
+    body_type: BodyType,
+    material: PhysicMaterial,
+) -> Collider {
+    let mut builder = match body {
+        Body2::Circle { radius } => ColliderBuilder::ball(*radius),
+        Body2::Stadium {
+            half_segment: half_height,
+            radius,
+        } => ColliderBuilder::capsule_y(*half_height, *radius),
+        Body2::Rectangle { half_extends } => cuboid_builder(half_extends.extend(0.0)),
     };
 
     builder = builder

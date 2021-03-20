@@ -140,6 +140,47 @@ pub enum Body {
     },
 }
 
+/// Components that defines a 2d body subject to physics and collision
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .with(Body::Circle { radius: 1.0 });
+/// }
+/// ```
+#[derive(Debug, Clone, Reflect)]
+pub enum Body2 {
+    /// Circle
+    Circle {
+        /// Radius of the circle
+        radius: f32,
+    },
+
+    /// Rectangle
+    Rectangle {
+        /// A vector from its center to a corner
+        half_extends: Vec2,
+    },
+
+    // /// Square
+    // Square {
+    //     /// Distance to a corner of the square
+    //     radius: f32,
+    // },
+    /// Stadium (a 2d capsule)
+    Stadium {
+        /// Distance from the center of the stadium to the center of a half-circle.
+        half_segment: f32,
+
+        /// Radius of the half-circles
+        radius: f32,
+    },
+}
+
 impl Default for Body {
     fn default() -> Self {
         Self::Sphere { radius: 1.0 }
