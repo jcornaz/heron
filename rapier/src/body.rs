@@ -89,7 +89,7 @@ pub(crate) fn create<T: BodyColliderBuilder>(
         }
 
         let rigid_body = bodies.insert(builder.build());
-        let mut collider = body.build(entity, body_type, material.cloned().unwrap_or_default());
+        let collider = body.build(entity, body_type, material.cloned().unwrap_or_default());
 
         let collider_handle = colliders.insert(collider, rigid_body, &mut bodies);
         handles.insert(entity, rigid_body);
