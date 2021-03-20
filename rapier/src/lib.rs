@@ -16,7 +16,7 @@ pub extern crate rapier3d as rapier;
 use bevy::app::{AppBuilder, Plugin};
 use bevy::ecs::{IntoSystem, Schedule, SystemStage};
 
-use heron_core::CollisionEvent;
+use heron_core::{Body, Body2, CollisionEvent};
 
 use crate::body::HandleMap;
 use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
@@ -132,8 +132,8 @@ impl Plugin for RapierPlugin {
                         .with_system(velocity::update_rapier_velocity.system())
                         .with_system(body::update_rapier_status.system())
                         .with_system(acceleration::update_rapier_force_and_torque.system())
-                        .with_system(body::create.system())
-                        .with_system(body::create2.system()),
+                        .with_system(body::create::<Body>.system())
+                        .with_system(body::create::<Body2>.system()),
                 )
                 .add_stage(
                     "heron-step",
