@@ -1,3 +1,3 @@
 # Summary
 
-- [Setup](setup.md)
+- [Quickstart](quickstart.md)
