@@ -16,12 +16,12 @@
 //!
 //! Add the library to `Cargo.toml`
 //! ```toml
-//! heron = "0.2.0"
+//! heron = "0.3.0"
 //! ```
 //!
 //! If you are creating a 2d game, change the default features:
 //! ```toml
-//! heron = { version = "0.2.0", default-features = false, features = ["2d"] }
+//! heron = { version = "0.3.0", default-features = false, features = ["2d"] }
 //! ```
 //!
 //! Note: when debugging, you may consider enabling the `debug` feature to render the collision shapes (works only for 2d, at the moment).
