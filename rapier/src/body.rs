@@ -3,7 +3,7 @@ use bevy::math::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, Body2, BodyType, PhysicMaterial, RotationConstraints, Velocity};
+use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -15,7 +15,7 @@ use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
-pub trait BodyColliderBuilder: Component {
+pub trait ColliderFactory: Component {
     fn collider_builder(&self) -> ColliderBuilder;
 
     fn build(&self, entity: Entity, body_type: BodyType, material: PhysicMaterial) -> Collider {
@@ -30,7 +30,7 @@ pub trait BodyColliderBuilder: Component {
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn create<T: BodyColliderBuilder>(
+pub(crate) fn create(
     commands: &mut Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
@@ -39,7 +39,7 @@ pub(crate) fn create<T: BodyColliderBuilder>(
         '_,
         (
             Entity,
-            &T,
+            &Body,
             &GlobalTransform,
             Option<&BodyType>,
             Option<&Velocity>,
@@ -235,7 +235,7 @@ pub(crate) fn remove(
     }
 }
 
-impl BodyColliderBuilder for Body {
+impl ColliderFactory for Body {
     fn collider_builder(&self) -> ColliderBuilder {
         match self {
             Body::Sphere { radius } => ColliderBuilder::ball(*radius),
@@ -245,19 +245,6 @@ impl BodyColliderBuilder for Body {
             } => ColliderBuilder::capsule_y(*half_height, *radius),
             Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
             Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
-        }
-    }
-}
-
-impl BodyColliderBuilder for Body2 {
-    fn collider_builder(&self) -> ColliderBuilder {
-        match self {
-            Body2::Circle { radius } => ColliderBuilder::ball(*radius),
-            Body2::Stadium {
-                half_segment: half_height,
-                radius,
-            } => ColliderBuilder::capsule_y(*half_height, *radius),
-            Body2::Rectangle { half_extends } => cuboid_builder(half_extends.extend(0.0)),
         }
     }
 }
