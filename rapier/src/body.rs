@@ -15,7 +15,7 @@ use crate::BodyHandle;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
-pub trait ColliderFactory: Component {
+trait ColliderFactory: Component {
     fn collider_builder(&self) -> ColliderBuilder;
 
     fn build(&self, entity: Entity, body_type: BodyType, material: PhysicMaterial) -> Collider {
