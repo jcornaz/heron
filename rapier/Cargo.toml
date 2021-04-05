@@ -15,7 +15,7 @@ default = []
 [dependencies]
 heron_core = { path = "../core", version = "^0.3.0"}
 bevy = { version = "^0.4.0", default-features = false }
-rapier2d = { version = "^0.6.1", optional = true, features = ["simd-stable"] }
+rapier2d = { version = "^0.7.2", optional = true, features = ["simd-stable"] }
 rapier3d = { version = "^0.7.2", optional = true, features = ["simd-stable"] }
 fnv = "^1.0"
 crossbeam = "^0.8.0"
