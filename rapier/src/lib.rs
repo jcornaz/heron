@@ -19,7 +19,9 @@ use bevy::ecs::{IntoSystem, Schedule, SystemStage};
 use heron_core::CollisionEvent;
 
 use crate::body::HandleMap;
-use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{
+    CCDSolver, IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet,
+};
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
@@ -114,6 +116,7 @@ impl Plugin for RapierPlugin {
         .add_resource(RigidBodySet::new())
         .add_resource(ColliderSet::new())
         .add_resource(JointSet::new())
+        .add_resource(CCDSolver::new())
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(

@@ -6,7 +6,7 @@ use crossbeam::channel::Receiver;
 use heron_core::{CollisionEvent, Gravity};
 
 use crate::convert::IntoRapier;
-use crate::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
+use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{
     BroadPhase, ColliderHandle, ColliderSet, ContactEvent, IntersectionEvent, NarrowPhase,
 };
@@ -22,6 +22,7 @@ pub(crate) fn step(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
+    mut ccd_solver: ResMut<'_, CCDSolver>,
     event_manager: Local<'_, EventManager>,
     mut events: ResMut<'_, Events<CollisionEvent>>,
 ) {
@@ -34,6 +35,7 @@ pub(crate) fn step(
         &mut bodies,
         &mut colliders,
         &mut joints,
+        &mut ccd_solver,
         &(),
         &event_manager.handler,
     );

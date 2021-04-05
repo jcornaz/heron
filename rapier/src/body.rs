@@ -141,7 +141,7 @@ pub(crate) fn update_rapier_status(
 ) {
     for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
-            body.body_status = body_status(*body_type);
+            body.set_body_status(body_status(*body_type));
         }
     }
 
@@ -151,7 +151,7 @@ pub(crate) fn update_rapier_status(
             .ok()
             .and_then(|handle| bodies.get_mut(handle.rigid_body))
         {
-            body.body_status = body_status(BodyType::default());
+            body.set_body_status(body_status(BodyType::default()));
         }
     }
 }
