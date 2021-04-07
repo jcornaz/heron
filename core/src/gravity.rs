@@ -29,7 +29,7 @@ impl Gravity {
 
 impl Default for Gravity {
     fn default() -> Self {
-        Self::from(Vec3::zero())
+        Self::from(Vec3::ZERO)
     }
 }
 

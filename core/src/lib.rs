@@ -76,14 +76,13 @@ impl CorePlugin {
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.resources_mut().get_or_insert_with(Gravity::default);
-
-        app.register_type::<Body>()
+        app.init_resource::<Gravity>()
+            .register_type::<Body>()
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<RotationConstraints>()
-            .add_stage_after(bevy::app::stage::UPDATE, crate::stage::ROOT, {
+            .add_stage_after(CoreStage::Update, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.steps_per_second {
@@ -104,7 +103,7 @@ impl Plugin for CorePlugin {
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 });
 /// }
 /// ```
@@ -154,7 +153,7 @@ impl Default for Body {
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
 /// }
@@ -246,7 +245,7 @@ pub enum CollisionEvent {
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .with(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
