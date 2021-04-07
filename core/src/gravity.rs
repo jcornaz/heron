@@ -11,7 +11,7 @@ use bevy::math::{Vec2, Vec3};
 /// fn main() {
 ///     App::build()
 ///         // ... Add plugins
-///         .add_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0)))
+///         .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0)))
 ///         // ... Add systems
 ///         .run();
 /// }

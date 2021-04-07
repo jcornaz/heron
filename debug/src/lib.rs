@@ -50,7 +50,7 @@ impl Plugin for DebugPlugin {
         #[cfg(feature = "2d")]
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin);
 
-        app.add_resource(DebugMaterial::from(self.0))
+        app.insert_resource(DebugMaterial::from(self.0))
             .init_resource::<DebugEntityMap>()
             .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
                 schedule.add_stage_after(heron_core::stage::UPDATE, "heron-debug", debug_stage())

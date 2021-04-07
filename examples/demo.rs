@@ -8,7 +8,7 @@ fn main() {
     App::build()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
-        .add_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
+        .insert_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
         .add_startup_system(spawn.system())
         .add_system(log_collisions.system())
         .run();

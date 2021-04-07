@@ -20,7 +20,7 @@ fn main() {
   App::build()
     .add_plugins(DefaultPlugins)
     .add_plugin(PhysicsPlugin::default()) // Add the plugin
-    .add_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
+    .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
     .add_startup_system(spawn.system())
     .run();
 }

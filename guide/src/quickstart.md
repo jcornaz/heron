@@ -12,7 +12,7 @@ fn main() {
     App::build()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the Heron plugin
-        .add_resource(Gravity::from(Vec3::new(0.0, -300.0, 0.0))) // Define gravity
+        .insert_resource(Gravity::from(Vec3::new(0.0, -300.0, 0.0))) // Define gravity
         .add_startup_system(spawn.system())
         .run();
 }

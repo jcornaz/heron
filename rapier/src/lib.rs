@@ -110,13 +110,13 @@ impl Plugin for RapierPlugin {
         .init_resource::<PhysicsPipeline>()
         .init_resource::<HandleMap>()
         .add_event::<CollisionEvent>()
-        .add_resource(self.parameters)
-        .add_resource(BroadPhase::new())
-        .add_resource(NarrowPhase::new())
-        .add_resource(RigidBodySet::new())
-        .add_resource(ColliderSet::new())
-        .add_resource(JointSet::new())
-        .add_resource(CCDSolver::new())
+        .insert_resource(self.parameters)
+        .insert_resource(BroadPhase::new())
+        .insert_resource(NarrowPhase::new())
+        .insert_resource(RigidBodySet::new())
+        .insert_resource(ColliderSet::new())
+        .insert_resource(JointSet::new())
+        .insert_resource(CCDSolver::new())
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(

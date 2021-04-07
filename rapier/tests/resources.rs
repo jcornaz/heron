@@ -16,7 +16,7 @@ use heron_rapier::RapierPlugin;
 #[test]
 fn can_define_gravity_before_plugin() {
     let mut app = App::build();
-    app.add_resource(Gravity::from(Vec3::unit_y()))
+    app.insert_resource(Gravity::from(Vec3::unit_y()))
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin::default());
