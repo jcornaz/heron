@@ -15,6 +15,6 @@ default = []
 [dependencies]
 heron_core = { path = "../core", version = "^0.3.0"}
 heron_rapier = { path = "../rapier", version = "^0.3.0"}
-bevy = { version = "^0.4.0", default-features = false, features = ["render"] }
+bevy = { version = "^0.5.0", default-features = false, features = ["render"] }
 bevy_prototype_lyon = { version = "0.2.0", optional = true }
 fnv = "^1.0"
