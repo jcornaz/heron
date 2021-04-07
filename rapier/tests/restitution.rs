@@ -60,7 +60,7 @@ fn restitution_can_be_updated() {
 
     let restitution = 2.0;
     app.world
-        .insert_one(
+        .insert(
             entity,
             PhysicMaterial {
                 restitution,

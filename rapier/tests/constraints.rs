@@ -75,7 +75,7 @@ fn rotation_can_be_locked_after_creation() {
     app.update();
 
     app.world
-        .insert_one(entity, RotationConstraints::lock())
+        .insert(entity, RotationConstraints::lock())
         .unwrap();
 
     app.update();

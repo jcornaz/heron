@@ -114,7 +114,7 @@ fn can_change_to_static_after_creation() {
 
     app.update();
 
-    app.world.insert_one(entity, BodyType::Static).unwrap();
+    app.world.insert(entity, BodyType::Static).unwrap();
 
     app.update();
 
@@ -138,7 +138,7 @@ fn can_change_to_sensor_after_creation() {
 
     app.update();
 
-    app.world.insert_one(entity, BodyType::Sensor).unwrap();
+    app.world.insert(entity, BodyType::Sensor).unwrap();
 
     app.update();
 
@@ -164,7 +164,7 @@ fn can_change_to_dynamic_after_creation() {
 
     app.update();
 
-    app.world.insert_one(entity, BodyType::Dynamic).unwrap();
+    app.world.insert(entity, BodyType::Dynamic).unwrap();
 
     app.update();
 

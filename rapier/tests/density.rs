@@ -79,7 +79,7 @@ fn density_can_be_updated_after_creation() {
     app.update();
 
     app.world
-        .insert_one(
+        .insert(
             entity,
             PhysicMaterial {
                 density: 2.0,

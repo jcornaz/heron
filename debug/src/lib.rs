@@ -109,7 +109,7 @@ fn track_debug_entities(
 ) {
     for (debug_entity, IsDebug(parent_entity)) in query.iter() {
         map.insert(*parent_entity, debug_entity);
-        commands.insert_one(debug_entity, Indexed);
+        commands.insert(debug_entity, Indexed);
     }
 }
 

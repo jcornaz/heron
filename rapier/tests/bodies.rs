@@ -218,7 +218,7 @@ fn update_bevy_transform(body_type: Option<BodyType>) {
     ));
 
     if let Some(body_type) = body_type {
-        app.world.insert_one(entity, body_type).unwrap();
+        app.world.insert(entity, body_type).unwrap();
     }
 
     let translation = Vec3::new(1.0, 2.0, 3.0);

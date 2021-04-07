@@ -98,7 +98,7 @@ fn acceleration_may_be_added_after_creating_the_body() {
     let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
 
     app.world
-        .insert_one(entity, Acceleration { linear, angular })
+        .insert(entity, Acceleration { linear, angular })
         .unwrap();
 
     app.update();
