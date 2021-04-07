@@ -10,7 +10,7 @@ fn main() {
         .run();
 }
 
-fn spawn(commands: &mut Commands) {
+fn spawn(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 
     // Sphere

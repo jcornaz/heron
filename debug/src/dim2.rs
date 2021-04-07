@@ -17,7 +17,7 @@ use heron_rapier::BodyHandle;
 use super::*;
 
 pub(crate) fn create_debug_sprites(
-    commands: &mut Commands,
+    mut commands: Commands,
     colliders: Res<'_, ColliderSet>,
     query: Query<'_, (Entity, &Body, &BodyHandle, &GlobalTransform), Without<HasDebug>>,
     debug_mat: Res<'_, DebugMaterial>,
@@ -44,7 +44,7 @@ pub(crate) fn create_debug_sprites(
 }
 
 pub(crate) fn replace_debug_sprite(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut map: ResMut<'_, DebugEntityMap>,
     colliders: Res<'_, ColliderSet>,
     query: Query<
@@ -77,7 +77,7 @@ pub(crate) fn replace_debug_sprite(
 }
 
 pub(crate) fn delete_debug_sprite(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut map: ResMut<'_, DebugEntityMap>,
     query: Query<'_, Entity, (With<HasDebug>, Without<Body>)>,
 ) {

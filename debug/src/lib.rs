@@ -103,7 +103,7 @@ fn create_material(
 }
 
 fn track_debug_entities(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut map: ResMut<'_, DebugEntityMap>,
     query: Query<'_, (Entity, &IsDebug), Without<Indexed>>,
 ) {

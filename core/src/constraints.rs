@@ -11,7 +11,7 @@ use bevy::reflect::Reflect;
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
 ///
-/// fn spawn(commands: &mut Commands) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 })
 ///         .with(RotationConstraints::lock()); // Prevent rotation caused by forces

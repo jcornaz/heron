@@ -31,7 +31,7 @@ trait ColliderFactory: Component {
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn create(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
@@ -105,7 +105,7 @@ pub(crate) fn create(
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn remove_bodies(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
@@ -220,7 +220,7 @@ pub(crate) fn update_bevy_transform(
 }
 
 pub(crate) fn remove(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,

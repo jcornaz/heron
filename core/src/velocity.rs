@@ -17,7 +17,7 @@ use std::ops::{Mul, MulAssign};
 /// # use heron_core::*;
 /// # use std::f32::consts::PI;
 ///
-/// fn spawn(commands: &mut Commands) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 })
 ///         .with(
@@ -47,7 +47,7 @@ pub struct Velocity {
 /// # use heron_core::*;
 /// # use std::f32::consts::PI;
 ///
-/// fn spawn(commands: &mut Commands) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 })
 ///         .with(

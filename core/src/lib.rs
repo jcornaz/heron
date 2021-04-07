@@ -103,7 +103,7 @@ impl Plugin for CorePlugin {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 });
 /// }
@@ -153,7 +153,7 @@ impl Default for Body {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
@@ -245,7 +245,7 @@ pub enum CollisionEvent {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .with(PhysicMaterial {

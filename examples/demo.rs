@@ -14,7 +14,7 @@ fn main() {
         .run();
 }
 
-fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     commands.spawn(Camera2dBundle::default());
 
     // The ground
