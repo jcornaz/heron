@@ -3,8 +3,9 @@
 [![License](https://img.shields.io/github/license/jcornaz/heron)](https://github.com/jcornaz/heron/blob/main/LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/heron)](https://crates.io/crates/heron)
 [![Docs](https://docs.rs/heron/badge.svg)](https://docs.rs/heron)
-[![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 [![dependency status](https://deps.rs/repo/github/jcornaz/heron/status.svg)](https://deps.rs/repo/github/jcornaz/heron)
+[![Bevy tracking](https://img.shields.io/badge/Bevy%20tracking-released%20version-lightblue)](https://github.com/bevyengine/bevy/blob/main/docs/plugins_guidelines.md#main-branch-tracking)
+[![Build](https://img.shields.io/github/workflow/status/jcornaz/heron/Build)](https://github.com/jcornaz/heron/actions?query=workflow%3ABuild+branch%3Amain)
 [![Zenhub](https://img.shields.io/badge/workspace-zenhub-%236061be)](https://app.zenhub.com/workspaces/heron-600478067304b1000e27f4c4/board)
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
