@@ -5,7 +5,7 @@ that falls down due to gravity:
 
 ```rust,no_run
 use bevy::prelude::*;
-use heron::*;
+use heron::prelude::*;
 
 #[bevy_main]
 fn main() {
@@ -19,21 +19,21 @@ fn main() {
 
 fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     // Ensure we can see things
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     // the size of our sprite
     let size = Vec2::new(30.0, 30.0);
     commands
         //  here we add a Sprite. We can add any bundle of our choice; the
         // only required component is a GlobalTransform
-        .spawn(SpriteBundle {
+        .spawn_bundle(SpriteBundle {
             sprite: Sprite::new(size),
             material: materials.add(Color::GREEN.into()),
             transform: Transform::from_translation(Vec3::new(0.0, 200.0, 0.0)),
             ..Default::default()
         })
         // Make it a physics body, by attaching a collision shape
-        .with(Body::Cuboid {
+        .insert(Body::Cuboid {
             // let the size be consistent with our sprite
             half_extends: size.extend(0.0) / 2.0,
         });
@@ -45,8 +45,8 @@ with this code. You should also add this to your projects's `Cargo.toml`:
 
 ```toml
 [dependencies]
-bevy = { version = "0.4"} 
-heron = { version = "0.2.0", default-features = false, features = ["2d"] }
+bevy = { version = "0.5"} 
+heron = { version = "0.4.0", default-features = false, features = ["2d"] }
 ```
 
 Heron defaults to 3d. To make sure we run it in 2d mode we have to configure it
@@ -75,4 +75,3 @@ And that's all there is to it! Heron, using the Rapier physics engine, makes
 your sprite behave according to physics!
 
 You can do a lot more with Heron but this should get you started!
-
