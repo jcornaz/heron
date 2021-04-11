@@ -3,7 +3,7 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-use bevy::app::Events;
+use bevy::app::{Events, ManualEventReader};
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
@@ -61,13 +61,13 @@ fn collision_events_are_fired() {
         .x = 10.0;
     app.update();
 
-    let events: Vec<CollisionEvent> = app
+    let mut event_reader = app
         .world
-        .get_resource_mut::<Events<CollisionEvent>>()
+        .get_resource::<Events<CollisionEvent>>()
         .unwrap()
-        .iter_current_update_events()
-        .cloned()
-        .collect();
+        .get_reader();
+
+    let events = collect_events(&app, &mut event_reader);
 
     assert_eq!(events, vec![CollisionEvent::Started(entity1, entity2)]);
 
@@ -78,13 +78,15 @@ fn collision_events_are_fired() {
         .x = 30.0;
     app.update();
 
-    let events: Vec<CollisionEvent> = app
-        .world
-        .get_resource_mut::<Events<CollisionEvent>>()
-        .unwrap()
-        .iter_current_update_events()
-        .cloned()
-        .collect();
+    let events = collect_events(&app, &mut event_reader);
 
     assert_eq!(events, vec![CollisionEvent::Stopped(entity1, entity2)])
+}
+
+fn collect_events(
+    app: &App,
+    reader: &mut ManualEventReader<CollisionEvent>,
+) -> Vec<CollisionEvent> {
+    let events = app.world.get_resource::<Events<CollisionEvent>>().unwrap();
+    reader.iter(&events).cloned().collect()
 }
