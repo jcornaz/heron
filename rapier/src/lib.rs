@@ -13,8 +13,7 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy::app::{AppBuilder, Plugin};
-use bevy::ecs::{IntoSystem, Schedule, SystemStage};
+use bevy::prelude::*;
 
 use heron_core::CollisionEvent;
 
@@ -121,11 +120,11 @@ impl Plugin for RapierPlugin {
             schedule
                 .add_stage(
                     "heron-remove-invalid-bodies",
-                    SystemStage::serial().with_system(body::remove_bodies.system()),
+                    SystemStage::single_threaded().with_system(body::remove_bodies.system()),
                 )
                 .add_stage(
                     "heron-pre-step",
-                    SystemStage::serial()
+                    SystemStage::single_threaded()
                         .with_system(
                             bevy::transform::transform_propagate_system::transform_propagate_system
                                 .system(),
@@ -139,7 +138,7 @@ impl Plugin for RapierPlugin {
                 )
                 .add_stage(
                     "heron-step",
-                    SystemStage::serial()
+                    SystemStage::single_threaded()
                         .with_system(velocity::apply_velocity_to_kinematic_bodies.system())
                         .with_system(pipeline::step.system()),
                 )

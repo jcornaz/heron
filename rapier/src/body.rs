@@ -31,7 +31,7 @@ trait ColliderFactory {
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn create(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
@@ -93,19 +93,16 @@ pub(crate) fn create(
 
         let collider_handle = colliders.insert(collider, rigid_body, &mut bodies);
         handles.insert(entity, rigid_body);
-        commands.insert(
-            entity,
-            BodyHandle {
-                rigid_body,
-                collider: collider_handle,
-            },
-        );
+        commands.entity(entity).insert(BodyHandle {
+            rigid_body,
+            collider: collider_handle,
+        });
     }
 }
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn remove_bodies(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
@@ -113,23 +110,24 @@ pub(crate) fn remove_bodies(
         '_,
         (Entity, &BodyHandle),
         Or<(
-            Mutated<Body>,
+            Changed<Body>,
             Changed<RotationConstraints>,
             Changed<BodyType>,
             Changed<PhysicMaterial>,
         )>,
     >,
-    removed: Query<'_, (Entity, &BodyHandle), Without<RotationConstraints>>,
+    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
+    constraints_removed: RemovedComponents<'_, RotationConstraints>,
 ) {
     for (entity, handle) in changed.iter() {
         bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
-        commands.remove_one::<BodyHandle>(entity);
+        commands.entity(entity).remove::<BodyHandle>();
     }
 
-    for entity in removed.removed::<RotationConstraints>() {
-        if let Ok((entity, handle)) = removed.get(*entity) {
+    for entity in constraints_removed.iter() {
+        if let Ok((entity, handle)) = with_body_handle.get(entity) {
             bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
-            commands.remove_one::<BodyHandle>(entity);
+            commands.entity(entity).remove::<BodyHandle>();
         }
     }
 }
@@ -137,7 +135,8 @@ pub(crate) fn remove_bodies(
 pub(crate) fn update_rapier_status(
     mut bodies: ResMut<'_, RigidBodySet>,
     with_type_changed: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
-    without_type: Query<'_, &BodyHandle, Without<BodyType>>,
+    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
+    type_removed: RemovedComponents<'_, BodyType>,
 ) {
     for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
@@ -145,11 +144,11 @@ pub(crate) fn update_rapier_status(
         }
     }
 
-    for entity in without_type.removed::<BodyType>() {
-        if let Some(body) = without_type
-            .get(*entity)
+    for entity in type_removed.iter() {
+        if let Some(body) = with_body_handle
+            .get(entity)
             .ok()
-            .and_then(|handle| bodies.get_mut(handle.rigid_body))
+            .and_then(|(_, handle)| bodies.get_mut(handle.rigid_body))
         {
             body.set_body_status(body_status(BodyType::default()));
         }
@@ -158,7 +157,7 @@ pub(crate) fn update_rapier_status(
 
 pub(crate) fn update_rapier_position(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&GlobalTransform, &BodyHandle), Mutated<GlobalTransform>>,
+    query: Query<'_, (&GlobalTransform, &BodyHandle), Changed<GlobalTransform>>,
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
@@ -220,17 +219,17 @@ pub(crate) fn update_bevy_transform(
 }
 
 pub(crate) fn remove(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
-    query: Query<'_, (Entity, &BodyHandle), Without<Body>>,
+    removed: RemovedComponents<'_, Body>,
 ) {
-    for entity in query.removed::<Body>() {
-        if let Some(handle) = handles.remove(entity) {
+    for entity in removed.iter() {
+        if let Some(handle) = handles.remove(&entity) {
             bodies.remove(handle, &mut colliders, &mut joints);
-            commands.remove_one::<BodyHandle>(*entity);
+            commands.entity(entity).remove::<BodyHandle>();
         }
     }
 }
