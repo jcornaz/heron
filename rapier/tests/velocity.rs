@@ -3,6 +3,8 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
+use std::f32::consts::PI;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
@@ -11,7 +13,6 @@ use heron_core::*;
 use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
-use std::f32::consts::PI;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -34,18 +35,22 @@ fn body_is_created_with_velocity() {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+    let angular = AxisAngle::new(Vec3::Z, 2.0);
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        Velocity { linear, angular },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            Velocity { linear, angular },
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
@@ -70,24 +75,28 @@ fn body_is_created_with_velocity() {
 fn velocity_may_be_added_after_creating_the_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+        ))
+        .id();
 
     app.update();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+    let angular = AxisAngle::new(Vec3::Z, 2.0);
 
     app.world
-        .insert(entity, Velocity { linear, angular })
-        .unwrap();
+        .entity_mut(entity)
+        .insert(Velocity { linear, angular });
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
@@ -111,23 +120,26 @@ fn velocity_may_be_added_after_creating_the_body() {
 fn velocity_is_updated_to_reflect_rapier_world() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        Velocity::default(),
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            Velocity::default(),
+        ))
+        .id();
 
     app.update();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular: AxisAngle = AxisAngle::new(Vec3::unit_z(), PI * 0.5);
+    let angular: AxisAngle = AxisAngle::new(Vec3::Z, PI * 0.5);
 
     {
-        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get_mut(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
+        let rigid_body_handle = app.world.get::<BodyHandle>(entity).unwrap().rigid_body();
+        let mut bodies = app.world.get_resource_mut::<RigidBodySet>().unwrap();
+        let body = bodies.get_mut(rigid_body_handle).unwrap();
 
         body.set_linvel(linear.into_rapier(), false);
         body.set_angvel(angular.into_rapier(), false);
@@ -151,18 +163,22 @@ fn velocity_can_move_kinematic_bodies() {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), PI * 0.5);
+    let angular = AxisAngle::new(Vec3::Z, PI * 0.5);
 
-    let entity = app.world.spawn((
-        GlobalTransform::from_rotation(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
-        Body::Sphere { radius: 1.0 },
-        BodyType::Kinematic,
-        Velocity::from_linear(linear).with_angular(angular),
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::from_rotation(Quat::from_axis_angle(Vec3::Z, 0.0)),
+            Body::Sphere { radius: 1.0 },
+            BodyType::Kinematic,
+            Velocity::from_linear(linear).with_angular(angular),
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();

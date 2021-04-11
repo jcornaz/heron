@@ -31,11 +31,13 @@ fn bodies_are_created_with_a_default_density() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
@@ -49,18 +51,22 @@ fn bodies_are_created_with_a_default_density() {
 fn bodies_are_created_with_defined_density() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        PhysicMaterial {
-            density: 2.0,
-            ..Default::default()
-        },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            PhysicMaterial {
+                density: 2.0,
+                ..Default::default()
+            },
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
@@ -74,23 +80,20 @@ fn density_can_be_updated_after_creation() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 1.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 1.0 }))
+        .id();
 
     app.update();
 
-    app.world
-        .insert(
-            entity,
-            PhysicMaterial {
-                density: 2.0,
-                ..Default::default()
-            },
-        )
-        .unwrap();
+    app.world.entity_mut(entity).insert(PhysicMaterial {
+        density: 2.0,
+        ..Default::default()
+    });
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();

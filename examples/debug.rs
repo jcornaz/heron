@@ -22,7 +22,7 @@ fn spawn(mut commands: Commands) {
     // Cuboid
     commands
         .spawn((
-            Transform::from_translation(Vec3::unit_x() * 300.0),
+            Transform::from_translation(Vec3::X * 300.0),
             GlobalTransform::default(),
         ))
         .with(Body::Cuboid {
@@ -33,7 +33,7 @@ fn spawn(mut commands: Commands) {
     // Capsule
     commands
         .spawn((
-            Transform::from_translation(Vec3::unit_x() * -300.0),
+            Transform::from_translation(Vec3::X * -300.0),
             GlobalTransform::default(),
         ))
         .with(Body::Capsule {
@@ -45,7 +45,7 @@ fn spawn(mut commands: Commands) {
     // ConvexHull, in this case describing a triangle
     commands
         .spawn((
-            Transform::from_translation(Vec3::unit_y() * 150.0),
+            Transform::from_translation(Vec3::Y * 150.0),
             GlobalTransform::default(),
         ))
         .with(Body::ConvexHull {

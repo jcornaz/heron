@@ -7,9 +7,9 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
+
 use heron_core::{Acceleration, AxisAngle, Body};
 use heron_rapier::convert::IntoBevy;
-
 #[cfg(feature = "3d")]
 use heron_rapier::rapier::math::Vector;
 use heron_rapier::{
@@ -42,32 +42,36 @@ fn body_is_created_with_acceleration() {
     #[cfg(feature = "2d")]
     let linear = Vec3::new(1.0, 2.0, 0.0);
 
-    let angular = AxisAngle::new(Vec3::unit_z(), 1.0);
+    let angular = AxisAngle::new(Vec3::Z, 1.0);
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        Acceleration { linear, angular },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            Acceleration { linear, angular },
+        ))
+        .id();
 
     app.update();
 
     {
-        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
         let body = bodies
             .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
             .unwrap();
 
         println!("{:?}", body);
-        assert_eq!(body.linvel().into_bevy(), Vec3::zero());
-        assert_eq_angular(body.angvel(), AxisAngle::from(Vec3::zero()));
+        assert_eq!(body.linvel().into_bevy(), Vec3::ZERO);
+        assert_eq_angular(body.angvel(), AxisAngle::from(Vec3::ZERO));
     }
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
@@ -82,11 +86,15 @@ fn body_is_created_with_acceleration() {
 fn acceleration_may_be_added_after_creating_the_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+        ))
+        .id();
 
     app.update();
 
@@ -95,15 +103,15 @@ fn acceleration_may_be_added_after_creating_the_body() {
     #[cfg(feature = "2d")]
     let linear = Vec3::new(1.0, 2.0, 0.0);
 
-    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+    let angular = AxisAngle::new(Vec3::Z, 2.0);
 
     app.world
-        .insert(entity, Acceleration { linear, angular })
-        .unwrap();
+        .entity_mut(entity)
+        .insert(Acceleration { linear, angular });
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())

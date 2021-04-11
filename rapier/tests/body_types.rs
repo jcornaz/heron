@@ -28,15 +28,19 @@ fn test_app() -> App {
 fn create_dynamic_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Dynamic,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Dynamic,
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
@@ -48,15 +52,19 @@ fn create_dynamic_body() {
 fn create_static_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Static,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Static,
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
@@ -68,15 +76,19 @@ fn create_static_body() {
 fn create_kinematic_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Kinematic,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Kinematic,
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
         .unwrap();
@@ -88,15 +100,19 @@ fn create_kinematic_body() {
 fn create_sensor_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Sensor,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Sensor,
+        ))
+        .id();
 
     app.update();
 
-    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let body = colliders
         .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
         .unwrap();
@@ -110,16 +126,18 @@ fn can_change_to_static_after_creation() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .id();
 
     app.update();
 
-    app.world.insert(entity, BodyType::Static).unwrap();
+    app.world.entity_mut(entity).insert(BodyType::Static);
 
     app.update();
 
     {
-        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
         let body = bodies
             .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
             .unwrap();
@@ -134,16 +152,18 @@ fn can_change_to_sensor_after_creation() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .id();
 
     app.update();
 
-    app.world.insert(entity, BodyType::Sensor).unwrap();
+    app.world.entity_mut(entity).insert(BodyType::Sensor);
 
     app.update();
 
     {
-        let colliders = app.resources.get::<ColliderSet>().unwrap();
+        let colliders = app.world.get_resource::<ColliderSet>().unwrap();
         let collider = colliders
             .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
             .unwrap();
@@ -156,20 +176,24 @@ fn can_change_to_sensor_after_creation() {
 fn can_change_to_dynamic_after_creation() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Static,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Static,
+        ))
+        .id();
 
     app.update();
 
-    app.world.insert(entity, BodyType::Dynamic).unwrap();
+    app.world.entity_mut(entity).insert(BodyType::Dynamic);
 
     app.update();
 
     {
-        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
         let body = bodies
             .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
             .unwrap();
@@ -182,20 +206,24 @@ fn can_change_to_dynamic_after_creation() {
 fn can_change_to_dynamic_by_removing_type_after_creation() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        BodyType::Static,
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            BodyType::Static,
+        ))
+        .id();
 
     app.update();
 
-    app.world.remove_one::<BodyType>(entity).unwrap();
+    app.world.entity_mut(entity).remove::<BodyType>();
 
     app.update();
 
     {
-        let bodies = app.resources.get::<RigidBodySet>().unwrap();
+        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
         let body = bodies
             .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
             .unwrap();

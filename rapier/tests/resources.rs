@@ -15,15 +15,21 @@ use heron_rapier::RapierPlugin;
 
 #[test]
 fn can_define_gravity_before_plugin() {
-    let mut app = App::build();
-    app.insert_resource(Gravity::from(Vec3::unit_y()))
-        .init_resource::<TypeRegistryArc>()
-        .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin::default());
+    let app = {
+        let mut builder = App::build();
+
+        builder
+            .insert_resource(Gravity::from(Vec3::Y))
+            .init_resource::<TypeRegistryArc>()
+            .add_plugin(CorePlugin)
+            .add_plugin(RapierPlugin::default());
+
+        builder.app
+    };
 
     assert_eq!(
-        Vec3::unit_y(),
-        app.resources().get::<Gravity>().unwrap().vector()
+        Vec3::Y,
+        app.world.get_resource::<Gravity>().unwrap().vector()
     );
 }
 
@@ -34,8 +40,8 @@ fn rapier_world_is_registered() {
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin::default());
 
-    assert!(app.resources().contains::<RigidBodySet>());
-    assert!(app.resources().contains::<ColliderSet>());
-    assert!(app.resources().contains::<JointSet>());
-    assert!(app.resources().contains::<IntegrationParameters>());
+    assert!(app.world().contains_resource::<RigidBodySet>());
+    assert!(app.world().contains_resource::<ColliderSet>());
+    assert!(app.world().contains_resource::<JointSet>());
+    assert!(app.world().contains_resource::<IntegrationParameters>());
 }

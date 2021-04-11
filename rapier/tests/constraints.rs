@@ -26,11 +26,13 @@ fn rotation_is_not_constrained_without_the_component() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     assert!(
         bodies
@@ -45,15 +47,19 @@ fn rotation_is_not_constrained_without_the_component() {
 fn rotation_can_be_locked_at_creation() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        RotationConstraints::lock(),
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            RotationConstraints::lock(),
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     assert_eq!(
         bodies
@@ -70,17 +76,19 @@ fn rotation_can_be_locked_after_creation() {
 
     let entity = app
         .world
-        .spawn((GlobalTransform::default(), Body::Sphere { radius: 10.0 }));
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .id();
 
     app.update();
 
     app.world
-        .insert(entity, RotationConstraints::lock())
-        .unwrap();
+        .entity_mut(entity)
+        .insert(RotationConstraints::lock());
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     assert_eq!(
         bodies
@@ -95,19 +103,23 @@ fn rotation_can_be_locked_after_creation() {
 fn rotation_is_unlocked_if_component_is_removed() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        GlobalTransform::default(),
-        Body::Sphere { radius: 10.0 },
-        RotationConstraints::lock(),
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            Body::Sphere { radius: 10.0 },
+            RotationConstraints::lock(),
+        ))
+        .id();
 
     app.update();
 
-    app.world.remove_one::<RotationConstraints>(entity).unwrap();
+    app.world.entity_mut(entity).remove::<RotationConstraints>();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     assert!(
         bodies

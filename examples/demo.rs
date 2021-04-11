@@ -54,10 +54,7 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
             half_extends: size.extend(0.0) / 2.0,
         })
         // Add an initial velocity. (it is also possible to read/mutate this component later)
-        .with(
-            Velocity::from(Vec2::unit_x() * 300.0)
-                .with_angular(AxisAngle::new(Vec3::unit_z(), -PI)),
-        )
+        .with(Velocity::from(Vec2::unit_x() * 300.0).with_angular(AxisAngle::new(Vec3::Z, -PI)))
         // Define restitution (so that it bounces)
         .with(PhysicMaterial {
             restitution: 0.7,

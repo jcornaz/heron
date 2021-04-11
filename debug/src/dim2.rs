@@ -98,7 +98,7 @@ fn create_shape(
         material,
         TessellationMode::Fill(FillOptions::default()),
         Transform {
-            translation: Vec3::unit_z(),
+            translation: Vec3::Z,
             scale: transform.scale.recip(),
             ..Default::default()
         },
