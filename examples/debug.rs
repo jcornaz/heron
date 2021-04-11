@@ -11,49 +11,49 @@ fn main() {
 }
 
 fn spawn(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     // Sphere
     commands
-        .spawn((Transform::default(), GlobalTransform::default()))
-        .with(Body::Sphere { radius: 50.0 })
-        .with(BodyType::Static);
+        .spawn_bundle((Transform::default(), GlobalTransform::default()))
+        .insert(Body::Sphere { radius: 50.0 })
+        .insert(BodyType::Static);
 
     // Cuboid
     commands
-        .spawn((
+        .spawn_bundle((
             Transform::from_translation(Vec3::X * 300.0),
             GlobalTransform::default(),
         ))
-        .with(Body::Cuboid {
+        .insert(Body::Cuboid {
             half_extends: Vec2::new(50.0, 50.0).extend(0.0),
         })
-        .with(BodyType::Static);
+        .insert(BodyType::Static);
 
     // Capsule
     commands
-        .spawn((
+        .spawn_bundle((
             Transform::from_translation(Vec3::X * -300.0),
             GlobalTransform::default(),
         ))
-        .with(Body::Capsule {
+        .insert(Body::Capsule {
             radius: 50.0,
             half_segment: 50.0,
         })
-        .with(BodyType::Static);
+        .insert(BodyType::Static);
 
     // ConvexHull, in this case describing a triangle
     commands
-        .spawn((
+        .spawn_bundle((
             Transform::from_translation(Vec3::Y * 150.0),
             GlobalTransform::default(),
         ))
-        .with(Body::ConvexHull {
+        .insert(Body::ConvexHull {
             points: vec![
                 Vec3::new(0.0, -50.0, 0.0),
                 Vec3::new(50.0, 0.0, 0.0),
                 Vec3::new(-50.0, 0.0, 0.0),
             ],
         })
-        .with(BodyType::Static);
+        .insert(BodyType::Static);
 }
