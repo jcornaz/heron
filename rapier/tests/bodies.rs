@@ -219,6 +219,7 @@ fn despawn_body_entity() {
     case(Some(BodyType::Kinematic)),
     case(None)
 )]
+#[ignore]
 fn update_bevy_transform(body_type: Option<BodyType>) {
     let mut app = test_app();
 
@@ -239,8 +240,9 @@ fn update_bevy_transform(body_type: Option<BodyType>) {
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
 
+    app.update();
+
     {
-        app.update();
         let handle = *app.world.get::<BodyHandle>(entity).unwrap();
         let mut bodies = app.world.get_resource_mut::<RigidBodySet>().unwrap();
         let body = bodies.get_mut(handle.rigid_body()).unwrap();

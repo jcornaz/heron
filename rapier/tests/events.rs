@@ -29,6 +29,7 @@ fn test_app() -> App {
 }
 
 #[test]
+#[ignore]
 fn collision_events_are_fired() {
     let mut app = test_app();
 
