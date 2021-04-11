@@ -14,11 +14,8 @@ mod dim2;
 #[derive(Debug, Copy, Clone)]
 pub struct DebugPlugin(Color);
 
-#[derive(Debug, Clone)]
-enum DebugMaterial {
-    Color(Color),
-    Handle(Handle<ColorMaterial>),
-}
+#[derive(Debug, Copy, Clone)]
+struct DebugColor(Color);
 
 type DebugEntityMap = FnvHashMap<Entity, Entity>;
 
@@ -50,17 +47,16 @@ impl Plugin for DebugPlugin {
         #[cfg(feature = "2d")]
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin);
 
-        app.insert_resource(DebugMaterial::from(self.0))
+        app.insert_resource(DebugColor(self.0))
             .init_resource::<DebugEntityMap>()
             .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
                 schedule.add_stage_after(heron_core::stage::UPDATE, "heron-debug", debug_stage())
-            })
-            .add_startup_system(create_material.system());
+            });
     }
 }
 
 fn debug_stage() -> SystemStage {
-    let mut stage = SystemStage::serial();
+    let mut stage = SystemStage::single_threaded();
 
     #[cfg(feature = "2d")]
     {
@@ -77,39 +73,26 @@ fn debug_stage() -> SystemStage {
     stage
 }
 
-impl From<Color> for DebugMaterial {
+impl From<Color> for DebugColor {
     fn from(color: Color) -> Self {
-        Self::Color(color)
+        Self(color)
     }
 }
 
-impl DebugMaterial {
-    #[allow(unused)]
-    fn handle(&self) -> Option<&Handle<ColorMaterial>> {
-        match self {
-            DebugMaterial::Color(_) => None,
-            DebugMaterial::Handle(handle) => Some(handle),
-        }
-    }
-}
-
-fn create_material(
-    mut debug_mat: ResMut<'_, DebugMaterial>,
-    mut assets: ResMut<'_, Assets<ColorMaterial>>,
-) {
-    if let DebugMaterial::Color(color) = &*debug_mat {
-        *debug_mat = DebugMaterial::Handle(assets.add((*color).into()));
+impl From<DebugColor> for Color {
+    fn from(DebugColor(color): DebugColor) -> Self {
+        color
     }
 }
 
 fn track_debug_entities(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut map: ResMut<'_, DebugEntityMap>,
     query: Query<'_, (Entity, &IsDebug), Without<Indexed>>,
 ) {
     for (debug_entity, IsDebug(parent_entity)) in query.iter() {
         map.insert(*parent_entity, debug_entity);
-        commands.insert(debug_entity, Indexed);
+        commands.entity(debug_entity).insert(Indexed);
     }
 }
 

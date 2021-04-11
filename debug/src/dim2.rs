@@ -20,70 +20,65 @@ pub(crate) fn create_debug_sprites(
     mut commands: Commands,
     colliders: Res<'_, ColliderSet>,
     query: Query<'_, (Entity, &Body, &BodyHandle, &GlobalTransform), Without<HasDebug>>,
-    debug_mat: Res<'_, DebugMaterial>,
+    debug_color: Res<'_, DebugColor>,
 ) {
-    let material = debug_mat.handle().expect("Debug material wasn't loaded");
-
     for (entity, body, handle, transform) in query.iter() {
         if let Some(collider) = colliders.get(handle.collider()) {
-            commands.set_current_entity(entity);
             commands
+                .entity(entity)
                 .with_children(|builder| {
                     builder
-                        .spawn(create_shape(
+                        .spawn_bundle(create_shape(
                             body,
                             collider.shape(),
-                            material.clone(),
+                            (*debug_color).into(),
                             *transform,
                         ))
-                        .with(IsDebug(entity));
+                        .insert(IsDebug(entity));
                 })
-                .with(HasDebug);
+                .insert(HasDebug);
         }
     }
 }
 
 pub(crate) fn replace_debug_sprite(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut map: ResMut<'_, DebugEntityMap>,
     colliders: Res<'_, ColliderSet>,
+    debug_color: Res<'_, DebugColor>,
     query: Query<
         '_,
         (Entity, &Body, &BodyHandle, &GlobalTransform),
-        (With<HasDebug>, Mutated<Body>),
+        (With<HasDebug>, Changed<Body>),
     >,
-    debug_mat: Res<'_, DebugMaterial>,
 ) {
-    let material = debug_mat.handle().expect("Debug material wasn't loaded");
-
     for (parent_entity, body, handle, transform) in query.iter() {
         if let (Some(debug_entity), Some(collider)) =
             (map.remove(&parent_entity), colliders.get(handle.collider()))
         {
-            commands.despawn(debug_entity);
-            commands.set_current_entity(parent_entity);
-            commands.with_children(|builder| {
+            commands.entity(debug_entity).despawn();
+            commands.entity(parent_entity).with_children(|builder| {
                 builder
-                    .spawn(create_shape(
+                    .spawn_bundle(create_shape(
                         body,
                         collider.shape(),
-                        material.clone(),
+                        (*debug_color).into(),
                         *transform,
                     ))
-                    .with(IsDebug(parent_entity));
+                    .insert(IsDebug(parent_entity));
             });
         }
     }
 }
 
 pub(crate) fn delete_debug_sprite(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<'_, Entity, (With<HasDebug>, Without<Body>)>,
+    removed_bodies: RemovedComponents<'_, Body>,
 ) {
-    for parent_entity in query.removed::<Body>() {
+    for parent_entity in removed_bodies.iter() {
         if let Some(debug_entity) = map.remove(&parent_entity) {
-            commands.despawn(debug_entity);
+            commands.entity(debug_entity).despawn();
         }
     }
 }
@@ -91,12 +86,12 @@ pub(crate) fn delete_debug_sprite(
 fn create_shape(
     body: &Body,
     shape: &dyn Shape,
-    material: Handle<ColorMaterial>,
+    color: Color,
     transform: GlobalTransform,
 ) -> ShapeBundle {
     base_builder(body, shape).build(
-        material,
-        TessellationMode::Fill(FillOptions::default()),
+        ShapeColors::new(color),
+        DrawMode::Fill(FillOptions::default()),
         Transform {
             translation: Vec3::Z,
             scale: transform.scale.recip(),
@@ -112,7 +107,7 @@ fn base_builder(body: &Body, shape: &dyn Shape) -> GeometryBuilder {
         Body::Sphere { radius } => {
             builder.add(&shapes::Circle {
                 radius: *radius,
-                center: Vec2::zero(),
+                center: Vec2::ZERO,
             });
         }
         Body::Capsule {
