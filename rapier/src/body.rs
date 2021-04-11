@@ -193,7 +193,6 @@ pub(crate) fn update_bevy_transform(
             Some(body) => body,
         };
 
-        println!("Update bevy position to: {:?}", body.position());
         let (translation, rotation) = body.position().into_bevy();
 
         if translation == global.translation && rotation == global.rotation {
