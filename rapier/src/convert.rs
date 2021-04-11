@@ -44,7 +44,7 @@ impl IntoBevy<Vec3> for Translation<f32> {
 
 impl IntoBevy<Quat> for UnitComplex<f32> {
     fn into_bevy(self) -> Quat {
-        Quat::from_axis_angle(Vec3::unit_z(), self.angle())
+        Quat::from_axis_angle(Vec3::Z, self.angle())
     }
 }
 
@@ -134,8 +134,8 @@ impl IntoRapier<Translation<f32>> for Vec3 {
 
 impl IntoRapier<UnitComplex<f32>> for Quat {
     fn into_rapier(self) -> UnitComplex<f32> {
-        let (Vec3 { z, .. }, angle) = self.to_axis_angle();
-        nalgebra::UnitComplex::new(if z > 0.0 { angle } else { -angle })
+        let (v, angle) = self.to_axis_angle();
+        nalgebra::UnitComplex::new(if v.z > 0.0 { angle } else { -angle })
     }
 }
 
@@ -184,14 +184,14 @@ mod tests {
 
         #[test]
         fn negative_axis_angle_to_rapier() {
-            let result: f32 = AxisAngle::new(Vec3::unit_z(), -1.0).into_rapier();
+            let result: f32 = AxisAngle::new(Vec3::Z, -1.0).into_rapier();
             assert_eq!(result, -1.0);
         }
 
         #[rstest(quat,
-            case(Quat::from_axis_angle(Vec3::unit_z(), 2.0)),
-            case(Quat::from_axis_angle(-Vec3::unit_z(), 2.0)),
-            case(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
+            case(Quat::from_axis_angle(Vec3::Z, 2.0)),
+            case(Quat::from_axis_angle(-Vec3::Z, 2.0)),
+            case(Quat::from_axis_angle(Vec3::Z, 0.0)),
         )]
         fn into_rapier_into_bevy_is_identity(quat: Quat) {
             let rapier: UnitComplex<f32> = quat.into_rapier();
@@ -210,7 +210,7 @@ mod tests {
         #[test]
         fn set_translation() {
             let translation = Vec3::new(1.0, 2.0, 3.0);
-            let result = (translation, Quat::identity()).into_rapier();
+            let result = (translation, Quat::IDENTITY).into_rapier();
             assert_eq!(translation.x, result.translation.x);
             assert_eq!(translation.y, result.translation.y);
 
