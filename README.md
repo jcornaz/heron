@@ -58,6 +58,13 @@ heron = { version = "0.3.0" default-features = false, features = ["2d"] }
 ```
 
 
+## Bevy Version Supported
+
+| bevy | heron      |
+|------|------------|
+| 0.5  | >= 0.4     |
+| 0.4  | < 0.4      |
+
 ## Design principles
 
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
