@@ -1,10 +1,6 @@
 use std::f32::consts::PI;
 
-use bevy::asset::prelude::*;
-use bevy::ecs::prelude::*;
-use bevy::math::{Vec2, Vec3};
-use bevy::sprite::prelude::*;
-use bevy::transform::prelude::*;
+use bevy::prelude::*;
 use bevy_prototype_lyon::entity::ShapeBundle;
 use bevy_prototype_lyon::prelude::*;
 use bevy_prototype_lyon::shapes::RectangleOrigin;
@@ -17,7 +13,7 @@ use heron_rapier::BodyHandle;
 use super::*;
 
 pub(crate) fn create_debug_sprites(
-    mut commands: Commands,
+    mut commands: Commands<'_>,
     colliders: Res<'_, ColliderSet>,
     query: Query<'_, (Entity, &Body, &BodyHandle, &GlobalTransform), Without<HasDebug>>,
     debug_color: Res<'_, DebugColor>,
