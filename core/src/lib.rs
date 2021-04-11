@@ -104,7 +104,7 @@ impl Plugin for CorePlugin {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 });
+///         .insert(Body::Sphere { radius: 1.0 });
 /// }
 /// ```
 #[derive(Debug, Clone, Reflect)]
@@ -154,8 +154,8 @@ impl Default for Body {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
+///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
@@ -246,8 +246,8 @@ pub enum CollisionEvent {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .with(PhysicMaterial {
+///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
 ///             density: 2.0, // Define the density. Higher value means heavier.
 ///         });

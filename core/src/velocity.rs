@@ -20,8 +20,8 @@ use crate::utils::NearZero;
 ///
 /// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 })
-///         .with(
+///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(
 ///             Velocity::from_linear(Vec3::X * 10.0)
 ///                 .with_angular(AxisAngle::new(Vec3::Z, 0.5 * PI))
 ///         );
@@ -50,8 +50,8 @@ pub struct Velocity {
 ///
 /// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 })
-///         .with(
+///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(
 ///             Acceleration::from_linear(Vec3::X * 1.0)
 ///                 .with_angular(AxisAngle::new(Vec3::Z, 0.05 * PI))
 ///         );
