@@ -82,7 +82,7 @@ impl Plugin for CorePlugin {
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<RotationConstraints>()
-            .add_stage_after(CoreStage::Update, crate::stage::ROOT, {
+            .add_stage_before(CoreStage::Update, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.steps_per_second {
