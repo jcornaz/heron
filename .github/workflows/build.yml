@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.5
         with:
           path: |
             ~/.cargo
@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.5
         with:
           path: |
             ~/.cargo
@@ -115,7 +115,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Global cache
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2.1.5
         with:
           path: |
             ~/.cargo
