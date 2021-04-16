@@ -11,21 +11,25 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 use rstest::rstest;
 
-use heron_core::{Body, BodyType};
-use heron_rapier::convert::{IntoBevy, IntoRapier};
+use heron_core::{Body, BodyType, Velocity};
+use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
+    let mut parameters = IntegrationParameters::default();
+    parameters.dt = 1.0;
+
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin {
             step_per_second: None,
-            parameters: IntegrationParameters::default(),
+            parameters,
         });
+
     builder.app
 }
 
@@ -219,9 +223,11 @@ fn despawn_body_entity() {
     case(Some(BodyType::Kinematic)),
     case(None)
 )]
-#[ignore]
-fn update_bevy_transform(body_type: Option<BodyType>) {
+fn bevy_transform_is_updated_when_moving(body_type: Option<BodyType>) {
     let mut app = test_app();
+
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
 
     let entity = app
         .world
@@ -230,24 +236,12 @@ fn update_bevy_transform(body_type: Option<BodyType>) {
             Body::Sphere { radius: 2.0 },
             Transform::default(),
             GlobalTransform::default(),
+            Velocity::from(translation).with_angular(rotation.into()),
         ))
         .id();
 
     if let Some(body_type) = body_type {
         app.world.entity_mut(entity).insert(body_type);
-    }
-
-    let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
-
-    app.update();
-
-    {
-        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
-        let mut bodies = app.world.get_resource_mut::<RigidBodySet>().unwrap();
-        let body = bodies.get_mut(handle.rigid_body()).unwrap();
-
-        body.set_position((translation, rotation).into_rapier(), true);
     }
 
     app.update();
