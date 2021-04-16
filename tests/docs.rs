@@ -1,5 +1,1 @@
-#[macro_use]
-extern crate doc_comment;
-
-doctest!("../README.md");
-doctest!("../guide/src/quickstart.md");
+include!(concat!(env!("OUT_DIR"), "/skeptic-tests.rs"));
