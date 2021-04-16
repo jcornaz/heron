@@ -9,25 +9,21 @@ use std::ops::DerefMut;
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
-use rstest::rstest;
 
-use heron_core::{Body, BodyType, Velocity};
+use heron_core::Body;
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
 
 fn test_app() -> App {
-    let mut parameters = IntegrationParameters::default();
-    parameters.dt = 1.0;
-
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin {
             step_per_second: None,
-            parameters,
+            parameters: IntegrationParameters::default(),
         });
 
     builder.app
@@ -215,52 +211,4 @@ fn despawn_body_entity() {
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     assert_eq!(colliders.len(), 0);
-}
-
-#[rstest(
-    body_type,
-    case(Some(BodyType::Dynamic)),
-    case(Some(BodyType::Kinematic)),
-    case(None)
-)]
-fn bevy_transform_is_updated_when_moving(body_type: Option<BodyType>) {
-    let mut app = test_app();
-
-    let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
-
-    let entity = app
-        .world
-        .spawn()
-        .insert_bundle((
-            Body::Sphere { radius: 2.0 },
-            Transform::default(),
-            GlobalTransform::default(),
-            Velocity::from(translation).with_angular(rotation.into()),
-        ))
-        .id();
-
-    if let Some(body_type) = body_type {
-        app.world.entity_mut(entity).insert(body_type);
-    }
-
-    app.update();
-
-    let Transform {
-        translation: actual_translation,
-        rotation: actual_rotation,
-        ..
-    } = *app.world.get::<Transform>(entity).unwrap();
-
-    #[cfg(feature = "3d")]
-    assert_eq!(actual_translation, translation);
-
-    #[cfg(feature = "2d")]
-    assert_eq!(actual_translation.truncate(), translation.truncate());
-
-    let (axis, angle) = rotation.to_axis_angle();
-    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
-
-    assert!(actual_axis.angle_between(axis) < 0.001);
-    assert!((actual_angle - angle).abs() < 0.001);
 }
