@@ -29,16 +29,16 @@ fn spawn(mut commands: Commands) {
     commands
 
         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
-        .spawn(SpriteBundle::default())
+        .spawn_bundle(SpriteBundle::default())
 
         // Make it a physics body, by attaching a collision shape
-        .with(Body::Sphere { radius: 10.0 })
+        .insert(Body::Sphere { radius: 10.0 })
 
         // Optionally define a type (if absent, the body will be *dynamic*)
-        .with(BodyType::Kinematic)
+        .insert(BodyType::Kinematic)
         
         // Optionally define the velocity (works only with dynamic and kinematic bodies)
-        .with(Velocity::from(Vec2::unit_x() * 2.0));
+        .insert(Velocity::from(Vec2::X * 2.0));
 }
 ```
 
@@ -47,14 +47,14 @@ fn spawn(mut commands: Commands) {
 
 **For a 3d game:**
 ```toml
-bevy = "^0.4.0"
-heron = "0.3.0"
+bevy = "^0.5.0"
+heron = "0.4.0"
 ```
 
 **For a 2d game:**
 ```toml
-bevy = "^0.4.0"
-heron = { version = "0.3.0" default-features = false, features = ["2d"] }
+bevy = "^0.5.0"
+heron = { version = "0.4.0", default-features = false, features = ["2d"] }
 ```
 
 
