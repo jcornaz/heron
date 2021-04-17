@@ -14,6 +14,13 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 The required version of rapier2d is bumped to ^0.8.0
 
+### ⚠ Support defining friction
+
+A new public field `friction` has been added in `PhysicMaterial`.
+As the name suggest, it allows to define the friction that should be applied when two rigid bodies are in contact.
+
+Thanks @yaymalaga
+
 
 ## [0.4.0] - 2021-04-17
 
