@@ -8,18 +8,21 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, CollisionEvent};
+use heron_core::{Body, BodyType, CollisionEvent, Velocity};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
+    let mut parameters = IntegrationParameters::default();
+    parameters.dt = 1.0;
+
     builder
         .init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin {
             step_per_second: None,
-            parameters: IntegrationParameters::default(),
+            parameters,
         })
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
@@ -29,7 +32,6 @@ fn test_app() -> App {
 }
 
 #[test]
-#[ignore]
 fn collision_events_are_fired() {
     let mut app = test_app();
 
@@ -40,6 +42,7 @@ fn collision_events_are_fired() {
             Transform::default(),
             GlobalTransform::default(),
             Body::Sphere { radius: 10.0 },
+            BodyType::Sensor,
         ))
         .id();
 
@@ -47,20 +50,12 @@ fn collision_events_are_fired() {
         .world
         .spawn()
         .insert_bundle((
-            Transform::from_translation(Vec3::X * 30.0),
+            Transform::from_translation(Vec3::X * -30.0),
             GlobalTransform::default(),
             Body::Sphere { radius: 10.0 },
+            Velocity::from_linear(Vec3::X * 30.0),
         ))
         .id();
-
-    app.update();
-
-    app.world
-        .get_mut::<Transform>(entity2)
-        .unwrap()
-        .translation
-        .x = 10.0;
-    app.update();
 
     let mut event_reader = app
         .world
@@ -68,20 +63,21 @@ fn collision_events_are_fired() {
         .unwrap()
         .get_reader();
 
-    let events = collect_events(&app, &mut event_reader);
+    let mut events = vec![];
 
-    assert_eq!(events, vec![CollisionEvent::Started(entity1, entity2)]);
-
-    app.world
-        .get_mut::<Transform>(entity2)
-        .unwrap()
-        .translation
-        .x = 30.0;
     app.update();
+    events.append(&mut collect_events(&app, &mut event_reader));
 
-    let events = collect_events(&app, &mut event_reader);
+    app.update();
+    events.append(&mut collect_events(&app, &mut event_reader));
 
-    assert_eq!(events, vec![CollisionEvent::Stopped(entity1, entity2)])
+    assert_eq!(
+        events,
+        vec![
+            CollisionEvent::Started(entity1, entity2),
+            CollisionEvent::Stopped(entity1, entity2)
+        ]
+    );
 }
 
 fn collect_events(
