@@ -21,7 +21,7 @@ The required version of rapier is bumped to ^0.8.0
 
 ### Feature flags of public dependencies
 
-Heron no longer add enable any feature flag on rapier. That way the end-use can freely choose the rapier feature flags.
+Heron no longer enables any feature flag for rapier. That way the end-user can freely choose the rapier feature flags.
 
 
 ## [0.3.0] - 2021-03-21
