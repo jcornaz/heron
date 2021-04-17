@@ -10,6 +10,9 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### ⚠ Dependency requirements updated (breaking)
+
+The required version of rapier2d is bumped to ^0.8.0
 
 
 ## [0.4.0] - 2021-04-17
@@ -17,7 +20,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 ### ⚠ Dependency requirements updated (breaking)
 
 The required version of bevy is bumped to ^0.5.0
-The required version of rapier is bumped to ^0.8.0
+The required version of rapier3d is bumped to ^0.8.0
 
 ### Feature flags of public dependencies
 
