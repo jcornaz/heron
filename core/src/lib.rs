@@ -83,7 +83,7 @@ impl Plugin for CorePlugin {
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<RotationConstraints>()
-            .add_stage_after(bevy::app::stage::UPDATE, crate::stage::ROOT, {
+            .add_stage_before(bevy::app::stage::POST_UPDATE, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.steps_per_second {
