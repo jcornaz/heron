@@ -250,6 +250,7 @@ pub enum CollisionEvent {
 ///         .insert(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
 ///             density: 2.0, // Define the density. Higher value means heavier.
+///             friction: 0.5, // Define the friction. Higher value means higher friction.
 ///         });
 /// }
 /// ```
@@ -268,6 +269,13 @@ pub struct PhysicMaterial {
     ///
     /// Value must be greater than 0. Except for sensor and static bodies, in which case the value is ignored.
     pub density: f32,
+
+    /// Friction. It affects the relative motion of two bodies in contact.
+    ///
+    /// The higher the value, the higher friction.
+    ///
+    /// Typical values are between 0 (ideal) and 1 (max friction)
+    pub friction: f32,
 }
 
 impl PhysicMaterial {
@@ -283,6 +291,7 @@ impl Default for PhysicMaterial {
         Self {
             restitution: Self::PERFECTLY_INELASTIC_RESTITUTION,
             density: 1.0,
+            friction: 0.0,
         }
     }
 }

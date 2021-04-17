@@ -24,7 +24,8 @@ trait ColliderFactory {
             .user_data(entity.to_bits().into())
             .sensor(matches!(body_type, BodyType::Sensor))
             .restitution(material.restitution)
-            .density(material.density);
+            .density(material.density)
+            .friction(material.friction);
         collider_builder.build()
     }
 }
