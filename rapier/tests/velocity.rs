@@ -118,7 +118,6 @@ fn velocity_may_be_added_after_creating_the_body() {
 }
 
 #[test]
-#[ignore]
 fn velocity_is_updated_to_reflect_rapier_world() {
     let mut app = test_app();
 

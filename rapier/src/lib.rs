@@ -38,6 +38,10 @@ mod stage {
     pub(crate) const POST_STEP: &str = "heron-post-step";
 }
 
+mod system_label {
+    pub(crate) const PHYSICS_STEP: &str = "physics_step";
+}
+
 /// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
@@ -142,9 +146,9 @@ impl Plugin for RapierPlugin {
                         .with_system(
                             velocity::apply_velocity_to_kinematic_bodies
                                 .system()
-                                .before("step"),
+                                .before(system_label::PHYSICS_STEP),
                         )
-                        .with_system(pipeline::step.system().label("step")),
+                        .with_system(pipeline::step.system().label(system_label::PHYSICS_STEP)),
                 )
                 .add_stage(
                     "heron-post-step",
