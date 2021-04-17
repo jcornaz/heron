@@ -14,6 +14,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 The required version of rapier is bumped to ^0.8.0
 
+### Feature flags of public dependencies
+
+Heron no longer add enable any feature flag on rapier. That way the end-use can freely choose the rapier feature flags.
+
 
 ## [0.3.0] - 2021-03-21
 
