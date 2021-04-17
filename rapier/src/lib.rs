@@ -139,8 +139,12 @@ impl Plugin for RapierPlugin {
                 .add_stage(
                     "heron-step",
                     SystemStage::single_threaded()
-                        .with_system(velocity::apply_velocity_to_kinematic_bodies.system())
-                        .with_system(pipeline::step.system()),
+                        .with_system(
+                            velocity::apply_velocity_to_kinematic_bodies
+                                .system()
+                                .before("step"),
+                        )
+                        .with_system(pipeline::step.system().label("step")),
                 )
                 .add_stage(
                     "heron-post-step",
