@@ -1,9 +1,10 @@
+use std::ops::{Mul, MulAssign};
+
 use bevy::math::prelude::*;
 use bevy::reflect::prelude::*;
 use duplicate::duplicate;
 
 use crate::utils::NearZero;
-use std::ops::{Mul, MulAssign};
 
 /// Component that defines the linear and angular velocity.
 ///
@@ -17,12 +18,12 @@ use std::ops::{Mul, MulAssign};
 /// # use heron_core::*;
 /// # use std::f32::consts::PI;
 ///
-/// fn spawn(commands: &mut Commands) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 })
-///         .with(
-///             Velocity::from_linear(Vec3::unit_x() * 10.0)
-///                 .with_angular(AxisAngle::new(Vec3::unit_z(), 0.5 * PI))
+/// fn spawn(mut commands: Commands) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(
+///             Velocity::from_linear(Vec3::X * 10.0)
+///                 .with_angular(AxisAngle::new(Vec3::Z, 0.5 * PI))
 ///         );
 /// }
 /// ```
@@ -47,12 +48,12 @@ pub struct Velocity {
 /// # use heron_core::*;
 /// # use std::f32::consts::PI;
 ///
-/// fn spawn(commands: &mut Commands) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 })
-///         .with(
-///             Acceleration::from_linear(Vec3::unit_x() * 1.0)
-///                 .with_angular(AxisAngle::new(Vec3::unit_z(), 0.05 * PI))
+/// fn spawn(mut commands: Commands) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(
+///             Acceleration::from_linear(Vec3::X * 1.0)
+///                 .with_angular(AxisAngle::new(Vec3::Z, 0.05 * PI))
 ///         );
 /// }
 /// ```
@@ -86,7 +87,7 @@ impl Velocity {
     pub fn from_angular(angular: AxisAngle) -> Self {
         Self {
             angular,
-            linear: Vec3::zero(),
+            linear: Vec3::ZERO,
         }
     }
 
@@ -120,7 +121,7 @@ impl Acceleration {
     pub fn from_angular(angular: AxisAngle) -> Self {
         Self {
             angular,
-            linear: Vec3::zero(),
+            linear: Vec3::ZERO,
         }
     }
 
@@ -320,7 +321,7 @@ impl From<Quat> for AxisAngle {
 impl From<AxisAngle> for Quat {
     fn from(axis_angle: AxisAngle) -> Self {
         if axis_angle.is_near_zero() {
-            Quat::identity()
+            Quat::IDENTITY
         } else {
             let angle = axis_angle.0.length();
             Quat::from_axis_angle(axis_angle.0 / angle, angle)

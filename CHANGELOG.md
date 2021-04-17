@@ -12,6 +12,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ### ⚠ Dependency requirements updated (breaking)
 
+The required version of bevy is bumped to ^0.5.0
 The required version of rapier is bumped to ^0.8.0
 
 ### Feature flags of public dependencies

@@ -13,8 +13,7 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy::app::{AppBuilder, Plugin};
-use bevy::ecs::{IntoSystem, Schedule, SystemStage};
+use bevy::prelude::*;
 
 use heron_core::CollisionEvent;
 
@@ -37,6 +36,10 @@ mod stage {
     pub(crate) const PRE_STEP: &str = "heron-pre-step";
     pub(crate) const STEP: &str = "heron-step";
     pub(crate) const POST_STEP: &str = "heron-post-step";
+}
+
+mod system_label {
+    pub(crate) const PHYSICS_STEP: &str = "physics_step";
 }
 
 /// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
@@ -110,22 +113,22 @@ impl Plugin for RapierPlugin {
         .init_resource::<PhysicsPipeline>()
         .init_resource::<HandleMap>()
         .add_event::<CollisionEvent>()
-        .add_resource(self.parameters)
-        .add_resource(BroadPhase::new())
-        .add_resource(NarrowPhase::new())
-        .add_resource(RigidBodySet::new())
-        .add_resource(ColliderSet::new())
-        .add_resource(JointSet::new())
-        .add_resource(CCDSolver::new())
+        .insert_resource(self.parameters)
+        .insert_resource(BroadPhase::new())
+        .insert_resource(NarrowPhase::new())
+        .insert_resource(RigidBodySet::new())
+        .insert_resource(ColliderSet::new())
+        .insert_resource(JointSet::new())
+        .insert_resource(CCDSolver::new())
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
                     "heron-remove-invalid-bodies",
-                    SystemStage::serial().with_system(body::remove_bodies.system()),
+                    SystemStage::single_threaded().with_system(body::remove_bodies.system()),
                 )
                 .add_stage(
                     "heron-pre-step",
-                    SystemStage::serial()
+                    SystemStage::single_threaded()
                         .with_system(
                             bevy::transform::transform_propagate_system::transform_propagate_system
                                 .system(),
@@ -139,9 +142,13 @@ impl Plugin for RapierPlugin {
                 )
                 .add_stage(
                     "heron-step",
-                    SystemStage::serial()
-                        .with_system(velocity::apply_velocity_to_kinematic_bodies.system())
-                        .with_system(pipeline::step.system()),
+                    SystemStage::single_threaded()
+                        .with_system(
+                            velocity::apply_velocity_to_kinematic_bodies
+                                .system()
+                                .before(system_label::PHYSICS_STEP),
+                        )
+                        .with_system(pipeline::step.system().label(system_label::PHYSICS_STEP)),
                 )
                 .add_stage(
                     "heron-post-step",

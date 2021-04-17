@@ -76,14 +76,13 @@ impl CorePlugin {
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.resources_mut().get_or_insert_with(Gravity::default);
-
-        app.register_type::<Body>()
+        app.init_resource::<Gravity>()
+            .register_type::<Body>()
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<RotationConstraints>()
-            .add_stage_before(bevy::app::stage::POST_UPDATE, crate::stage::ROOT, {
+            .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
                 if let Some(steps_per_second) = self.steps_per_second {
@@ -103,9 +102,9 @@ impl Plugin for CorePlugin {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 });
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(Body::Sphere { radius: 1.0 });
 /// }
 /// ```
 #[derive(Debug, Clone, Reflect)]
@@ -153,10 +152,10 @@ impl Default for Body {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .with(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
@@ -220,13 +219,13 @@ impl BodyType {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn detect_collisions(mut reader: Local<EventReader<CollisionEvent>>, events: Res<Events<CollisionEvent>>) {
-///     for event in reader.iter(&events) {
+/// fn detect_collisions(mut events: EventReader<CollisionEvent>) {
+///     for event in events.iter() {
 ///         match event {
 ///             CollisionEvent::Started(entity1, entity2) => println!("Entity {:?} and {:?} started to collide", entity1, entity2),
 ///             CollisionEvent::Stopped(entity1, entity2) => println!("Entity {:?} and {:?} stopped to collide", entity1, entity2),
-///         }   
-///     }   
+///         }
+///     }
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -245,10 +244,10 @@ pub enum CollisionEvent {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(commands: &mut Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
-///     commands.spawn(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .with(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .with(PhysicMaterial {
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
 ///             density: 2.0, // Define the density. Higher value means heavier.
 ///         });

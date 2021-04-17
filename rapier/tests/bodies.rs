@@ -10,13 +10,11 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, BodyType};
-use heron_rapier::convert::{IntoBevy, IntoRapier};
+use heron_core::Body;
+use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
-
-use rstest::rstest;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -27,6 +25,7 @@ fn test_app() -> App {
             step_per_second: None,
             parameters: IntegrationParameters::default(),
         });
+
     builder.app
 }
 
@@ -35,16 +34,20 @@ fn creates_body_in_rapier_world() {
     let mut app = test_app();
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
+    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
 
-    let entity = app.world.spawn((
-        Body::Sphere { radius: 2.0 },
-        GlobalTransform {
-            translation,
-            rotation,
-            ..Default::default()
-        },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Body::Sphere { radius: 2.0 },
+            GlobalTransform {
+                translation,
+                rotation,
+                ..Default::default()
+            },
+        ))
+        .id();
 
     app.update();
 
@@ -53,8 +56,8 @@ fn creates_body_in_rapier_world() {
         .get::<BodyHandle>(entity)
         .expect("No body handle attached");
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
-    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
 
     let body = bodies
         .get(handle.rigid_body())
@@ -100,7 +103,9 @@ fn update_shape() {
 
     let entity = app
         .world
-        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
+        .spawn()
+        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .id();
 
     {
         app.update();
@@ -113,7 +118,7 @@ fn update_shape() {
 
     app.update();
 
-    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let handle = app.world.get::<BodyHandle>(entity).unwrap();
     let collider = colliders.get(handle.collider()).unwrap();
 
@@ -126,10 +131,12 @@ fn update_rapier_position() {
 
     let entity = app
         .world
-        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
+        .spawn()
+        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .id();
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
+    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
 
     {
         app.update();
@@ -140,7 +147,7 @@ fn update_rapier_position() {
 
     app.update();
 
-    let colliders = app.resources.get::<RigidBodySet>().unwrap();
+    let colliders = app.world.get_resource::<RigidBodySet>().unwrap();
     let handle = app.world.get::<BodyHandle>(entity).unwrap();
     let rigid_body = colliders.get(handle.rigid_body()).unwrap();
     let (actual_translation, actual_rotation) = rigid_body.position().into_bevy();
@@ -164,19 +171,21 @@ fn remove_body_component() {
 
     let entity = app
         .world
-        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
+        .spawn()
+        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .id();
 
     app.update();
 
-    app.world.remove_one::<Body>(entity).unwrap();
+    app.world.entity_mut(entity).remove::<Body>();
     app.update();
 
-    assert!(app.world.get::<BodyHandle>(entity).is_err());
+    assert!(app.world.get::<BodyHandle>(entity).is_none());
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     assert_eq!(bodies.len(), 0);
 
-    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     assert_eq!(colliders.len(), 0);
 }
 
@@ -186,70 +195,20 @@ fn despawn_body_entity() {
 
     let entity = app
         .world
-        .spawn((Body::Sphere { radius: 2.0 }, GlobalTransform::default()));
+        .spawn()
+        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .id();
 
     app.update();
 
-    app.world.despawn(entity).unwrap();
+    app.world.despawn(entity);
     app.update();
 
-    assert!(app.world.get::<BodyHandle>(entity).is_err());
+    assert!(app.world.get::<BodyHandle>(entity).is_none());
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     assert_eq!(bodies.len(), 0);
 
-    let colliders = app.resources.get::<ColliderSet>().unwrap();
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     assert_eq!(colliders.len(), 0);
-}
-
-#[rstest(
-    body_type,
-    case(Some(BodyType::Dynamic)),
-    case(Some(BodyType::Kinematic)),
-    case(None)
-)]
-fn update_bevy_transform(body_type: Option<BodyType>) {
-    let mut app = test_app();
-
-    let entity = app.world.spawn((
-        Body::Sphere { radius: 2.0 },
-        Transform::default(),
-        GlobalTransform::default(),
-    ));
-
-    if let Some(body_type) = body_type {
-        app.world.insert_one(entity, body_type).unwrap();
-    }
-
-    let translation = Vec3::new(1.0, 2.0, 3.0);
-    let rotation = Quat::from_axis_angle(Vec3::unit_z(), PI / 2.0);
-
-    {
-        app.update();
-        let handle = *app.world.get::<BodyHandle>(entity).unwrap();
-        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
-        let body = bodies.get_mut(handle.rigid_body()).unwrap();
-
-        body.set_position((translation, rotation).into_rapier(), true);
-    }
-
-    app.update();
-
-    let Transform {
-        translation: actual_translation,
-        rotation: actual_rotation,
-        ..
-    } = *app.world.get::<Transform>(entity).unwrap();
-
-    #[cfg(feature = "3d")]
-    assert_eq!(actual_translation, translation);
-
-    #[cfg(feature = "2d")]
-    assert_eq!(actual_translation.truncate(), translation.truncate());
-
-    let (axis, angle) = rotation.to_axis_angle();
-    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
-
-    assert!(actual_axis.angle_between(axis) < 0.001);
-    assert!((actual_angle - angle).abs() < 0.001);
 }

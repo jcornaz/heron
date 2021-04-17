@@ -55,8 +55,7 @@ pub(crate) fn update_velocity_component(
 
             #[cfg(feature = "2d")]
             {
-                velocity.angular =
-                    heron_core::AxisAngle::from(bevy::math::Vec3::unit_z() * body.angvel());
+                velocity.angular = heron_core::AxisAngle::from(bevy::math::Vec3::Z * body.angvel());
             }
 
             #[cfg(feature = "3d")]

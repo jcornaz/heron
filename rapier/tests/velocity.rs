@@ -3,15 +3,17 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
+use std::f32::consts::PI;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use rstest::rstest;
 
 use heron_core::*;
-use heron_rapier::convert::{IntoBevy, IntoRapier};
+use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
-use std::f32::consts::PI;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -34,18 +36,22 @@ fn body_is_created_with_velocity() {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+    let angular = AxisAngle::new(Vec3::Z, 2.0);
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        Velocity { linear, angular },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            Velocity { linear, angular },
+        ))
+        .id();
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
@@ -70,24 +76,28 @@ fn body_is_created_with_velocity() {
 fn velocity_may_be_added_after_creating_the_body() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-    ));
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+        ))
+        .id();
 
     app.update();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), 2.0);
+    let angular = AxisAngle::new(Vec3::Z, 2.0);
 
     app.world
-        .insert_one(entity, Velocity { linear, angular })
-        .unwrap();
+        .entity_mut(entity)
+        .insert(Velocity { linear, angular });
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
     let body = bodies
         .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
@@ -111,28 +121,22 @@ fn velocity_may_be_added_after_creating_the_body() {
 fn velocity_is_updated_to_reflect_rapier_world() {
     let mut app = test_app();
 
-    let entity = app.world.spawn((
-        Transform::default(),
-        GlobalTransform::default(),
-        Body::Sphere { radius: 1.0 },
-        Velocity::default(),
-    ));
+    let linear = Vec3::new(1.0, 2.0, 3.0);
+    let angular: AxisAngle = AxisAngle::new(Vec3::Z, PI * 0.5);
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            Body::Sphere { radius: 1.0 },
+            Velocity::default(),
+            Acceleration::from_linear(linear).with_angular(angular),
+        ))
+        .id();
 
     app.update();
-
-    let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular: AxisAngle = AxisAngle::new(Vec3::unit_z(), PI * 0.5);
-
-    {
-        let mut bodies = app.resources.get_mut::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get_mut(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
-
-        body.set_linvel(linear.into_rapier(), false);
-        body.set_angvel(angular.into_rapier(), false);
-    }
-
     app.update();
 
     let velocity = app.world.get::<Velocity>(entity).unwrap();
@@ -143,42 +147,54 @@ fn velocity_is_updated_to_reflect_rapier_world() {
     #[cfg(feature = "3d")]
     assert_eq!(velocity.linear.z, linear.z);
 
+    #[cfg(feature = "3d")]
     assert_eq!(angular, velocity.angular.into());
+
+    #[cfg(feature = "2d")]
+    assert!((angular.angle() - velocity.angular.angle()).abs() < 0.001);
 }
 
-#[test]
-fn velocity_can_move_kinematic_bodies() {
+#[rstest]
+#[case(Some(BodyType::Dynamic))]
+#[case(Some(BodyType::Kinematic))]
+#[case(None)]
+fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<BodyType>) {
     let mut app = test_app();
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
 
-    let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular = AxisAngle::new(Vec3::unit_z(), PI * 0.5);
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Body::Sphere { radius: 2.0 },
+            Transform::default(),
+            GlobalTransform::default(),
+            Velocity::from(translation).with_angular(rotation.into()),
+        ))
+        .id();
 
-    let entity = app.world.spawn((
-        GlobalTransform::from_rotation(Quat::from_axis_angle(Vec3::unit_z(), 0.0)),
-        Body::Sphere { radius: 1.0 },
-        BodyType::Kinematic,
-        Velocity::from_linear(linear).with_angular(angular),
-    ));
+    if let Some(body_type) = body_type {
+        app.world.entity_mut(entity).insert(body_type);
+    }
 
     app.update();
 
-    let bodies = app.resources.get::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
-
-    let position = body.position().translation.into_bevy();
-    let rotation = body.position().rotation.into_bevy();
-
-    assert_eq!(position.x, linear.x);
-    assert_eq!(position.y, linear.y);
+    let Transform {
+        translation: actual_translation,
+        rotation: actual_rotation,
+        ..
+    } = *app.world.get::<Transform>(entity).unwrap();
 
     #[cfg(feature = "3d")]
-    assert_eq!(position.z, linear.z);
+    assert_eq!(actual_translation, translation);
 
-    let angular: Quat = angular.into();
-    assert!((rotation.x - angular.x).abs() < 0.00001);
-    assert!((rotation.y - angular.y).abs() < 0.00001);
-    assert!((rotation.z - angular.z).abs() < 0.00001);
-    assert!((rotation.w - angular.w).abs() < 0.00001);
+    #[cfg(feature = "2d")]
+    assert_eq!(actual_translation.truncate(), translation.truncate());
+
+    let (axis, angle) = rotation.to_axis_angle();
+    let (actual_axis, actual_angle) = actual_rotation.to_axis_angle();
+
+    assert!(actual_axis.angle_between(axis) < 0.001);
+    assert!((actual_angle - angle).abs() < 0.001);
 }

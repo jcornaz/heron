@@ -20,25 +20,25 @@ fn main() {
   App::build()
     .add_plugins(DefaultPlugins)
     .add_plugin(PhysicsPlugin::default()) // Add the plugin
-    .add_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
+    .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
     .add_startup_system(spawn.system())
     .run();
 }
 
-fn spawn(commands: &mut Commands) {
+fn spawn(mut commands: Commands) {
     commands
 
         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
-        .spawn(SpriteBundle::default())
+        .spawn_bundle(SpriteBundle::default())
 
         // Make it a physics body, by attaching a collision shape
-        .with(Body::Sphere { radius: 10.0 })
+        .insert(Body::Sphere { radius: 10.0 })
 
         // Optionally define a type (if absent, the body will be *dynamic*)
-        .with(BodyType::Kinematic)
+        .insert(BodyType::Kinematic)
         
         // Optionally define the velocity (works only with dynamic and kinematic bodies)
-        .with(Velocity::from(Vec2::unit_x() * 2.0));
+        .insert(Velocity::from(Vec2::X * 2.0));
 }
 ```
 
@@ -47,16 +47,23 @@ fn spawn(commands: &mut Commands) {
 
 **For a 3d game:**
 ```toml
-bevy = "^0.4.0"
-heron = "0.3.0"
+bevy = "^0.5.0"
+heron = "0.4.0"
 ```
 
 **For a 2d game:**
 ```toml
-bevy = "^0.4.0"
-heron = { version = "0.3.0" default-features = false, features = ["2d"] }
+bevy = "^0.5.0"
+heron = { version = "0.4.0", default-features = false, features = ["2d"] }
 ```
 
+
+## Bevy Version Supported
+
+| bevy | heron      |
+|------|------------|
+| 0.5  | >= 0.4     |
+| 0.4  | < 0.4      |
 
 ## Design principles
 
