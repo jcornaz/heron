@@ -28,10 +28,10 @@ mod velocity;
 /// to register systems that should run during the physics update.
 pub mod stage {
 
-    /// The root **[`Schedule`](bevy::::ecs::Schedule)** stage
+    /// The root **`Schedule`** stage
     pub const ROOT: &str = "heron-physics";
 
-    /// A **child** [`SystemStage`](bevy::::ecs::SystemStage) running before each physics step.
+    /// A **child** `SystemStage` running before each physics step.
     ///
     /// Use this stage to modify rigid-body transforms or any other physics component.
     ///
