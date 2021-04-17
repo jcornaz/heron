@@ -20,6 +20,7 @@ The required version of rapier2d is bumped to ^0.8.0
 ### ⚠ Dependency requirements updated (breaking)
 
 The required version of bevy is bumped to ^0.5.0
+The required version of rapier2d is bumped to ^0.7.2
 The required version of rapier3d is bumped to ^0.8.0
 
 ### Feature flags of public dependencies
