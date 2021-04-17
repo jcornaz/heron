@@ -147,7 +147,11 @@ fn velocity_is_updated_to_reflect_rapier_world() {
     #[cfg(feature = "3d")]
     assert_eq!(velocity.linear.z, linear.z);
 
+    #[cfg(feature = "3d")]
     assert_eq!(angular, velocity.angular.into());
+
+    #[cfg(feature = "2d")]
+    assert!((angular.angle() - velocity.angular.angle()).abs() < 0.001);
 }
 
 #[rstest]
