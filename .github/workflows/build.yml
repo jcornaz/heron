@@ -62,9 +62,6 @@ jobs:
       - name: Run tests with default features
         run: cargo test --workspace
 
-      - name: Build documentation
-        run: cargo doc --workspace
-
   test-features:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -136,3 +133,35 @@ jobs:
 
       - name: Run ignored tests
         run: cargo test --workspace --features "debug" -- --ignored
+
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RUSTFLAGS: "-D warnings"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Global cache
+        uses: actions/cache@v2.1.5
+        with:
+          path: |
+            ~/.cargo
+            ~/.rustup
+          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
+          restore-keys: cargo-ubuntu-latest-stable
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install dependencies
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
+
+      - name: Run ignored tests
+        run: cargo doc --workspace
