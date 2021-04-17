@@ -62,6 +62,9 @@ jobs:
       - name: Run tests with default features
         run: cargo test --workspace
 
+      - name: Build documentation
+        run: cargo doc --workspace
+
   test-features:
     runs-on: ubuntu-latest
     timeout-minutes: 20
