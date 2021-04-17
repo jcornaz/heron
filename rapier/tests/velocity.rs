@@ -11,7 +11,7 @@ use bevy::reflect::TypeRegistryArc;
 use rstest::rstest;
 
 use heron_core::*;
-use heron_rapier::convert::{IntoBevy, IntoRapier};
+use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
 
@@ -121,6 +121,9 @@ fn velocity_may_be_added_after_creating_the_body() {
 fn velocity_is_updated_to_reflect_rapier_world() {
     let mut app = test_app();
 
+    let linear = Vec3::new(1.0, 2.0, 3.0);
+    let angular: AxisAngle = AxisAngle::new(Vec3::Z, PI * 0.5);
+
     let entity = app
         .world
         .spawn()
@@ -129,23 +132,11 @@ fn velocity_is_updated_to_reflect_rapier_world() {
             GlobalTransform::default(),
             Body::Sphere { radius: 1.0 },
             Velocity::default(),
+            Acceleration::from_linear(linear).with_angular(angular),
         ))
         .id();
 
     app.update();
-
-    let linear = Vec3::new(1.0, 2.0, 3.0);
-    let angular: AxisAngle = AxisAngle::new(Vec3::Z, PI * 0.5);
-
-    {
-        let rigid_body_handle = app.world.get::<BodyHandle>(entity).unwrap().rigid_body();
-        let mut bodies = app.world.get_resource_mut::<RigidBodySet>().unwrap();
-        let body = bodies.get_mut(rigid_body_handle).unwrap();
-
-        body.set_linvel(linear.into_rapier(), false);
-        body.set_angvel(angular.into_rapier(), false);
-    }
-
     app.update();
 
     let velocity = app.world.get::<Velocity>(entity).unwrap();
