@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.4.0] - 2021-04-17
+
 ### ⚠ Dependency requirements updated (breaking)
 
 The required version of bevy is bumped to ^0.5.0
@@ -183,7 +187,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.3.0...HEAD
+[Unreleased]: ../../compare/v0.4.0...HEAD
+[0.4.0]: ../../compare/v0.3.0...v0.4.0
 [0.3.0]: ../../compare/v0.2.0...v0.3.0
 [0.2.0]: ../../compare/v0.1.1...v0.2.0
 [0.1.1]: ../../compare/v0.1.0...v0.1.1
