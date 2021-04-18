@@ -11,12 +11,14 @@ pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
+pub use physics_controller::PhysicsController;
 
 mod constraints;
 pub mod ext;
 mod gravity;
 pub mod utils;
 mod velocity;
+mod physics_controller;
 
 /// Physics stages for user systems. These stages are executed once per physics step.
 ///
@@ -77,6 +79,7 @@ impl CorePlugin {
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
+            .init_resource::<PhysicsController>()
             .register_type::<Body>()
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
