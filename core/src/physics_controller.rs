@@ -9,7 +9,7 @@
 /// fn main() {
 ///     App::build()
 ///         // ... Add plugins
-///         .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0)))
+///         .insert_resource(PhysicsController::from(0.5))
 ///         // ... Add systems
 ///         .run();
 /// }
@@ -21,12 +21,14 @@ pub struct PhysicsController {
 }
 
 impl PhysicsController {
-    fn pause(&mut self) {
+    /// Pause the physics emulation, avoiding heron systems to run.
+    pub fn pause(&mut self) {
         self.prev_time_scale = Some(self.time_scale);
         self.time_scale = 0.0;
     }
 
-    fn resume(&mut self) {
+    /// Resume the physics emulation
+    pub fn resume(&mut self) {
         if self.time_scale == 0.0 {
             if let Some(prev) = self.prev_time_scale {
                 self.time_scale = prev;
@@ -35,13 +37,20 @@ impl PhysicsController {
         }
     }
 
-    fn time_scale(&mut self, time_scale: f32) {
+    /// Set the physics emulation time scale
+    pub fn time_scale(&mut self, time_scale: f32) {
         if time_scale.is_sign_positive() {
             self.time_scale = time_scale;
         }
     }
 
-    fn from(time_scale: f32) -> Self {
+    /// Get the physics emulation time scale
+    pub fn current_time_scale(&self) -> f32 {
+        self.time_scale
+    }
+
+    /// Initialize a `PhysicsController` struct with an initial time scale
+    pub fn from(time_scale: f32) -> Self {
         let mut physics_controller = Self::default();
         physics_controller.time_scale(time_scale);
         physics_controller

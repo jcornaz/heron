@@ -128,6 +128,7 @@
 //! * How to choose a [collision shape](Body)
 //! * How to define a [`BodyType`] (dynamic, static, kinematic or sensor)
 //! * How to define the world's [`Gravity`]
+//! * How to define the world's [`PhysicsController`]
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]
@@ -149,7 +150,7 @@ pub mod rapier_plugin {
 pub mod prelude {
     pub use crate::{
         ext::*, stage, Acceleration, AxisAngle, Body, BodyType, CollisionEvent, Gravity,
-        PhysicMaterial, PhysicsPlugin, RotationConstraints, Velocity,
+        PhysicsController, PhysicMaterial, PhysicsPlugin,RotationConstraints, Velocity,
     };
 }
 
