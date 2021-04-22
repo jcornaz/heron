@@ -29,7 +29,7 @@ pub(crate) fn step(
 ) {
     let gravity = Vec3::from(*gravity).into_rapier();
     let mut integration_parameters = integration_parameters.clone();
-    integration_parameters.dt *= physics_controller.current_time_scale();
+    integration_parameters.dt *= physics_controller.time_scale;
     pipeline.step(
         &gravity,
         &integration_parameters,

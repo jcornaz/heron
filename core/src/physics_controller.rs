@@ -16,7 +16,8 @@
 /// ```
 #[derive(Debug, Copy, Clone)]
 pub struct PhysicsController {
-    time_scale: f32,
+    /// Specify the physics emulation time scale used
+    pub time_scale: f32,
     prev_time_scale: Option<f32>,
 }
 
@@ -37,23 +38,12 @@ impl PhysicsController {
         }
     }
 
-    /// Set the physics emulation time scale
-    pub fn time_scale(&mut self, time_scale: f32) {
-        if time_scale.is_sign_positive() {
-            self.time_scale = time_scale;
-        }
-    }
-
-    /// Get the physics emulation time scale
-    pub fn current_time_scale(&self) -> f32 {
-        self.time_scale
-    }
-
     /// Initialize a `PhysicsController` struct with an initial time scale
     pub fn from(time_scale: f32) -> Self {
-        let mut physics_controller = Self::default();
-        physics_controller.time_scale(time_scale);
-        physics_controller
+        Self {
+            time_scale,
+            prev_time_scale: None,
+        }
     }
 }
 
