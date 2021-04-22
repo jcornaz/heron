@@ -10,15 +10,15 @@ use bevy::prelude::*;
 pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
-pub use velocity::{Acceleration, AxisAngle, Velocity};
 pub use physics_controller::PhysicsController;
+pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 pub mod ext;
 mod gravity;
+mod physics_controller;
 pub mod utils;
 mod velocity;
-mod physics_controller;
 
 /// Physics stages for user systems. These stages are executed once per physics step.
 ///

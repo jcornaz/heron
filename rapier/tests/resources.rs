@@ -50,10 +50,12 @@ fn can_define_time_scale_before_plugin() {
 
     assert_eq!(
         0.5,
-        app.world.get_resource::<PhysicsController>().unwrap().time_scale
+        app.world
+            .get_resource::<PhysicsController>()
+            .unwrap()
+            .time_scale
     );
 }
-
 
 #[test]
 fn rapier_world_is_registered() {
