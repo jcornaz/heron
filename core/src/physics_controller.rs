@@ -30,11 +30,9 @@ impl PhysicsTime {
 
     /// Resume the physics emulation
     pub fn resume(&mut self) {
-        if self.scale == 0.0 {
-            if let Some(prev) = self.previous_scale {
-                self.scale = prev;
-                self.previous_scale = None;
-            }
+        if let Some(prev) = self.previous_scale {
+            self.scale = prev;
+            self.previous_scale = None;
         }
     }
 }
@@ -54,5 +52,35 @@ impl From<f32> for PhysicsTime {
             scale: time_scale,
             previous_scale: None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[rstest]
+    #[case(0.0)]
+    #[case(1.0)]
+    #[case(0.5)]
+    #[case(-1.0)]
+    fn pause_sets_scale_to_zero(#[case] initial_scale: f32) {
+        let mut time = PhysicsTime::from(initial_scale);
+        time.pause();
+        assert_eq!(time.scale, 0.0);
+    }
+
+    #[rstest]
+    #[case(0.0)]
+    #[case(1.0)]
+    #[case(0.5)]
+    #[case(-1.0)]
+    fn pause_restore_time_scale_before_pause(#[case] initial_scale: f32) {
+        let mut time = PhysicsTime::from(initial_scale);
+        time.pause();
+        time.resume();
+        assert_eq!(time.scale, initial_scale);
     }
 }
