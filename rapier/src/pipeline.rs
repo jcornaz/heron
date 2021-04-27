@@ -16,7 +16,7 @@ use crate::rapier::pipeline::{ChannelEventCollector, PhysicsPipeline};
 pub(crate) fn step(
     mut pipeline: ResMut<'_, PhysicsPipeline>,
     gravity: Res<'_, Gravity>,
-    integration_parameters: Res<'_, IntegrationParameters>,
+    mut integration_parameters: ResMut<'_, IntegrationParameters>,
     mut broad_phase: ResMut<'_, BroadPhase>,
     mut narrow_phase: ResMut<'_, NarrowPhase>,
     mut bodies: ResMut<'_, RigidBodySet>,
@@ -28,7 +28,6 @@ pub(crate) fn step(
     physics_controller: Res<'_, PhysicsTime>,
 ) {
     let gravity = Vec3::from(*gravity).into_rapier();
-    let mut integration_parameters = integration_parameters.to_owned();
     integration_parameters.dt *= physics_controller.scale;
     pipeline.step(
         &gravity,
