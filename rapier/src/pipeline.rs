@@ -3,7 +3,7 @@ use bevy::ecs::prelude::*;
 use bevy::math::Vec3;
 use crossbeam::channel::Receiver;
 
-use heron_core::{CollisionEvent, Gravity, PhysicsController};
+use heron_core::{CollisionEvent, Gravity, PhysicsTime};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
@@ -25,11 +25,11 @@ pub(crate) fn step(
     mut ccd_solver: ResMut<'_, CCDSolver>,
     event_manager: Local<'_, EventManager>,
     mut events: ResMut<'_, Events<CollisionEvent>>,
-    physics_controller: Res<'_, PhysicsController>,
+    physics_controller: Res<'_, PhysicsTime>,
 ) {
     let gravity = Vec3::from(*gravity).into_rapier();
     let mut integration_parameters = integration_parameters.to_owned();
-    integration_parameters.dt *= physics_controller.time_scale;
+    integration_parameters.dt *= physics_controller.scale;
     pipeline.step(
         &gravity,
         &integration_parameters,

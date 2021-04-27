@@ -9,31 +9,31 @@
 /// fn main() {
 ///     App::build()
 ///         // ... Add plugins
-///         .insert_resource(PhysicsController::from(0.5))
+///         .insert_resource(PhysicsTime::from(0.5))
 ///         // ... Add systems
 ///         .run();
 /// }
 /// ```
 #[derive(Debug, Copy, Clone)]
-pub struct PhysicsController {
+pub struct PhysicsTime {
     /// Specify the physics emulation time scale used
-    pub time_scale: f32,
-    prev_time_scale: Option<f32>,
+    pub scale: f32,
+    previous_scale: Option<f32>,
 }
 
-impl PhysicsController {
+impl PhysicsTime {
     /// Pause the physics emulation, avoiding heron systems to run.
     pub fn pause(&mut self) {
-        self.prev_time_scale = Some(self.time_scale);
-        self.time_scale = 0.0;
+        self.previous_scale = Some(self.scale);
+        self.scale = 0.0;
     }
 
     /// Resume the physics emulation
     pub fn resume(&mut self) {
-        if self.time_scale == 0.0 {
-            if let Some(prev) = self.prev_time_scale {
-                self.time_scale = prev;
-                self.prev_time_scale = None;
+        if self.scale == 0.0 {
+            if let Some(prev) = self.previous_scale {
+                self.scale = prev;
+                self.previous_scale = None;
             }
         }
     }
@@ -42,17 +42,17 @@ impl PhysicsController {
     #[must_use]
     pub fn from(time_scale: f32) -> Self {
         Self {
-            time_scale,
-            prev_time_scale: None,
+            scale: time_scale,
+            previous_scale: None,
         }
     }
 }
 
-impl Default for PhysicsController {
+impl Default for PhysicsTime {
     fn default() -> Self {
         Self {
-            time_scale: 1.0,
-            prev_time_scale: None,
+            scale: 1.0,
+            previous_scale: None,
         }
     }
 }

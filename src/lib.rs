@@ -150,7 +150,7 @@ pub mod rapier_plugin {
 pub mod prelude {
     pub use crate::{
         ext::*, stage, Acceleration, AxisAngle, Body, BodyType, CollisionEvent, Gravity,
-        PhysicMaterial, PhysicsController, PhysicsPlugin, RotationConstraints, Velocity,
+        PhysicMaterial, PhysicsPlugin, PhysicsTime, RotationConstraints, Velocity,
     };
 }
 

@@ -9,7 +9,7 @@ use bevy::math::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::Gravity;
-use heron_core::PhysicsController;
+use heron_core::PhysicsTime;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
@@ -40,7 +40,7 @@ fn can_define_time_scale_before_plugin() {
         let mut builder = App::build();
 
         builder
-            .insert_resource(PhysicsController::from(0.5))
+            .insert_resource(PhysicsTime::from(0.5))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
             .add_plugin(RapierPlugin::default());
@@ -48,13 +48,7 @@ fn can_define_time_scale_before_plugin() {
         builder.app
     };
 
-    assert_eq!(
-        0.5,
-        app.world
-            .get_resource::<PhysicsController>()
-            .unwrap()
-            .time_scale
-    );
+    assert_eq!(0.5, app.world.get_resource::<PhysicsTime>().unwrap().scale);
 }
 
 #[test]
