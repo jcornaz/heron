@@ -37,21 +37,21 @@ impl PhysicsTime {
             }
         }
     }
-
-    /// Initialize a `PhysicsController` struct with an initial time scale
-    #[must_use]
-    pub fn from(time_scale: f32) -> Self {
-        Self {
-            scale: time_scale,
-            previous_scale: None,
-        }
-    }
 }
 
 impl Default for PhysicsTime {
     fn default() -> Self {
         Self {
             scale: 1.0,
+            previous_scale: None,
+        }
+    }
+}
+
+impl From<f32> for PhysicsTime {
+    fn from(time_scale: f32) -> Self {
+        Self {
+            scale: time_scale,
             previous_scale: None,
         }
     }
