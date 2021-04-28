@@ -17,7 +17,7 @@
 #[derive(Debug, Copy, Clone)]
 pub struct PhysicsTime {
     /// Specify the physics emulation time scale used
-    pub scale: f32,
+    scale: f32,
     previous_scale: Option<f32>,
 }
 
@@ -34,6 +34,19 @@ impl PhysicsTime {
             self.scale = prev;
             self.previous_scale = None;
         }
+    }
+
+    /// Set the physics emulation time scale
+    pub fn set_scale(&mut self, time_scale: f32) {
+        if time_scale > 0.0 {
+            self.scale = time_scale;
+        }
+    }
+
+    /// Get the physics emulation time scale
+    #[must_use]
+    pub fn get_scale(&self) -> f32 {
+        self.scale
     }
 }
 
@@ -69,7 +82,7 @@ mod tests {
     fn pause_sets_scale_to_zero(#[case] initial_scale: f32) {
         let mut time = PhysicsTime::from(initial_scale);
         time.pause();
-        assert_eq!(time.scale, 0.0);
+        assert_eq!(time.get_scale(), 0.0);
     }
 
     #[rstest]
@@ -81,6 +94,6 @@ mod tests {
         let mut time = PhysicsTime::from(initial_scale);
         time.pause();
         time.resume();
-        assert_eq!(time.scale, initial_scale);
+        assert_eq!(time.get_scale(), initial_scale);
     }
 }

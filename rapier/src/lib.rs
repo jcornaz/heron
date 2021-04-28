@@ -163,7 +163,7 @@ impl Plugin for RapierPlugin {
 }
 
 fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
-    if physics_time.scale == 0.0 {
+    if physics_time.get_scale() == 0.0 {
         ShouldRun::No
     } else {
         ShouldRun::Yes
