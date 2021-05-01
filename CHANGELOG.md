@@ -10,6 +10,11 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### PhysicsTime resource
+
+The `PhysicsTime` resource can be used to change the time-scale of the physics engine.
+
+Thanks @yaymalaga
 
 
 ## [0.5.0] - 2021-04-18

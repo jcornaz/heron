@@ -10,11 +10,13 @@ use bevy::prelude::*;
 pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
+pub use physics_time::PhysicsTime;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 pub mod ext;
 mod gravity;
+mod physics_time;
 pub mod utils;
 mod velocity;
 
@@ -77,6 +79,7 @@ impl CorePlugin {
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
+            .init_resource::<PhysicsTime>()
             .register_type::<Body>()
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()

@@ -13,9 +13,9 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy::prelude::*;
+use bevy::{ecs::schedule::ShouldRun, prelude::*};
 
-use heron_core::CollisionEvent;
+use heron_core::{CollisionEvent, PhysicsTime};
 
 use crate::body::HandleMap;
 use crate::rapier::dynamics::{
@@ -143,6 +143,7 @@ impl Plugin for RapierPlugin {
                 .add_stage(
                     "heron-step",
                     SystemStage::single_threaded()
+                        .with_run_criteria(should_run.system())
                         .with_system(
                             velocity::apply_velocity_to_kinematic_bodies
                                 .system()
@@ -153,10 +154,19 @@ impl Plugin for RapierPlugin {
                 .add_stage(
                     "heron-post-step",
                     SystemStage::parallel()
+                        .with_run_criteria(should_run.system())
                         .with_system(body::update_bevy_transform.system())
                         .with_system(velocity::update_velocity_component.system()),
                 )
         });
+    }
+}
+
+fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
+    if physics_time.get_scale() == 0.0 {
+        ShouldRun::No
+    } else {
+        ShouldRun::Yes
     }
 }
 
