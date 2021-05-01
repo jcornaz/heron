@@ -9,7 +9,7 @@
 /// fn main() {
 ///     App::build()
 ///         // ... Add plugins
-///         .insert_resource(PhysicsTime::from(0.5))
+///         .insert_resource(PhysicsTime::new(0.5))
 ///         // ... Add systems
 ///         .run();
 /// }
@@ -22,6 +22,21 @@ pub struct PhysicsTime {
 }
 
 impl PhysicsTime {
+    /// Create a new physics time for the given scale (which must be >= 0).
+    ///
+    /// # Panics
+    ///
+    /// Panic if the scale is negative.
+    ///
+    #[must_use]
+    pub fn new(scale: f32) -> Self {
+        assert!(scale >= 0.0, "Negative scale: {}", scale);
+        Self {
+            scale,
+            previous_scale: None,
+        }
+    }
+
     /// Pause the physics emulation, avoiding heron systems to run.
     pub fn pause(&mut self) {
         self.previous_scale = Some(self.scale);
@@ -36,11 +51,15 @@ impl PhysicsTime {
         }
     }
 
-    /// Set the physics emulation time scale
-    pub fn set_scale(&mut self, time_scale: f32) {
-        if time_scale > 0.0 {
-            self.scale = time_scale;
-        }
+    /// Set the physics emulation time scale (must be positive)
+    ///
+    /// # Panics
+    ///
+    /// Panic if the scale is negative
+    ///
+    pub fn set_scale(&mut self, scale: f32) {
+        assert!(scale >= 0.0);
+        self.scale = scale;
     }
 
     /// Get the physics emulation time scale
@@ -59,15 +78,6 @@ impl Default for PhysicsTime {
     }
 }
 
-impl From<f32> for PhysicsTime {
-    fn from(time_scale: f32) -> Self {
-        Self {
-            scale: time_scale,
-            previous_scale: None,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use rstest::rstest;
@@ -78,9 +88,8 @@ mod tests {
     #[case(0.0)]
     #[case(1.0)]
     #[case(0.5)]
-    #[case(-1.0)]
     fn pause_sets_scale_to_zero(#[case] initial_scale: f32) {
-        let mut time = PhysicsTime::from(initial_scale);
+        let mut time = PhysicsTime::new(initial_scale);
         time.pause();
         assert_eq!(time.get_scale(), 0.0);
     }
@@ -89,11 +98,37 @@ mod tests {
     #[case(0.0)]
     #[case(1.0)]
     #[case(0.5)]
-    #[case(-1.0)]
     fn pause_restore_time_scale_before_pause(#[case] initial_scale: f32) {
-        let mut time = PhysicsTime::from(initial_scale);
+        let mut time = PhysicsTime::new(initial_scale);
         time.pause();
         time.resume();
         assert_eq!(time.get_scale(), initial_scale);
+    }
+
+    #[rstest]
+    #[case(1.0, 2.0)]
+    #[case(1.0, 0.0)]
+    #[case(1.0, 1.0)]
+    #[case(0.0, 0.0)]
+    fn scale_can_be_set(#[case] initial_scale: f32, #[case] new_scale: f32) {
+        let mut time = PhysicsTime::new(initial_scale);
+        time.set_scale(new_scale);
+        assert_eq!(new_scale, time.get_scale());
+    }
+
+    #[rstest]
+    #[case(PhysicsTime::new(1.0), -1.0)]
+    #[case(PhysicsTime::new(0.0), -0.1)]
+    #[should_panic]
+    fn set_negative_scale_panics(#[case] mut time: PhysicsTime, #[case] new_scale: f32) {
+        time.set_scale(new_scale);
+    }
+
+    #[rstest]
+    #[case(-1.0)]
+    #[case(-0.1)]
+    #[should_panic]
+    fn new_with_negative_scale_panics(#[case] scale: f32) {
+        let _ = PhysicsTime::new(scale);
     }
 }

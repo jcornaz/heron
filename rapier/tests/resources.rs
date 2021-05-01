@@ -40,7 +40,7 @@ fn can_define_time_scale_before_plugin() {
         let mut builder = App::build();
 
         builder
-            .insert_resource(PhysicsTime::from(0.5))
+            .insert_resource(PhysicsTime::new(0.5))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
             .add_plugin(RapierPlugin::default());
