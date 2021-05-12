@@ -41,7 +41,7 @@ jobs:
           restore-keys: cargo-${{ matrix.os }}-${{ matrix.rust }}
 
       - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.7
         with:
           profile: minimal
           toolchain: ${{ matrix.rust }}
@@ -90,7 +90,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable
 
       - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.7
         with:
           profile: minimal
           toolchain: stable
@@ -122,7 +122,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable
 
       - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.7
         with:
           profile: minimal
           toolchain: stable
@@ -154,7 +154,7 @@ jobs:
           restore-keys: cargo-ubuntu-latest-stable
 
       - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1.0.7
         with:
           profile: minimal
           toolchain: stable
