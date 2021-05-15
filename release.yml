@@ -1,0 +1,24 @@
+hooks:
+  verify:
+    - cargo test --workspace
+    - cargo test --workspace --no-default-features --features "2d"
+    - cargo test --workspace --no-default-features --features "2d, debug"
+    - cargo test --workspace --no-default-features --features "3d"
+    - cargo test --workspace --no-default-features --features "3d, debug"
+
+  prepare:
+    - cargo install cargo-release
+    - cargo release --skip-publish --skip-push --skip-tag --workspace {{version}}
+
+  publish:
+    - cd core && cargo publish && cd ..
+    - sleep 60
+    - cd rapier && cargo publish && cd ..
+    - sleep 60
+    - cd debug && cargo publish && cd ..
+    - sleep 60
+    - cargo publish
+
+
+github:
+  repo: jcornaz/heron

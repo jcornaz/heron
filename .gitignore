@@ -13,3 +13,7 @@
 .DS_Store
 .trashes
 *.db
+
+# Release process
+autorel
+autorel.tar.gz
