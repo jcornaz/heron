@@ -23,7 +23,7 @@ jobs:
 
       - name: Configure git user
         run: |
-          git config --global user.name "Jonathan Cornaz
+          git config --global user.name "Jonathan Cornaz"
           git config --global user.email "jonathan.cornaz@noreply.github.com"
 
       - name: Global cache
