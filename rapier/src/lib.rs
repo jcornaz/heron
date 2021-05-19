@@ -38,10 +38,6 @@ mod stage {
     pub(crate) const POST_STEP: &str = "heron-post-step";
 }
 
-mod system_label {
-    pub(crate) const PHYSICS_STEP: &str = "physics_step";
-}
-
 /// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
 ///
 /// When creating the plugin, you may choose the number of physics steps per second.
@@ -63,6 +59,13 @@ pub struct RapierPlugin {
 pub struct BodyHandle {
     rigid_body: RigidBodyHandle,
     collider: ColliderHandle,
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
+enum PhysicsSystem {
+    TransformPropagation,
+    CreatBodies,
+    Step,
 }
 
 impl RapierPlugin {
@@ -123,40 +126,67 @@ impl Plugin for RapierPlugin {
         .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
-                    "heron-remove-invalid-bodies",
-                    SystemStage::single_threaded().with_system(body::remove_bodies.system()),
+                    "heron-remove-bodies",
+                    SystemStage::single_threaded()
+                        .with_system(body::remove_invalid_bodies.system())
+                        .with_system(body::remove.system()),
                 )
                 .add_stage(
-                    "heron-pre-step",
+                    "heron-update-rapier-world",
                     SystemStage::single_threaded()
                         .with_system(
                             bevy::transform::transform_propagate_system::transform_propagate_system
-                                .system(),
+                                .system()
+                                .label(PhysicsSystem::TransformPropagation),
                         )
-                        .with_system(body::remove.system())
-                        .with_system(body::update_rapier_position.system())
-                        .with_system(velocity::update_rapier_velocity.system())
-                        .with_system(body::update_rapier_status.system())
-                        .with_system(acceleration::update_rapier_force_and_torque.system())
-                        .with_system(body::create.system()),
+                        .with_system(
+                            body::update_rapier_position
+                                .system()
+                                .after(PhysicsSystem::TransformPropagation)
+                                .before(PhysicsSystem::CreatBodies),
+                        )
+                        .with_system(
+                            velocity::update_rapier_velocity
+                                .system()
+                                .before(PhysicsSystem::CreatBodies),
+                        )
+                        .with_system(
+                            body::update_rapier_status
+                                .system()
+                                .before(PhysicsSystem::CreatBodies),
+                        )
+                        .with_system(
+                            acceleration::update_rapier_force_and_torque
+                                .system()
+                                .before(PhysicsSystem::CreatBodies),
+                        )
+                        .with_system(
+                            body::create
+                                .system()
+                                .label(PhysicsSystem::CreatBodies)
+                                .after(PhysicsSystem::TransformPropagation),
+                        ),
                 )
                 .add_stage(
                     "heron-step",
-                    SystemStage::single_threaded()
+                    SystemStage::parallel()
                         .with_run_criteria(should_run.system())
                         .with_system(
                             velocity::apply_velocity_to_kinematic_bodies
                                 .system()
-                                .before(system_label::PHYSICS_STEP),
+                                .before(PhysicsSystem::Step),
                         )
-                        .with_system(pipeline::step.system().label(system_label::PHYSICS_STEP)),
-                )
-                .add_stage(
-                    "heron-post-step",
-                    SystemStage::parallel()
-                        .with_run_criteria(should_run.system())
-                        .with_system(body::update_bevy_transform.system())
-                        .with_system(velocity::update_velocity_component.system()),
+                        .with_system(pipeline::step.system().label(PhysicsSystem::Step))
+                        .with_system(
+                            body::update_bevy_transform
+                                .system()
+                                .after(PhysicsSystem::Step),
+                        )
+                        .with_system(
+                            velocity::update_velocity_component
+                                .system()
+                                .after(PhysicsSystem::Step),
+                        ),
                 )
         });
     }

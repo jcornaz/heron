@@ -102,7 +102,7 @@ pub(crate) fn create(
 }
 
 #[allow(clippy::type_complexity)]
-pub(crate) fn remove_bodies(
+pub(crate) fn remove_invalid_bodies(
     mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
