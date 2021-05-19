@@ -176,7 +176,7 @@ mod tests {
 
         let mut events = Events::<CollisionEvent>::default();
         manager.fire_events(&context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
         assert_eq!(
             events,
@@ -195,7 +195,7 @@ mod tests {
 
         let mut events = Events::<CollisionEvent>::default();
         manager.fire_events(&context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
         assert_eq!(
             events,
@@ -218,7 +218,7 @@ mod tests {
 
         let mut events = Events::<CollisionEvent>::default();
         manager.fire_events(&context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
         assert_eq!(
             events,
@@ -241,7 +241,7 @@ mod tests {
 
         let mut events = Events::<CollisionEvent>::default();
         manager.fire_events(&context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
         assert_eq!(
             events,

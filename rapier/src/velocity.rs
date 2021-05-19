@@ -13,7 +13,7 @@ pub(crate) fn update_rapier_velocity(
     query: Query<'_, (&BodyHandle, Option<&BodyType>, &Velocity), Changed<Velocity>>,
 ) {
     let dynamic_bodies = query.iter().filter(|(_, body_type, _)| {
-        matches!(body_type.cloned().unwrap_or_default(), BodyType::Dynamic)
+        matches!(body_type.copied().unwrap_or_default(), BodyType::Dynamic)
     });
 
     for (handle, _, velocity) in dynamic_bodies {

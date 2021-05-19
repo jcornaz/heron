@@ -53,7 +53,7 @@ pub(crate) fn create(
     for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
         query.iter()
     {
-        let body_type = body_type.cloned().unwrap_or_default();
+        let body_type = body_type.copied().unwrap_or_default();
 
         let mut builder = RigidBodyBuilder::new(body_status(body_type))
             .user_data(entity.to_bits().into())
@@ -64,7 +64,7 @@ pub(crate) fn create(
             allow_x,
             allow_y,
             allow_z,
-        }) = rotation_constraints.cloned()
+        }) = rotation_constraints.copied()
         {
             #[cfg(feature = "2d")]
             if !allow_z {
@@ -90,7 +90,7 @@ pub(crate) fn create(
         }
 
         let rigid_body = bodies.insert(builder.build());
-        let collider = body.build(entity, body_type, material.cloned().unwrap_or_default());
+        let collider = body.build(entity, body_type, material.copied().unwrap_or_default());
 
         let collider_handle = colliders.insert(collider, rigid_body, &mut bodies);
         handles.insert(entity, rigid_body);
@@ -212,7 +212,7 @@ pub(crate) fn update_bevy_transform(
     >,
 ) {
     for (mut local, mut global, handle, body_type) in query.iter_mut() {
-        if !body_type.cloned().unwrap_or_default().can_have_velocity() {
+        if !body_type.copied().unwrap_or_default().can_have_velocity() {
             continue;
         }
 

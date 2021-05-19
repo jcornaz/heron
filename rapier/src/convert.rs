@@ -104,13 +104,13 @@ impl IntoRapier<Point3<f32>> for Vec3 {
 
 impl IntoRapier<Vec<Point2<f32>>> for &[Vec3] {
     fn into_rapier(self) -> Vec<Point2<f32>> {
-        self.iter().cloned().map(IntoRapier::into_rapier).collect()
+        self.iter().copied().map(IntoRapier::into_rapier).collect()
     }
 }
 
 impl IntoRapier<Vec<Point3<f32>>> for &[Vec3] {
     fn into_rapier(self) -> Vec<Point3<f32>> {
-        self.iter().cloned().map(IntoRapier::into_rapier).collect()
+        self.iter().copied().map(IntoRapier::into_rapier).collect()
     }
 }
 
@@ -122,7 +122,7 @@ impl IntoBevy<Vec2> for Point2<f32> {
 
 impl IntoBevy<Vec<Vec2>> for &[Point2<f32>] {
     fn into_bevy(self) -> Vec<Vec2> {
-        self.iter().cloned().map(IntoBevy::into_bevy).collect()
+        self.iter().copied().map(IntoBevy::into_bevy).collect()
     }
 }
 

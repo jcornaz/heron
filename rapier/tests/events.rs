@@ -85,5 +85,5 @@ fn collect_events(
     reader: &mut ManualEventReader<CollisionEvent>,
 ) -> Vec<CollisionEvent> {
     let events = app.world.get_resource::<Events<CollisionEvent>>().unwrap();
-    reader.iter(&events).cloned().collect()
+    reader.iter(&events).copied().collect()
 }
