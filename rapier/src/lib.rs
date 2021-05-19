@@ -128,8 +128,9 @@ impl Plugin for RapierPlugin {
                 .add_stage(
                     "heron-remove-bodies",
                     SystemStage::single_threaded()
-                        .with_system(body::remove_invalid_bodies.system())
-                        .with_system(body::remove.system()),
+                        .with_system(body::remove.system())
+                        .with_system(body::remove_invalids_after_component_changed.system())
+                        .with_system(body::remove_invalids_after_component_removed.system()),
                 )
                 .add_stage(
                     "heron-update-rapier-world",

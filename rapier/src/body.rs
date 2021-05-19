@@ -101,9 +101,26 @@ pub(crate) fn create(
     }
 }
 
-#[allow(clippy::type_complexity)]
-pub(crate) fn remove_invalid_bodies(
+pub(crate) fn remove(
     mut commands: Commands<'_>,
+    mut handles: ResMut<'_, HandleMap>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut joints: ResMut<'_, JointSet>,
+    removed: RemovedComponents<'_, Body>,
+) {
+    for entity in removed.iter() {
+        if let Some(handle) = handles.remove(&entity) {
+            bodies.remove(handle, &mut colliders, &mut joints);
+            commands.entity(entity).remove::<BodyHandle>();
+        }
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn remove_invalids_after_component_changed(
+    mut commands: Commands<'_>,
+    mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
@@ -117,18 +134,28 @@ pub(crate) fn remove_invalid_bodies(
             Changed<PhysicMaterial>,
         )>,
     >,
-    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
-    constraints_removed: RemovedComponents<'_, RotationConstraints>,
 ) {
     for (entity, handle) in changed.iter() {
         bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
         commands.entity(entity).remove::<BodyHandle>();
+        handles.remove(&entity);
     }
+}
 
+pub(crate) fn remove_invalids_after_component_removed(
+    mut commands: Commands<'_>,
+    mut handles: ResMut<'_, HandleMap>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    mut joints: ResMut<'_, JointSet>,
+    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
+    constraints_removed: RemovedComponents<'_, RotationConstraints>,
+) {
     for entity in constraints_removed.iter() {
         if let Ok((entity, handle)) = with_body_handle.get(entity) {
             bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
             commands.entity(entity).remove::<BodyHandle>();
+            handles.remove(&entity);
         }
     }
 }
@@ -217,22 +244,6 @@ pub(crate) fn update_bevy_transform(
 
         global.translation = translation;
         global.rotation = rotation;
-    }
-}
-
-pub(crate) fn remove(
-    mut commands: Commands<'_>,
-    mut handles: ResMut<'_, HandleMap>,
-    mut bodies: ResMut<'_, RigidBodySet>,
-    mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
-    removed: RemovedComponents<'_, Body>,
-) {
-    for entity in removed.iter() {
-        if let Some(handle) = handles.remove(&entity) {
-            bodies.remove(handle, &mut colliders, &mut joints);
-            commands.entity(entity).remove::<BodyHandle>();
-        }
     }
 }
 
