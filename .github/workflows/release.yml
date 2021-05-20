@@ -21,11 +21,6 @@ jobs:
       - name: Fetch tags
         run: git fetch --tags
 
-      - name: Configure git user
-        run: |
-          git config --global user.name "Jonathan Cornaz"
-          git config --global user.email "jonathan.cornaz@noreply.github.com"
-
       - name: Global cache
         uses: actions/cache@v2.1.5
         with:
@@ -47,7 +42,7 @@ jobs:
 
       - name: Download autorel
         run: |
-          wget https://github.com/jcornaz/autorel/releases/download/v0.1.0/autorel
+          wget https://github.com/jcornaz/autorel/releases/download/v0.1.2/autorel
           chmod +x autorel
 
       - name: Release
