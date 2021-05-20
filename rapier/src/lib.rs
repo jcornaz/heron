@@ -19,10 +19,8 @@ use heron_core::{CollisionEvent, PhysicsTime};
 
 use crate::body::HandleMap;
 use crate::pipeline::PhysicsStepPerSecond;
-use crate::rapier::dynamics::{
-    CCDSolver, IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet,
-};
-use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
+use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
+use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
 use heron_core::utils::NearZero;
@@ -52,15 +50,6 @@ pub struct RapierPlugin {
 
     /// Integration parameters, incl. delta-time at each step.
     pub parameters: IntegrationParameters,
-}
-
-/// Components automatically register, by the plugin that references the body in rapier's world.
-///
-/// It can be used to get direct access to rapier's world.
-#[derive(Debug, Copy, Clone)]
-pub struct BodyHandle {
-    rigid_body: RigidBodyHandle,
-    collider: ColliderHandle,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
@@ -210,28 +199,5 @@ fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
         ShouldRun::No
     } else {
         ShouldRun::Yes
-    }
-}
-
-impl BodyHandle {
-    /// Creates the new `BodyHandle`.
-    #[must_use]
-    pub fn new(rigid_body: RigidBodyHandle, collider: ColliderHandle) -> BodyHandle {
-        BodyHandle {
-            rigid_body,
-            collider,
-        }
-    }
-
-    /// Returns the rapier's rigid body handle.
-    #[must_use]
-    pub fn rigid_body(&self) -> RigidBodyHandle {
-        self.rigid_body
-    }
-
-    /// Returns the rapier's collider handle.
-    #[must_use]
-    pub fn collider(&self) -> ColliderHandle {
-        self.collider
     }
 }

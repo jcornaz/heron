@@ -10,7 +10,7 @@ use bevy::reflect::TypeRegistryArc;
 use heron_core::{CollisionShape, RigidBody};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -41,9 +41,7 @@ fn create_dynamic_body() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert!(body.is_dynamic())
 }
@@ -65,9 +63,7 @@ fn create_static_body() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert!(body.is_static())
 }
@@ -89,9 +85,7 @@ fn create_kinematic_body() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert!(body.is_kinematic())
 }
@@ -113,9 +107,7 @@ fn create_sensor_body() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let body = colliders
-        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-        .unwrap();
+    let body = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert!(body.is_sensor())
 }
@@ -141,9 +133,7 @@ fn can_change_to_static_after_creation() {
 
     {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
+        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
         assert!(body.is_static());
     }
@@ -170,9 +160,7 @@ fn can_change_to_sensor_after_creation() {
 
     {
         let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-        let collider = colliders
-            .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-            .unwrap();
+        let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
         assert!(collider.is_sensor());
     }
@@ -200,9 +188,7 @@ fn can_change_to_dynamic_after_creation() {
 
     {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
+        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
         assert!(body.is_dynamic());
     }
@@ -230,9 +216,7 @@ fn can_change_to_dynamic_by_removing_type_after_creation() {
 
     {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-        let body = bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
+        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
         assert!(body.is_dynamic());
     }

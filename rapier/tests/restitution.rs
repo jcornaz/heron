@@ -10,7 +10,7 @@ use bevy::reflect::TypeRegistryArc;
 use heron_core::{CollisionShape, PhysicMaterial};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -45,9 +45,7 @@ fn restitution_can_be_defined_when_creating_body() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders
-        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-        .unwrap();
+    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(restitution, collider.restitution)
 }
@@ -76,9 +74,7 @@ fn restitution_can_be_updated() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders
-        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-        .unwrap();
+    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(restitution, collider.restitution)
 }

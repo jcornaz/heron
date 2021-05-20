@@ -13,7 +13,7 @@ use rstest::rstest;
 use heron_core::*;
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -53,9 +53,7 @@ fn body_is_created_with_velocity() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     let actual_linear = (*body.linvel()).into_bevy();
 
@@ -99,9 +97,7 @@ fn velocity_may_be_added_after_creating_the_body() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     let actual_linear = (*body.linvel()).into_bevy();
     assert_eq!(linear.x, actual_linear.x);
