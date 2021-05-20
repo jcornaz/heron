@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::{BodyHandle, RapierPlugin};
@@ -34,7 +34,7 @@ fn restitution_can_be_defined_when_creating_body() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            CollisionShape::Sphere { radius: 10.0 },
             PhysicMaterial {
                 restitution,
                 ..Default::default()
@@ -59,7 +59,10 @@ fn restitution_can_be_updated() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();

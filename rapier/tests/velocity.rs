@@ -44,7 +44,7 @@ fn body_is_created_with_velocity() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            CollisionShape::Sphere { radius: 1.0 },
             Velocity { linear, angular },
         ))
         .id();
@@ -82,7 +82,7 @@ fn velocity_may_be_added_after_creating_the_body() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();
 
@@ -130,7 +130,7 @@ fn velocity_is_updated_to_reflect_rapier_world() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            CollisionShape::Sphere { radius: 1.0 },
             Velocity::default(),
             Acceleration::from_linear(linear).with_angular(angular),
         ))
@@ -155,10 +155,10 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 }
 
 #[rstest]
-#[case(Some(BodyType::Dynamic))]
-#[case(Some(BodyType::Kinematic))]
+#[case(Some(RigidBody::Dynamic))]
+#[case(Some(RigidBody::Kinematic))]
 #[case(None)]
-fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<BodyType>) {
+fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
     let mut app = test_app();
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
@@ -167,7 +167,7 @@ fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<BodyType>) {
         .world
         .spawn()
         .insert_bundle((
-            Body::Sphere { radius: 2.0 },
+            CollisionShape::Sphere { radius: 2.0 },
             Transform::default(),
             GlobalTransform::default(),
             Velocity::from(translation).with_angular(rotation.into()),

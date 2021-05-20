@@ -10,7 +10,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::Body;
+use heron_core::CollisionShape;
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::rapier::geometry::ColliderSet;
@@ -40,7 +40,7 @@ fn creates_body_in_rapier_world() {
         .world
         .spawn()
         .insert_bundle((
-            Body::Sphere { radius: 2.0 },
+            CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform {
                 translation,
                 rotation,
@@ -104,14 +104,17 @@ fn update_shape() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .insert_bundle((
+            CollisionShape::Sphere { radius: 2.0 },
+            GlobalTransform::default(),
+        ))
         .id();
 
     {
         app.update();
 
-        let mut body_def = app.world.get_mut::<Body>(entity).unwrap();
-        if let Body::Sphere { radius } = body_def.deref_mut() {
+        let mut body_def = app.world.get_mut::<CollisionShape>(entity).unwrap();
+        if let CollisionShape::Sphere { radius } = body_def.deref_mut() {
             *radius = 42.0;
         }
     }
@@ -132,7 +135,10 @@ fn update_rapier_position() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .insert_bundle((
+            CollisionShape::Sphere { radius: 2.0 },
+            GlobalTransform::default(),
+        ))
         .id();
 
     let translation = Vec3::new(1.0, 2.0, 3.0);
@@ -172,12 +178,15 @@ fn remove_body_component() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .insert_bundle((
+            CollisionShape::Sphere { radius: 2.0 },
+            GlobalTransform::default(),
+        ))
         .id();
 
     app.update();
 
-    app.world.entity_mut(entity).remove::<Body>();
+    app.world.entity_mut(entity).remove::<CollisionShape>();
     app.update();
 
     assert!(app.world.get::<BodyHandle>(entity).is_none());
@@ -196,7 +205,10 @@ fn despawn_body_entity() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((Body::Sphere { radius: 2.0 }, GlobalTransform::default()))
+        .insert_bundle((
+            CollisionShape::Sphere { radius: 2.0 },
+            GlobalTransform::default(),
+        ))
         .id();
 
     app.update();

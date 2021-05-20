@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
-use heron_core::{Body, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, MassProperties, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
@@ -32,7 +32,10 @@ fn bodies_are_created_with_a_default_density() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -56,7 +59,7 @@ fn bodies_are_created_with_defined_density() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            CollisionShape::Sphere { radius: 1.0 },
             PhysicMaterial {
                 density: 2.0,
                 ..Default::default()
@@ -81,7 +84,10 @@ fn density_can_be_updated_after_creation() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 1.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 1.0 },
+        ))
         .id();
 
     app.update();

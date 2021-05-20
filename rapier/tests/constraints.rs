@@ -4,7 +4,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, RotationConstraints};
+use heron_core::{CollisionShape, RotationConstraints};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
 
@@ -27,7 +27,10 @@ fn rotation_is_not_constrained_without_the_component() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -52,7 +55,7 @@ fn rotation_can_be_locked_at_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))
         .id();
@@ -77,7 +80,10 @@ fn rotation_can_be_locked_after_creation() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -108,7 +114,7 @@ fn rotation_is_unlocked_if_component_is_removed() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))
         .id();

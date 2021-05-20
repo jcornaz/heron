@@ -13,7 +13,7 @@ use bevy::reflect::Reflect;
 ///
 /// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(CollisionShape::Sphere { radius: 1.0 })
 ///         .insert(RotationConstraints::lock()); // Prevent rotation caused by forces
 /// }
 /// ```

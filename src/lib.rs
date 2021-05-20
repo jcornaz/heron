@@ -60,10 +60,10 @@
 //!         .spawn_bundle(SpriteBundle::default())
 //!
 //!         // Make it a physics body, by attaching a collision shape
-//!         .insert(Body::Sphere { radius: 10.0 })
+//!         .insert(CollisionShape::Sphere { radius: 10.0 })
 //!
 //!         // Optionally define a type (if absent, the body will be *dynamic*)
-//!         .insert(BodyType::Kinematic)
+//!         .insert(RigidBody::Kinematic)
 //!         
 //!         // Optionally define the velocity (works only with dynamic and kinematic bodies)
 //!         .insert(Velocity::from(Vec2::unit_x() * 2.0));
@@ -149,8 +149,8 @@ pub mod rapier_plugin {
 /// Re-exports of the most commons/useful types
 pub mod prelude {
     pub use crate::{
-        ext::*, stage, Acceleration, AxisAngle, Body, BodyType, CollisionEvent, Gravity,
-        PhysicMaterial, PhysicsPlugin, PhysicsTime, RotationConstraints, Velocity,
+        ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionShape, Gravity,
+        PhysicMaterial, PhysicsPlugin, PhysicsTime, RigidBody, RotationConstraints, Velocity,
     };
 }
 

@@ -3,7 +3,7 @@ use bevy::math::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
+use heron_core::{CollisionShape, PhysicMaterial, RigidBody, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -18,11 +18,11 @@ pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 trait ColliderFactory {
     fn collider_builder(&self) -> ColliderBuilder;
 
-    fn build(&self, entity: Entity, body_type: BodyType, material: PhysicMaterial) -> Collider {
+    fn build(&self, entity: Entity, body_type: RigidBody, material: PhysicMaterial) -> Collider {
         let mut collider_builder = self.collider_builder();
         collider_builder = collider_builder
             .user_data(entity.to_bits().into())
-            .sensor(matches!(body_type, BodyType::Sensor))
+            .sensor(matches!(body_type, RigidBody::Sensor))
             .restitution(material.restitution)
             .density(material.density)
             .friction(material.friction);
@@ -40,9 +40,9 @@ pub(crate) fn create(
         '_,
         (
             Entity,
-            &Body,
+            &CollisionShape,
             &GlobalTransform,
-            Option<&BodyType>,
+            Option<&RigidBody>,
             Option<&Velocity>,
             Option<&PhysicMaterial>,
             Option<&RotationConstraints>,
@@ -107,7 +107,7 @@ pub(crate) fn remove(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
-    removed: RemovedComponents<'_, Body>,
+    removed: RemovedComponents<'_, CollisionShape>,
 ) {
     for entity in removed.iter() {
         if let Some(handle) = handles.remove(&entity) {
@@ -128,9 +128,9 @@ pub(crate) fn remove_invalids_after_component_changed(
         '_,
         (Entity, &BodyHandle),
         Or<(
-            Changed<Body>,
+            Changed<CollisionShape>,
             Changed<RotationConstraints>,
-            Changed<BodyType>,
+            Changed<RigidBody>,
             Changed<PhysicMaterial>,
         )>,
     >,
@@ -162,9 +162,9 @@ pub(crate) fn remove_invalids_after_component_removed(
 
 pub(crate) fn update_rapier_status(
     mut bodies: ResMut<'_, RigidBodySet>,
-    with_type_changed: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
+    with_type_changed: Query<'_, (&RigidBody, &BodyHandle), Changed<RigidBody>>,
     with_body_handle: Query<'_, (Entity, &BodyHandle)>,
-    type_removed: RemovedComponents<'_, BodyType>,
+    type_removed: RemovedComponents<'_, RigidBody>,
 ) {
     for (body_type, handle) in with_type_changed.iter() {
         if let Some(body) = bodies.get_mut(handle.rigid_body) {
@@ -178,7 +178,7 @@ pub(crate) fn update_rapier_status(
             .ok()
             .and_then(|(_, handle)| bodies.get_mut(handle.rigid_body))
         {
-            body.set_body_status(body_status(BodyType::default()));
+            body.set_body_status(body_status(RigidBody::default()));
         }
     }
 }
@@ -207,7 +207,7 @@ pub(crate) fn update_bevy_transform(
             Option<&mut Transform>,
             &mut GlobalTransform,
             &BodyHandle,
-            Option<&BodyType>,
+            Option<&RigidBody>,
         ),
     >,
 ) {
@@ -247,16 +247,16 @@ pub(crate) fn update_bevy_transform(
     }
 }
 
-impl ColliderFactory for Body {
+impl ColliderFactory for CollisionShape {
     fn collider_builder(&self) -> ColliderBuilder {
         match self {
-            Body::Sphere { radius } => ColliderBuilder::ball(*radius),
-            Body::Capsule {
+            CollisionShape::Sphere { radius } => ColliderBuilder::ball(*radius),
+            CollisionShape::Capsule {
                 half_segment: half_height,
                 radius,
             } => ColliderBuilder::capsule_y(*half_height, *radius),
-            Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
-            Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
+            CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
+            CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
         }
     }
 }
@@ -279,11 +279,11 @@ fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
     ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
 }
 
-fn body_status(body_type: BodyType) -> BodyStatus {
+fn body_status(body_type: RigidBody) -> BodyStatus {
     match body_type {
-        BodyType::Dynamic => BodyStatus::Dynamic,
-        BodyType::Static | BodyType::Sensor => BodyStatus::Static,
-        BodyType::Kinematic => BodyStatus::Kinematic,
+        RigidBody::Dynamic => BodyStatus::Dynamic,
+        RigidBody::Static | RigidBody::Sensor => BodyStatus::Static,
+        RigidBody::Kinematic => BodyStatus::Kinematic,
     }
 }
 
@@ -295,9 +295,9 @@ mod tests {
 
     #[test]
     fn build_sphere() {
-        let collider = Body::Sphere { radius: 4.2 }.build(
+        let collider = CollisionShape::Sphere { radius: 4.2 }.build(
             Entity::new(0),
-            BodyType::default(),
+            RigidBody::default(),
             Default::default(),
         );
 
@@ -310,10 +310,10 @@ mod tests {
 
     #[test]
     fn build_cuboid() {
-        let collider = Body::Cuboid {
+        let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
         }
-        .build(Entity::new(0), BodyType::default(), Default::default());
+        .build(Entity::new(0), RigidBody::default(), Default::default());
 
         let cuboid = collider
             .shape()
@@ -329,11 +329,11 @@ mod tests {
 
     #[test]
     fn build_capsule() {
-        let collider = Body::Capsule {
+        let collider = CollisionShape::Capsule {
             half_segment: 10.0,
             radius: 5.0,
         }
-        .build(Entity::new(0), BodyType::default(), Default::default());
+        .build(Entity::new(0), RigidBody::default(), Default::default());
 
         let capsule = collider
             .shape()
