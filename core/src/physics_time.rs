@@ -64,6 +64,13 @@ impl PhysicsTime {
 
     /// Get the physics emulation time scale
     #[must_use]
+    pub fn scale(&self) -> f32 {
+        self.scale
+    }
+
+    /// Get the physics emulation time scale
+    #[must_use]
+    #[deprecated(note = "Please use 'scale()' instead")]
     pub fn get_scale(&self) -> f32 {
         self.scale
     }
@@ -91,7 +98,7 @@ mod tests {
     fn pause_sets_scale_to_zero(#[case] initial_scale: f32) {
         let mut time = PhysicsTime::new(initial_scale);
         time.pause();
-        assert_eq!(time.get_scale(), 0.0);
+        assert_eq!(time.scale(), 0.0);
     }
 
     #[rstest]
@@ -102,7 +109,7 @@ mod tests {
         let mut time = PhysicsTime::new(initial_scale);
         time.pause();
         time.resume();
-        assert_eq!(time.get_scale(), initial_scale);
+        assert_eq!(time.scale(), initial_scale);
     }
 
     #[rstest]
@@ -113,7 +120,7 @@ mod tests {
     fn scale_can_be_set(#[case] initial_scale: f32, #[case] new_scale: f32) {
         let mut time = PhysicsTime::new(initial_scale);
         time.set_scale(new_scale);
-        assert_eq!(new_scale, time.get_scale());
+        assert_eq!(new_scale, time.scale());
     }
 
     #[rstest]

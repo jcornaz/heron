@@ -50,7 +50,7 @@ fn can_define_time_scale_before_plugin() {
 
     assert_eq!(
         0.5,
-        app.world.get_resource::<PhysicsTime>().unwrap().get_scale()
+        app.world.get_resource::<PhysicsTime>().unwrap().scale()
     );
 }
 
