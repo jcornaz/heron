@@ -10,7 +10,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::CollisionShape;
+use heron_core::{CollisionShape, RigidBody};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodyHandle, RigidBodySet};
 use heron_rapier::rapier::geometry::{ColliderHandle, ColliderSet};
@@ -165,6 +165,7 @@ fn update_rapier_position() {
 }
 
 #[test]
+#[ignore]
 fn remove_body_component() {
     let mut app = test_app();
 
@@ -179,7 +180,7 @@ fn remove_body_component() {
 
     app.update();
 
-    app.world.entity_mut(entity).remove::<CollisionShape>();
+    app.world.entity_mut(entity).remove::<RigidBody>();
     app.update();
 
     assert!(app.world.get::<RigidBodyHandle>(entity).is_none());

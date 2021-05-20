@@ -29,6 +29,7 @@ mod acceleration;
 mod body;
 pub mod convert;
 mod pipeline;
+mod shape;
 mod velocity;
 
 #[allow(unused)]
@@ -129,7 +130,7 @@ impl Plugin for RapierPlugin {
                         .with_system(body::remove_invalids_after_component_removed.system()),
                 )
                 .add_stage(
-                    "heron-update-rapier-world",
+                    "heron-update-rigid-bodies",
                     SystemStage::single_threaded()
                         .with_system(
                             bevy::transform::transform_propagate_system::transform_propagate_system
@@ -163,6 +164,10 @@ impl Plugin for RapierPlugin {
                                 .label(PhysicsSystem::CreatBodies)
                                 .after(PhysicsSystem::TransformPropagation),
                         ),
+                )
+                .add_stage(
+                    "heron-update-colliders",
+                    SystemStage::single_threaded().with_system(shape::create.system()),
                 )
                 .add_stage(
                     "heron-step",
