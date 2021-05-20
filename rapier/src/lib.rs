@@ -1,6 +1,6 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::needless_pass_by_value)]
+#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation)]
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
@@ -18,12 +18,14 @@ use bevy::{ecs::schedule::ShouldRun, prelude::*};
 use heron_core::{CollisionEvent, PhysicsTime};
 
 use crate::body::HandleMap;
+use crate::pipeline::PhysicsStepPerSecond;
 use crate::rapier::dynamics::{
     CCDSolver, IntegrationParameters, JointSet, RigidBodyHandle, RigidBodySet,
 };
 use crate::rapier::geometry::{BroadPhase, ColliderHandle, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
+use heron_core::utils::NearZero;
 
 mod acceleration;
 mod body;
@@ -122,8 +124,13 @@ impl Plugin for RapierPlugin {
         .insert_resource(RigidBodySet::new())
         .insert_resource(ColliderSet::new())
         .insert_resource(JointSet::new())
-        .insert_resource(CCDSolver::new())
-        .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+        .insert_resource(CCDSolver::new());
+
+        if let Some(steps_per_second) = self.step_per_second {
+            app.insert_resource(PhysicsStepPerSecond(steps_per_second as f32));
+        }
+
+        app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
                     "heron-remove-bodies",
@@ -177,6 +184,11 @@ impl Plugin for RapierPlugin {
                                 .system()
                                 .before(PhysicsSystem::Step),
                         )
+                        .with_system(
+                            pipeline::update_integration_parameters
+                                .system()
+                                .before(PhysicsSystem::Step),
+                        )
                         .with_system(pipeline::step.system().label(PhysicsSystem::Step))
                         .with_system(
                             body::update_bevy_transform
@@ -194,7 +206,7 @@ impl Plugin for RapierPlugin {
 }
 
 fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
-    if physics_time.get_scale() == 0.0 {
+    if physics_time.scale().is_near_zero() {
         ShouldRun::No
     } else {
         ShouldRun::Yes

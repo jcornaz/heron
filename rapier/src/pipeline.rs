@@ -12,6 +12,21 @@ use crate::rapier::geometry::{
 };
 use crate::rapier::pipeline::{ChannelEventCollector, PhysicsPipeline};
 
+#[derive(Copy, Clone)]
+pub(crate) struct PhysicsStepPerSecond(pub(crate) f32);
+
+pub(crate) fn update_integration_parameters(
+    steps_per_second: Option<Res<'_, PhysicsStepPerSecond>>,
+    physics_time: Res<'_, PhysicsTime>,
+    mut integration_parameters: ResMut<'_, IntegrationParameters>,
+) {
+    if let Some(steps_per_second) = steps_per_second {
+        if steps_per_second.is_changed() {
+            integration_parameters.dt = physics_time.scale() / steps_per_second.0;
+        }
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn step(
     mut pipeline: ResMut<'_, PhysicsPipeline>,
@@ -25,11 +40,8 @@ pub(crate) fn step(
     mut ccd_solver: ResMut<'_, CCDSolver>,
     event_manager: Local<'_, EventManager>,
     mut events: ResMut<'_, Events<CollisionEvent>>,
-    physics_controller: Res<'_, PhysicsTime>,
 ) {
     let gravity = Vec3::from(*gravity).into_rapier();
-    let mut integration_parameters = integration_parameters.to_owned();
-    integration_parameters.dt *= physics_controller.get_scale();
     pipeline.step(
         &gravity,
         &integration_parameters,
