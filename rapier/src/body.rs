@@ -2,7 +2,7 @@ use bevy::ecs::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{CollisionShape, PhysicMaterial, RigidBody, RotationConstraints, Velocity};
+use heron_core::{PhysicMaterial, RigidBody, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -71,21 +71,27 @@ pub(crate) fn create(
     }
 }
 
-pub(crate) fn remove(
+pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
-    removed: RemovedComponents<'_, CollisionShape>,
+    bodies_removed: RemovedComponents<'_, RigidBody>,
+    constraints_removed: RemovedComponents<'_, RotationConstraints>,
+    materials_removed: RemovedComponents<'_, PhysicMaterial>,
 ) {
-    for entity in removed.iter() {
-        if let Some(handle) = handles.remove(&entity) {
-            bodies.remove(handle, &mut colliders, &mut joints);
-            commands.entity(entity).remove::<RigidBodyHandle>();
-            commands.entity(entity).remove::<ColliderHandle>();
-        }
-    }
+    bodies_removed
+        .iter()
+        .chain(constraints_removed.iter())
+        .chain(materials_removed.iter())
+        .for_each(|entity| {
+            if let Some(handle) = handles.remove(&entity) {
+                remove_collider_handles(&mut commands, &bodies, &colliders, handle);
+                bodies.remove(handle, &mut colliders, &mut joints);
+                commands.entity(entity).remove::<RigidBodyHandle>();
+            }
+        });
 }
 
 #[allow(clippy::type_complexity)]
@@ -99,38 +105,35 @@ pub(crate) fn remove_invalids_after_component_changed(
         '_,
         (Entity, &RigidBodyHandle),
         Or<(
-            Changed<CollisionShape>,
-            Changed<RotationConstraints>,
             Changed<RigidBody>,
+            Changed<RotationConstraints>,
             Changed<PhysicMaterial>,
         )>,
     >,
 ) {
     for (entity, handle) in changed.iter() {
+        remove_collider_handles(&mut commands, &bodies, &colliders, *handle);
         bodies.remove(*handle, &mut colliders, &mut joints);
         commands.entity(entity).remove::<RigidBodyHandle>();
-        commands.entity(entity).remove::<ColliderHandle>();
         handles.remove(&entity);
     }
 }
 
-pub(crate) fn remove_invalids_after_component_removed(
-    mut commands: Commands<'_>,
-    mut handles: ResMut<'_, HandleMap>,
-    mut bodies: ResMut<'_, RigidBodySet>,
-    mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
-    with_body_handle: Query<'_, (Entity, &RigidBodyHandle)>,
-    constraints_removed: RemovedComponents<'_, RotationConstraints>,
+fn remove_collider_handles(
+    commands: &mut Commands<'_>,
+    bodies: &RigidBodySet,
+    colliders: &ColliderSet,
+    handle: RigidBodyHandle,
 ) {
-    for entity in constraints_removed.iter() {
-        if let Ok((entity, handle)) = with_body_handle.get(entity) {
-            bodies.remove(*handle, &mut colliders, &mut joints);
-            commands.entity(entity).remove::<RigidBodyHandle>();
-            commands.entity(entity).remove::<ColliderHandle>();
-            handles.remove(&entity);
-        }
-    }
+    bodies
+        .get(handle)
+        .iter()
+        .flat_map(|it| it.colliders().iter())
+        .flat_map(|it| colliders.get(*it))
+        .map(|it| Entity::from_bits(it.user_data as u64))
+        .for_each(|collider_entity| {
+            commands.entity(collider_entity).remove::<ColliderHandle>();
+        });
 }
 
 pub(crate) fn update_rapier_status(

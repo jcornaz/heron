@@ -195,31 +195,3 @@ fn can_change_to_dynamic_after_creation() {
         assert!(body.is_dynamic());
     }
 }
-
-#[test]
-fn can_change_to_dynamic_by_removing_type_after_creation() {
-    let mut app = test_app();
-
-    let entity = app
-        .world
-        .spawn()
-        .insert_bundle((
-            GlobalTransform::default(),
-            CollisionShape::Sphere { radius: 10.0 },
-            RigidBody::Static,
-        ))
-        .id();
-
-    app.update();
-
-    app.world.entity_mut(entity).remove::<RigidBody>();
-
-    app.update();
-
-    {
-        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
-
-        assert!(body.is_dynamic());
-    }
-}

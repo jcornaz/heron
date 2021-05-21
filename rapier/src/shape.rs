@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use fnv::FnvHashMap;
 
 use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
 
@@ -7,10 +8,13 @@ use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderHandle, ColliderSet};
 use crate::rapier::math::Point;
 
+pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
+
 pub(crate) fn create(
     mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
+    mut handles: ResMut<'_, HandleMap>,
     body_handles: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
     shapes: Query<
         '_,
@@ -22,12 +26,41 @@ pub(crate) fn create(
         if let Ok((body, rigid_body_handle, material)) = body_handles.get(entity) {
             let collider = shape.build(entity, *body, material.copied().unwrap_or_default());
 
-            commands.entity(entity).insert(colliders.insert(
-                collider,
-                *rigid_body_handle,
-                &mut bodies,
-            ));
+            let handle = colliders.insert(collider, *rigid_body_handle, &mut bodies);
+
+            commands.entity(entity).insert(handle);
+            handles.insert(entity, handle);
         }
+    }
+}
+
+pub(crate) fn remove_invalids_after_components_removed(
+    mut commands: Commands<'_>,
+    mut handles: ResMut<'_, HandleMap>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    shapes_removed: RemovedComponents<'_, CollisionShape>,
+) {
+    for entity in shapes_removed.iter() {
+        if let Some(handle) = handles.remove(&entity) {
+            colliders.remove(handle, &mut bodies, true);
+            commands.entity(entity).remove::<ColliderHandle>();
+        }
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn remove_invalids_after_component_changed(
+    mut commands: Commands<'_>,
+    mut handles: ResMut<'_, HandleMap>,
+    mut bodies: ResMut<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    changed: Query<'_, (Entity, &ColliderHandle), Changed<CollisionShape>>,
+) {
+    for (entity, handle) in changed.iter() {
+        colliders.remove(*handle, &mut bodies, true);
+        commands.entity(entity).remove::<ColliderHandle>();
+        handles.remove(&entity);
     }
 }
 

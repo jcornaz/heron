@@ -168,7 +168,6 @@ fn update_rapier_position() {
 }
 
 #[test]
-#[ignore]
 fn remove_body_component() {
     let mut app = test_app();
 

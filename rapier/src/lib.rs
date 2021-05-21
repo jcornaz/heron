@@ -15,6 +15,7 @@ pub extern crate rapier3d as rapier;
 
 use bevy::{ecs::schedule::ShouldRun, prelude::*};
 
+use heron_core::utils::NearZero;
 use heron_core::{CollisionEvent, PhysicsTime};
 
 use crate::body::HandleMap;
@@ -23,7 +24,6 @@ use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidB
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
-use heron_core::utils::NearZero;
 
 mod acceleration;
 mod body;
@@ -106,7 +106,8 @@ impl Plugin for RapierPlugin {
             steps_per_second: self.step_per_second,
         })
         .init_resource::<PhysicsPipeline>()
-        .init_resource::<HandleMap>()
+        .init_resource::<body::HandleMap>()
+        .init_resource::<shape::HandleMap>()
         .add_event::<CollisionEvent>()
         .insert_resource(self.parameters)
         .insert_resource(BroadPhase::new())
@@ -124,11 +125,12 @@ impl Plugin for RapierPlugin {
         app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage(
-                    "heron-remove-bodies",
+                    "heron-remove",
                     SystemStage::single_threaded()
-                        .with_system(body::remove.system())
+                        .with_system(body::remove_invalids_after_components_removed.system())
+                        .with_system(shape::remove_invalids_after_components_removed.system())
                         .with_system(body::remove_invalids_after_component_changed.system())
-                        .with_system(body::remove_invalids_after_component_removed.system()),
+                        .with_system(shape::remove_invalids_after_component_changed.system()),
                 )
                 .add_stage(
                     "heron-update-rigid-bodies",
