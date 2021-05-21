@@ -27,7 +27,6 @@ fn test_app() -> App {
 }
 
 #[test]
-#[ignore]
 fn can_use_child_entity_for_the_collision_shape() {
     let mut app = test_app();
 

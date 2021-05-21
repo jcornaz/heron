@@ -18,7 +18,6 @@ use bevy::{ecs::schedule::ShouldRun, prelude::*};
 use heron_core::utils::NearZero;
 use heron_core::{CollisionEvent, PhysicsTime};
 
-use crate::body::HandleMap;
 use crate::pipeline::PhysicsStepPerSecond;
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};

@@ -15,19 +15,32 @@ pub(crate) fn create(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
-    body_handles: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
-    shapes: Query<
+    rigid_bodies: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
+    collision_shapes: Query<
         '_,
         (Entity, &CollisionShape, Option<&Parent>, Option<&Transform>),
         Without<ColliderHandle>,
     >,
 ) {
-    for (entity, shape, _, _) in shapes.iter() {
-        if let Ok((body, rigid_body_handle, material)) = body_handles.get(entity) {
-            let collider = shape.build(entity, *body, material.copied().unwrap_or_default());
+    for (entity, shape, parent, transform) in collision_shapes.iter() {
+        let collider = if let Ok((body, rigid_body_handle, material)) = rigid_bodies.get(entity) {
+            Some((
+                shape.build(entity, *body, material, None),
+                rigid_body_handle,
+            ))
+        } else if let Some((body, rigid_body_handle, material)) =
+            parent.and_then(|p| rigid_bodies.get(p.0).ok())
+        {
+            Some((
+                shape.build(entity, *body, material, transform),
+                rigid_body_handle,
+            ))
+        } else {
+            None
+        };
 
+        if let Some((collider, rigid_body_handle)) = collider {
             let handle = colliders.insert(collider, *rigid_body_handle, &mut bodies);
-
             commands.entity(entity).insert(handle);
             handles.insert(entity, handle);
         }
@@ -67,15 +80,31 @@ pub(crate) fn remove_invalids_after_component_changed(
 trait ColliderFactory {
     fn collider_builder(&self) -> ColliderBuilder;
 
-    fn build(&self, entity: Entity, body_type: RigidBody, material: PhysicMaterial) -> Collider {
-        let mut collider_builder = self.collider_builder();
-        collider_builder = collider_builder
+    fn build(
+        &self,
+        entity: Entity,
+        body_type: RigidBody,
+        material: Option<&PhysicMaterial>,
+        transform: Option<&Transform>,
+    ) -> Collider {
+        let mut builder = self
+            .collider_builder()
             .user_data(entity.to_bits().into())
-            .sensor(matches!(body_type, RigidBody::Sensor))
-            .restitution(material.restitution)
-            .density(material.density)
-            .friction(material.friction);
-        collider_builder.build()
+            .sensor(matches!(body_type, RigidBody::Sensor));
+
+        if let Some(material) = material {
+            builder = builder
+                .restitution(material.restitution)
+                .density(material.density)
+                .friction(material.friction);
+        }
+
+        if let Some(transform) = transform {
+            builder = builder
+                .position_wrt_parent((transform.translation, transform.rotation).into_rapier());
+        }
+
+        builder.build()
     }
 }
 
@@ -122,7 +151,8 @@ mod tests {
         let collider = CollisionShape::Sphere { radius: 4.2 }.build(
             Entity::new(0),
             RigidBody::default(),
-            Default::default(),
+            None,
+            None,
         );
 
         let ball = collider
@@ -137,7 +167,7 @@ mod tests {
         let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
         }
-        .build(Entity::new(0), RigidBody::default(), Default::default());
+        .build(Entity::new(0), RigidBody::default(), None, None);
 
         let cuboid = collider
             .shape()
@@ -157,7 +187,7 @@ mod tests {
             half_segment: 10.0,
             radius: 5.0,
         }
-        .build(Entity::new(0), RigidBody::default(), Default::default());
+        .build(Entity::new(0), RigidBody::default(), None, None);
 
         let capsule = collider
             .shape()
