@@ -71,6 +71,7 @@ pub(crate) fn create(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
@@ -129,8 +130,11 @@ fn remove_collider_handles(
         .get(handle)
         .iter()
         .flat_map(|it| it.colliders().iter())
-        .flat_map(|it| colliders.get(*it))
-        .map(|it| Entity::from_bits(it.user_data as u64))
+        .filter_map(|it| colliders.get(*it))
+        .map(|it| {
+            #[allow(clippy::cast_possible_truncation)]
+            Entity::from_bits(it.user_data as u64)
+        })
         .for_each(|collider_entity| {
             commands.entity(collider_entity).remove::<ColliderHandle>();
         });
