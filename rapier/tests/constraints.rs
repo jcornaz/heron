@@ -4,7 +4,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionShape, RotationConstraints};
+use heron_core::{CollisionShape, RigidBody, RotationConstraints};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
 use heron_rapier::{BodyHandle, RapierPlugin};
 
@@ -29,6 +29,7 @@ fn rotation_is_not_constrained_without_the_component() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();
@@ -55,6 +56,7 @@ fn rotation_can_be_locked_at_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))
@@ -82,6 +84,7 @@ fn rotation_can_be_locked_after_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();
@@ -114,6 +117,7 @@ fn rotation_is_unlocked_if_component_is_removed() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))

@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionShape, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
@@ -34,6 +34,7 @@ fn friction_can_be_defined_when_creating_body() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
             PhysicMaterial {
                 friction,
@@ -59,6 +60,7 @@ fn friction_can_be_updated() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();

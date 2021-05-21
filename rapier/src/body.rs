@@ -22,7 +22,7 @@ pub(crate) fn create(
         (
             Entity,
             &GlobalTransform,
-            Option<&RigidBody>,
+            &RigidBody,
             Option<&Velocity>,
             Option<&RotationConstraints>,
         ),
@@ -30,8 +30,7 @@ pub(crate) fn create(
     >,
 ) {
     for (entity, transform, body, velocity, rotation_constraints) in query.iter() {
-        let body_type = body.copied().unwrap_or_default();
-        let mut builder = RigidBodyBuilder::new(body_status(body_type))
+        let mut builder = RigidBodyBuilder::new(body_status(*body))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 

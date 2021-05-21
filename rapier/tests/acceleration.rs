@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Acceleration, AxisAngle, CollisionShape};
+use heron_core::{Acceleration, AxisAngle, CollisionShape, RigidBody};
 use heron_rapier::convert::IntoBevy;
 #[cfg(feature = "3d")]
 use heron_rapier::rapier::math::Vector;
@@ -50,6 +50,7 @@ fn body_is_created_with_acceleration() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
             Acceleration { linear, angular },
         ))
@@ -88,6 +89,7 @@ fn acceleration_may_be_added_after_creating_the_body() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();

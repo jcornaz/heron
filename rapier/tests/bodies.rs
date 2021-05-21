@@ -40,6 +40,7 @@ fn creates_body_in_rapier_world() {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform {
                 translation,
@@ -100,6 +101,7 @@ fn update_shape() {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform::default(),
         ))
@@ -130,6 +132,7 @@ fn update_rapier_position() {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform::default(),
         ))
@@ -173,6 +176,7 @@ fn remove_body_component() {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform::default(),
         ))
@@ -201,6 +205,7 @@ fn despawn_body_entity() {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             GlobalTransform::default(),
         ))

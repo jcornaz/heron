@@ -11,14 +11,7 @@ pub(crate) fn create(
     mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    body_handles: Query<
-        '_,
-        (
-            Option<&RigidBody>,
-            &RigidBodyHandle,
-            Option<&PhysicMaterial>,
-        ),
-    >,
+    body_handles: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
     shapes: Query<
         '_,
         (Entity, &CollisionShape, Option<&Parent>, Option<&Transform>),
@@ -27,11 +20,7 @@ pub(crate) fn create(
 ) {
     for (entity, shape, _, _) in shapes.iter() {
         if let Ok((body, rigid_body_handle, material)) = body_handles.get(entity) {
-            let collider = shape.build(
-                entity,
-                body.copied().unwrap_or_default(),
-                material.copied().unwrap_or_default(),
-            );
+            let collider = shape.build(entity, *body, material.copied().unwrap_or_default());
 
             commands.entity(entity).insert(colliders.insert(
                 collider,

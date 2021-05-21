@@ -121,13 +121,14 @@ fn can_change_to_static_after_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();
 
     app.update();
 
-    app.world.entity_mut(entity).insert(RigidBody::Static);
+    *app.world.entity_mut(entity).get_mut::<RigidBody>().unwrap() = RigidBody::Static;
 
     app.update();
 
@@ -148,13 +149,14 @@ fn can_change_to_sensor_after_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();
 
     app.update();
 
-    app.world.entity_mut(entity).insert(RigidBody::Sensor);
+    *app.world.entity_mut(entity).get_mut::<RigidBody>().unwrap() = RigidBody::Sensor;
 
     app.update();
 
@@ -182,7 +184,7 @@ fn can_change_to_dynamic_after_creation() {
 
     app.update();
 
-    app.world.entity_mut(entity).insert(RigidBody::Dynamic);
+    *app.world.entity_mut(entity).get_mut::<RigidBody>().unwrap() = RigidBody::Dynamic;
 
     app.update();
 

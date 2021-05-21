@@ -52,6 +52,7 @@ fn collision_events_are_fired() {
         .insert_bundle((
             Transform::from_translation(Vec3::X * -30.0),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
             Velocity::from_linear(Vec3::X * 30.0),
         ))

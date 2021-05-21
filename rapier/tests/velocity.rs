@@ -44,6 +44,7 @@ fn body_is_created_with_velocity() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
             Velocity { linear, angular },
         ))
@@ -80,6 +81,7 @@ fn velocity_may_be_added_after_creating_the_body() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();
@@ -126,6 +128,7 @@ fn velocity_is_updated_to_reflect_rapier_world() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
             Velocity::default(),
             Acceleration::from_linear(linear).with_angular(angular),
@@ -163,6 +166,7 @@ fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
         .world
         .spawn()
         .insert_bundle((
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
             Transform::default(),
             GlobalTransform::default(),

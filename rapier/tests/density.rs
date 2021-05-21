@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
-use heron_core::{CollisionShape, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, MassProperties, RigidBodySet};
 use heron_rapier::RapierPlugin;
@@ -34,6 +34,7 @@ fn bodies_are_created_with_a_default_density() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 10.0 },
         ))
         .id();
@@ -57,6 +58,7 @@ fn bodies_are_created_with_defined_density() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
             PhysicMaterial {
                 density: 2.0,
@@ -82,6 +84,7 @@ fn density_can_be_updated_after_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
+            RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();

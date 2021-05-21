@@ -1,6 +1,6 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::needless_pass_by_value, clippy::cast_possible_truncation)]
+#![allow(clippy::needless_pass_by_value, clippy::type_complexity)]
 #![cfg(all(
     any(feature = "2d", feature = "3d"),
     not(all(feature = "2d", feature = "3d")),
@@ -117,6 +117,7 @@ impl Plugin for RapierPlugin {
         .insert_resource(CCDSolver::new());
 
         if let Some(steps_per_second) = self.step_per_second {
+            #[allow(clippy::cast_possible_truncation)]
             app.insert_resource(PhysicsStepPerSecond(steps_per_second as f32));
         }
 
