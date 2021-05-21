@@ -101,6 +101,10 @@ impl Plugin for CorePlugin {
 
 /// Components that defines the collision shape of a rigid body
 ///
+/// The collision shape will be attached to the [`RigidBody`] of the same entity.
+/// If there isn't any [`RigidBody`] in the entity,
+/// the collision shape will be attached to the [`RigidBody`] of the parent entity.
+///
 /// # Example
 ///
 /// ```
@@ -108,9 +112,9 @@ impl Plugin for CorePlugin {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(CollisionShape::Sphere { radius: 1.0 });
+///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
+///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
-/// ```
 #[derive(Debug, Clone, Reflect)]
 pub enum CollisionShape {
     /// A sphere (or circle in 2d) shape defined by its radius
@@ -149,7 +153,9 @@ impl Default for CollisionShape {
     }
 }
 
-/// Component that defines the *type* of rigid body.
+/// Component that mark the entity as being a rigid body
+///
+/// It'll need some [`CollisionShape`] to be attached. Either in the same entity or in a direct child
 ///
 /// # Example
 ///
@@ -158,8 +164,8 @@ impl Default for CollisionShape {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(CollisionShape::Sphere { radius: 1.0 }) // Create a collision shape (will automatically attached to a dynamic rigid body by default)
-///         .insert(RigidBody::Static); // Create a static rigid body (so that it doesn't move and is not affected by forces like gravity)
+///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
+///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
@@ -242,6 +248,8 @@ pub enum CollisionEvent {
 }
 
 /// Component that defines the physics properties of the rigid body
+///
+/// It must be inserted on the same entity of a [`RigidBody`]
 ///
 /// # Example
 ///

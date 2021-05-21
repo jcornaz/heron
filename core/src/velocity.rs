@@ -8,6 +8,8 @@ use crate::utils::NearZero;
 
 /// Component that defines the linear and angular velocity.
 ///
+/// It must be inserted on the same entity of a [`crate::RigidBody`]
+///
 /// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
 /// The angular part is in radians per second around an axis, represented as a `Quat`.
 ///
@@ -37,6 +39,8 @@ pub struct Velocity {
 }
 
 /// Component that defines the linear and angular acceleration.
+///
+/// It must be inserted on the same entity of a [`crate::RigidBody`]
 ///
 /// The linear part is in "unit" per second squared on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
 /// The angular part is in radians per second squared around an axis, represented as an [`AxisAngle`]
