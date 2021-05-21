@@ -26,7 +26,9 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
             transform: Transform::from_translation(Vec3::new(0.0, 200.0, 0.0)),
             ..Default::default()
         })
-        // Make it a physics body, by attaching a collision shape
+        // Make it a physics body, by adding the RigidBody component
+        .insert(RigidBody::Dynamic)
+        // Attach a collision shape
         .insert(CollisionShape::Cuboid {
             // let the size be consistent with our sprite
             half_extends: size.extend(0.0) / 2.0,
