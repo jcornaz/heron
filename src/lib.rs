@@ -45,8 +45,7 @@
 //!
 //! ## Create rigid bodies
 //!
-//! To create a rigid body, add the component `Body` to the entity, choosing a collision shape.
-//! It will turn the entity into a dynamic rigid body affected by physics.
+//! To create a rigid body, add the `RigdBody` to the entity and add a collision shapes with the `CollisionShape` component.
 //!
 //! The position and rotation are defined by the bevy `GlobalTransform` component.
 //!
@@ -54,19 +53,22 @@
 //! # use bevy::prelude::*;
 //! # use heron::prelude::*;
 //! fn spawn(mut commands: Commands) {
-//!     commands
+//! commands
 //!
-//!         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
-//!         .spawn_bundle(SpriteBundle::default())
-//!
-//!         // Make it a physics body, by attaching a collision shape
-//!         .insert(CollisionShape::Sphere { radius: 10.0 })
-//!
-//!         // Optionally define a type (if absent, the body will be *dynamic*)
-//!         .insert(RigidBody::Kinematic)
-//!         
-//!         // Optionally define the velocity (works only with dynamic and kinematic bodies)
-//!         .insert(Velocity::from(Vec2::unit_x() * 2.0));
+//!     // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
+//!     .spawn_bundle(SpriteBundle::default())
+//!     
+//!     // Make it a rigid body
+//!     .insert(RigidBody::Dynamic)
+//!     
+//!     // Attach a collision shape
+//!     .insert(CollisionShape::Sphere { radius: 10.0 })
+//!     
+//!     // Optionally add other useful components...
+//!     .insert(Velocity::from_linear(Vec3::X * 2.0))
+//!     .insert(Acceleration::from_linear(Vec3::X * 1.0))
+//!     .insert(PhysicMaterial { friction: 1.0, density: 10.0, ..Default::default() })
+//!     .insert(RotationConstraints::lock());
 //! }
 //! ```
 //!
@@ -75,7 +77,7 @@
 //! The physics step runs at a fixed rate (60 times per second by default) and is out of sync of the
 //! bevy frame.
 //!
-//! But modifying any physics component (such as the transform or velocity), **must** be done synchronously with
+//! But modifying any physics component (such as the transform or velocity), should often be done synchronously with
 //! the physics step.
 //!
 //! The simplest way is to add these systems with `add_physics_system`:
@@ -107,7 +109,7 @@
 //!
 //! ### Option 1: Update the Transform
 //!
-//! For kinematic bodies ([`BodyType::Kinematic`]), if the transform is updated,
+//! For kinematic bodies ([`RigidBody::Kinematic`]), if the transform is updated,
 //! the body is moved and get an automatically calculated velocity. Physics rules will be applied normally.
 //! Updating the transform is a good way to move a kinematic body.
 //!
@@ -116,7 +118,7 @@
 //!
 //! ### Option 2: Use the Velocity component
 //!
-//! For [`BodyType::Dynamic`] and [`BodyType::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
+//! For [`RigidBody::Dynamic`] and [`RigidBody::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
 //! that will move the body over time. Physics rules will be applied normally.
 //!
 //! Note that the velocity component is updated by heron to always reflects the current velocity.
@@ -125,10 +127,10 @@
 //!
 //! ## See also
 //!
-//! * How to choose a [collision shape](Body)
-//! * How to define a [`BodyType`] (dynamic, static, kinematic or sensor)
+//! * How to define a [`RigidBody`]
+//! * How to choose a [`CollisionShape`]
 //! * How to define the world's [`Gravity`]
-//! * How to define the world's [`PhysicsController`]
+//! * How to define the world's [`PhysicsTime`]
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]

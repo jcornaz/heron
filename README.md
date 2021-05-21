@@ -31,14 +31,17 @@ fn spawn(mut commands: Commands) {
         // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
         .spawn_bundle(SpriteBundle::default())
 
-        // Make it a physics body, by attaching a collision shape
-        .insert(Body::Sphere { radius: 10.0 })
-
-        // Optionally define a type (if absent, the body will be *dynamic*)
-        .insert(BodyType::Kinematic)
+        // Make it a rigid body
+        .insert(RigidBody::Dynamic)
         
-        // Optionally define the velocity (works only with dynamic and kinematic bodies)
-        .insert(Velocity::from(Vec2::X * 2.0));
+        // Attach a collision shape
+        .insert(CollisionShape::Sphere { radius: 10.0 })
+        
+        // Optionally add other useful copmonents...
+        .insert(Velocity::from_linear(Vec3::X * 2.0))
+        .insert(Acceleration::from_linear(Vec3::X * 1.0))
+        .insert(PhysicMaterial { friction: 1.0, density: 10.0, ..Default::default() })
+        .insert(RotationConstraints::lock());
 }
 ```
 
