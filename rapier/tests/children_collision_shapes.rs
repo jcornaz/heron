@@ -30,14 +30,16 @@ fn test_app() -> App {
 fn can_use_child_entity_for_the_collision_shape() {
     let mut app = test_app();
 
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+    let rotation = Quat::from_axis_angle(Vec3::Z, 1.0);
     app.world
         .spawn()
         .insert_bundle((GlobalTransform::default(), RigidBody::Dynamic))
         .with_children(|children| {
             children.spawn_bundle((
                 Transform {
-                    translation: Vec3::new(1.0, 2.0, 3.0),
-                    rotation: Quat::from_axis_angle(Vec3::Z, 1.0),
+                    translation,
+                    rotation,
                     ..Default::default()
                 },
                 CollisionShape::Sphere { radius: 1.0 },
@@ -60,21 +62,18 @@ fn can_use_child_entity_for_the_collision_shape() {
 
     assert_eq!(collider.parent(), body_handle);
 
+    let (actual_translation, actual_rotation) = collider.position_wrt_parent().into_bevy();
+
     #[cfg(feature = "2d")]
     assert_eq!(
-        collider.position_wrt_parent().into_bevy(),
-        (
-            Vec3::new(1.0, 2.0, 0.0),
-            Quat::from_axis_angle(Vec3::Z, 1.0)
-        )
+        actual_translation,
+        Vec3::new(translation.x, translation.y, 0.0)
     );
-
     #[cfg(feature = "3d")]
-    assert_eq!(
-        collider.position_wrt_parent().into_bevy(),
-        (
-            Vec3::new(1.0, 2.0, 3.0),
-            Quat::from_axis_angle(Vec3::Z, 1.0)
-        )
-    );
+    assert_eq!(actual_translation, translation);
+
+    assert!((actual_rotation.x - rotation.x).abs() < 0.00001);
+    assert!((actual_rotation.y - rotation.y).abs() < 0.00001);
+    assert!((actual_rotation.z - rotation.z).abs() < 0.00001);
+    assert!((actual_rotation.w - rotation.w).abs() < 0.00001);
 }

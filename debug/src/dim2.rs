@@ -7,19 +7,22 @@ use bevy_prototype_lyon::shapes::RectangleOrigin;
 
 use heron_core::CollisionShape;
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier::geometry::{ColliderSet, Shape};
-use heron_rapier::BodyHandle;
+use heron_rapier::rapier::geometry::{ColliderHandle, ColliderSet, Shape};
 
 use super::*;
 
 pub(crate) fn create_debug_sprites(
     mut commands: Commands<'_>,
     colliders: Res<'_, ColliderSet>,
-    query: Query<'_, (Entity, &CollisionShape, &BodyHandle, &GlobalTransform), Without<HasDebug>>,
+    query: Query<
+        '_,
+        (Entity, &CollisionShape, &ColliderHandle, &GlobalTransform),
+        Without<HasDebug>,
+    >,
     debug_color: Res<'_, DebugColor>,
 ) {
     for (entity, body, handle, transform) in query.iter() {
-        if let Some(collider) = colliders.get(handle.collider()) {
+        if let Some(collider) = colliders.get(*handle) {
             commands
                 .entity(entity)
                 .with_children(|builder| {
@@ -44,13 +47,13 @@ pub(crate) fn replace_debug_sprite(
     debug_color: Res<'_, DebugColor>,
     query: Query<
         '_,
-        (Entity, &CollisionShape, &BodyHandle, &GlobalTransform),
+        (Entity, &CollisionShape, &ColliderHandle, &GlobalTransform),
         (With<HasDebug>, Changed<CollisionShape>),
     >,
 ) {
     for (parent_entity, body, handle, transform) in query.iter() {
         if let (Some(debug_entity), Some(collider)) =
-            (map.remove(&parent_entity), colliders.get(handle.collider()))
+            (map.remove(&parent_entity), colliders.get(*handle))
         {
             commands.entity(debug_entity).despawn();
             commands.entity(parent_entity).with_children(|builder| {
