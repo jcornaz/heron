@@ -84,6 +84,7 @@ impl Plugin for CorePlugin {
             .register_type::<BodyType>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
+            .register_type::<Acceleration>()
             .register_type::<RotationConstraints>()
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();

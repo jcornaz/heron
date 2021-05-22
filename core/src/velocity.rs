@@ -57,7 +57,7 @@ pub struct Velocity {
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Default)]
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Acceleration {
     /// Linear acceleration in units-per-second-squared on each axis
     pub linear: Vec3,
