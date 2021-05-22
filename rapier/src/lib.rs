@@ -123,90 +123,10 @@ impl Plugin for RapierPlugin {
 
         app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
-                .add_stage(
-                    "heron-remove",
-                    SystemStage::single_threaded()
-                        .with_system(body::remove_invalids_after_components_removed.system())
-                        .with_system(shape::remove_invalids_after_components_removed.system())
-                        .with_system(body::remove_invalids_after_component_changed.system())
-                        .with_system(shape::remove_invalids_after_component_changed.system()),
-                )
-                .add_stage(
-                    "heron-update-rigid-bodies",
-                    SystemStage::single_threaded()
-                        .with_system(
-                            bevy::transform::transform_propagate_system::transform_propagate_system
-                                .system()
-                                .label(PhysicsSystem::TransformPropagation),
-                        )
-                        .with_system(
-                            body::update_rapier_position
-                                .system()
-                                .after(PhysicsSystem::TransformPropagation)
-                                .before(PhysicsSystem::CreateRapierEntity),
-                        )
-                        .with_system(
-                            velocity::update_rapier_velocity
-                                .system()
-                                .before(PhysicsSystem::CreateRapierEntity),
-                        )
-                        .with_system(
-                            body::update_rapier_status
-                                .system()
-                                .before(PhysicsSystem::CreateRapierEntity),
-                        )
-                        .with_system(
-                            acceleration::update_rapier_force_and_torque
-                                .system()
-                                .before(PhysicsSystem::CreateRapierEntity),
-                        )
-                        .with_system(
-                            body::create
-                                .system()
-                                .label(PhysicsSystem::CreateRapierEntity)
-                                .after(PhysicsSystem::TransformPropagation),
-                        ),
-                )
-                .add_stage(
-                    "heron-update-colliders",
-                    SystemStage::single_threaded()
-                        .with_system(
-                            shape::update_position
-                                .system()
-                                .before(PhysicsSystem::CreateRapierEntity),
-                        )
-                        .with_system(
-                            shape::create
-                                .system()
-                                .label(PhysicsSystem::CreateRapierEntity),
-                        ),
-                )
-                .add_stage(
-                    "heron-step",
-                    SystemStage::parallel()
-                        .with_run_criteria(should_run.system())
-                        .with_system(
-                            velocity::apply_velocity_to_kinematic_bodies
-                                .system()
-                                .before(PhysicsSystem::Step),
-                        )
-                        .with_system(
-                            pipeline::update_integration_parameters
-                                .system()
-                                .before(PhysicsSystem::Step),
-                        )
-                        .with_system(pipeline::step.system().label(PhysicsSystem::Step))
-                        .with_system(
-                            body::update_bevy_transform
-                                .system()
-                                .after(PhysicsSystem::Step),
-                        )
-                        .with_system(
-                            velocity::update_velocity_component
-                                .system()
-                                .after(PhysicsSystem::Step),
-                        ),
-                )
+                .add_stage("heron-remove", removal_stage())
+                .add_stage("heron-update-rigid-bodies", body_update_stage())
+                .add_stage("heron-update-colliders", collider_update_stage())
+                .add_stage("heron-step", step_stage())
         });
     }
 }
@@ -217,4 +137,88 @@ fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
     } else {
         ShouldRun::Yes
     }
+}
+
+fn removal_stage() -> SystemStage {
+    SystemStage::single_threaded()
+        .with_system(body::remove_invalids_after_components_removed.system())
+        .with_system(shape::remove_invalids_after_components_removed.system())
+        .with_system(body::remove_invalids_after_component_changed.system())
+        .with_system(shape::remove_invalids_after_component_changed.system())
+}
+
+fn body_update_stage() -> SystemStage {
+    SystemStage::single_threaded()
+        .with_system(
+            bevy::transform::transform_propagate_system::transform_propagate_system
+                .system()
+                .label(PhysicsSystem::TransformPropagation),
+        )
+        .with_system(
+            body::update_rapier_position
+                .system()
+                .after(PhysicsSystem::TransformPropagation)
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
+            velocity::update_rapier_velocity
+                .system()
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
+            body::update_rapier_status
+                .system()
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
+            acceleration::update_rapier_force_and_torque
+                .system()
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
+            body::create
+                .system()
+                .label(PhysicsSystem::CreateRapierEntity)
+                .after(PhysicsSystem::TransformPropagation),
+        )
+}
+
+fn collider_update_stage() -> SystemStage {
+    SystemStage::single_threaded()
+        .with_system(
+            shape::update_position
+                .system()
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
+            shape::create
+                .system()
+                .label(PhysicsSystem::CreateRapierEntity),
+        )
+}
+
+fn step_stage() -> SystemStage {
+    SystemStage::parallel()
+        .with_run_criteria(should_run.system())
+        .with_system(
+            velocity::apply_velocity_to_kinematic_bodies
+                .system()
+                .before(PhysicsSystem::Step),
+        )
+        .with_system(
+            pipeline::update_integration_parameters
+                .system()
+                .before(PhysicsSystem::Step),
+        )
+        .with_system(pipeline::step.system().label(PhysicsSystem::Step))
+        .with_system(
+            body::update_bevy_transform
+                .system()
+                .after(PhysicsSystem::Step),
+        )
+        .with_system(
+            velocity::update_velocity_component
+                .system()
+                .after(PhysicsSystem::Step),
+        )
 }
