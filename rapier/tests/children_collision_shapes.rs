@@ -77,3 +77,74 @@ fn can_use_child_entity_for_the_collision_shape() {
     assert!((actual_rotation.z - rotation.z).abs() < 0.00001);
     assert!((actual_rotation.w - rotation.w).abs() < 0.00001);
 }
+
+#[test]
+fn can_change_the_position_of_a_shape_inserted_in_child_entity() {
+    let mut app = test_app();
+
+    let translation = Vec3::new(1.0, 2.0, 3.0);
+
+    let shape_entity = app
+        .world
+        .spawn()
+        .insert_bundle((Transform::default(), CollisionShape::Sphere { radius: 1.0 }))
+        .id();
+
+    app.world
+        .spawn()
+        .insert_bundle((GlobalTransform::default(), RigidBody::Dynamic))
+        .push_children(&[shape_entity]);
+
+    app.update();
+
+    app.world
+        .get_mut::<Transform>(shape_entity)
+        .unwrap()
+        .translation = Vec3::new(1.0, 2.0, 3.0);
+
+    app.update();
+
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+
+    let (_, collider) = colliders.iter().next().unwrap();
+
+    let (actual_translation, _) = collider.position_wrt_parent().into_bevy();
+
+    #[cfg(feature = "2d")]
+    assert_eq!(
+        actual_translation,
+        Vec3::new(translation.x, translation.y, 0.0)
+    );
+    #[cfg(feature = "3d")]
+    assert_eq!(actual_translation, translation);
+}
+
+#[test]
+fn updating_local_transform_of_a_rigid_body_doesnt_affect_the_shape() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            Transform::default(),
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
+        ))
+        .id();
+
+    app.update();
+
+    app.world.get_mut::<Transform>(entity).unwrap().translation = Vec3::new(1.0, 2.0, 3.0);
+
+    app.update();
+
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+
+    let (_, collider) = colliders.iter().next().unwrap();
+
+    let (actual_translation, _) = collider.position_wrt_parent().into_bevy();
+
+    assert_eq!(actual_translation, Vec3::default());
+}

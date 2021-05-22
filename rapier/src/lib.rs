@@ -55,7 +55,7 @@ pub struct RapierPlugin {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum PhysicsSystem {
     TransformPropagation,
-    CreatBodies,
+    CreateRapierEntity,
     Step,
 }
 
@@ -143,33 +143,43 @@ impl Plugin for RapierPlugin {
                             body::update_rapier_position
                                 .system()
                                 .after(PhysicsSystem::TransformPropagation)
-                                .before(PhysicsSystem::CreatBodies),
+                                .before(PhysicsSystem::CreateRapierEntity),
                         )
                         .with_system(
                             velocity::update_rapier_velocity
                                 .system()
-                                .before(PhysicsSystem::CreatBodies),
+                                .before(PhysicsSystem::CreateRapierEntity),
                         )
                         .with_system(
                             body::update_rapier_status
                                 .system()
-                                .before(PhysicsSystem::CreatBodies),
+                                .before(PhysicsSystem::CreateRapierEntity),
                         )
                         .with_system(
                             acceleration::update_rapier_force_and_torque
                                 .system()
-                                .before(PhysicsSystem::CreatBodies),
+                                .before(PhysicsSystem::CreateRapierEntity),
                         )
                         .with_system(
                             body::create
                                 .system()
-                                .label(PhysicsSystem::CreatBodies)
+                                .label(PhysicsSystem::CreateRapierEntity)
                                 .after(PhysicsSystem::TransformPropagation),
                         ),
                 )
                 .add_stage(
                     "heron-update-colliders",
-                    SystemStage::single_threaded().with_system(shape::create.system()),
+                    SystemStage::single_threaded()
+                        .with_system(
+                            shape::update_position
+                                .system()
+                                .before(PhysicsSystem::CreateRapierEntity),
+                        )
+                        .with_system(
+                            shape::create
+                                .system()
+                                .label(PhysicsSystem::CreateRapierEntity),
+                        ),
                 )
                 .add_stage(
                     "heron-step",

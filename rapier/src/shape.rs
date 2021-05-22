@@ -47,6 +47,18 @@ pub(crate) fn create(
     }
 }
 
+pub(crate) fn update_position(
+    mut colliders: ResMut<'_, ColliderSet>,
+    query: Query<'_, (&Transform, &ColliderHandle), (Changed<Transform>, Without<RigidBody>)>,
+) {
+    for (transform, handle) in query.iter() {
+        if let Some(collider) = colliders.get_mut(*handle) {
+            collider
+                .set_position_wrt_parent((transform.translation, transform.rotation).into_rapier())
+        }
+    }
+}
+
 pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
