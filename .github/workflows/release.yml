@@ -40,10 +40,8 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
-      - name: Download autorel
-        run: |
-          wget https://github.com/jcornaz/autorel/releases/download/v0.1.2/autorel
-          chmod +x autorel
+      - name: Install autorel
+        run: cargo install --git "https://github.com/jcornaz/autorel.git" --rev "e5d3b1952800236fd551020bd3884e1a3f1f4d12"
 
       - name: Release
         run: ./autorel

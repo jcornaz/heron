@@ -7,8 +7,15 @@ hooks:
     - cargo test --workspace --no-default-features --features "3d, debug"
 
   prepare:
-    - cargo install cargo-release
-    - cargo release --skip-publish --skip-push --skip-tag --workspace {{version}}
+    - "sed -i 's/\".*\" # auto-version/\"{{version}}\" # auto-version/' core/Cargo.toml"
+    - "sed -i 's/\".*\" # auto-version/\"{{version}}\" # auto-version/' rapier/Cargo.toml"
+    - "sed -i 's/\".*\" # auto-version/\"{{version}}\" # auto-version/' debug/Cargo.toml"
+    - "sed -i 's/\".*\" # auto-version/\"{{version}}\" # auto-version/' Cargo.toml"
+    - "sed -i 's/heron = \".*\"/heron = \"{{version}}\"/' README.md"
+    - "sed -i 's/heron = \".*\"/heron = \"{{version}}\"/' src/lib.rs"
+    - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' README.md"
+    - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' src/lib.rs"
+    - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' guide/src/quickstart.md"
 
   publish:
     - cd core && cargo publish && cd ..
@@ -19,6 +26,16 @@ hooks:
     - sleep 60
     - cargo publish
 
+
+commit:
+  files:
+    - core/Cargo.toml
+    - rapier/Cargo.toml
+    - debug/Cargo.toml
+    - Cargo.toml
+    - src/lib.rs
+    - README.md
+    - guide/src/quickstart.md
 
 github:
   repo: jcornaz/heron

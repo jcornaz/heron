@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier"]
 
 [package]
 name = "heron"
-version = "0.5.1"
+version = "0.5.2" # auto-version
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -35,33 +35,3 @@ required-features = ["2d"]
 [[example]]
 name = "debug"
 required-features = ["2d", "debug"]
-
-[[package.metadata.release.pre-release-replacements]]
-file = "src/lib.rs"
-search = "//! heron = \".+\""
-replace = "//! heron = \"{{version}}\""
-prerelease = true
-
-[[package.metadata.release.pre-release-replacements]]
-file = "src/lib.rs"
-search = "//! heron = \\{ version = \"[0-9a-z\\.-]+\""
-replace = "//! heron = { version = \"{{version}}\""
-prerelease = true
-
-[[package.metadata.release.pre-release-replacements]]
-file = "README.md"
-search = "heron = \".*\""
-replace = "heron = \"{{version}}\""
-prerelease = true
-
-[[package.metadata.release.pre-release-replacements]]
-file = "README.md"
-search = "heron = \\{ version = \"[0-9a-z\\.-]+\""
-replace = "heron = { version = \"{{version}}\""
-prerelease = true
-
-[[package.metadata.release.pre-release-replacements]]
-file = "guide/src/quickstart.md"
-search = "heron = \\{ version = \"[0-9a-z\\.-]+\""
-replace = "heron = { version = \"{{version}}\""
-prerelease = true
