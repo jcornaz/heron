@@ -8,6 +8,8 @@ use crate::utils::NearZero;
 
 /// Component that defines the linear and angular velocity.
 ///
+/// It must be inserted on the same entity of a [`crate::RigidBody`]
+///
 /// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
 /// The angular part is in radians per second around an axis, represented as a `Quat`.
 ///
@@ -20,7 +22,7 @@ use crate::utils::NearZero;
 ///
 /// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(CollisionShape::Sphere { radius: 1.0 })
 ///         .insert(
 ///             Velocity::from_linear(Vec3::X * 10.0)
 ///                 .with_angular(AxisAngle::new(Vec3::Z, 0.5 * PI))
@@ -38,6 +40,8 @@ pub struct Velocity {
 
 /// Component that defines the linear and angular acceleration.
 ///
+/// It must be inserted on the same entity of a [`crate::RigidBody`]
+///
 /// The linear part is in "unit" per second squared on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
 /// The angular part is in radians per second squared around an axis, represented as an [`AxisAngle`]
 ///
@@ -50,7 +54,7 @@ pub struct Velocity {
 ///
 /// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 })
+///         .insert(CollisionShape::Sphere { radius: 1.0 })
 ///         .insert(
 ///             Acceleration::from_linear(Vec3::X * 1.0)
 ///                 .with_angular(AxisAngle::new(Vec3::Z, 0.05 * PI))

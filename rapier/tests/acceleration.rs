@@ -8,13 +8,13 @@ use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Acceleration, AxisAngle, Body};
+use heron_core::{Acceleration, AxisAngle, CollisionShape, RigidBody};
 use heron_rapier::convert::IntoBevy;
 #[cfg(feature = "3d")]
 use heron_rapier::rapier::math::Vector;
 use heron_rapier::{
     rapier::dynamics::{IntegrationParameters, RigidBodySet},
-    BodyHandle, RapierPlugin,
+    RapierPlugin,
 };
 
 fn test_app() -> App {
@@ -50,7 +50,8 @@ fn body_is_created_with_acceleration() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
             Acceleration { linear, angular },
         ))
         .id();
@@ -60,9 +61,7 @@ fn body_is_created_with_acceleration() {
     {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-        let body = bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-            .unwrap();
+        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
         println!("{:?}", body);
         assert_eq!(body.linvel().into_bevy(), Vec3::ZERO);
@@ -73,9 +72,7 @@ fn body_is_created_with_acceleration() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     println!("{:?}", body);
     assert_eq!(body.linvel().into_bevy(), linear);
@@ -92,7 +89,8 @@ fn acceleration_may_be_added_after_creating_the_body() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();
 
@@ -113,9 +111,7 @@ fn acceleration_may_be_added_after_creating_the_body() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(body.linvel().into_bevy(), linear);
     assert_eq_angular(body.angvel(), angular);

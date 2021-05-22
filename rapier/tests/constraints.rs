@@ -4,9 +4,9 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, RotationConstraints};
+use heron_core::{CollisionShape, RigidBody, RotationConstraints};
 use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -27,7 +27,11 @@ fn rotation_is_not_constrained_without_the_component() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -36,7 +40,7 @@ fn rotation_is_not_constrained_without_the_component() {
 
     assert!(
         bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .get(*app.world.get(entity).unwrap())
             .unwrap()
             .effective_world_inv_inertia_sqrt
             > 0.0
@@ -52,7 +56,8 @@ fn rotation_can_be_locked_at_creation() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))
         .id();
@@ -63,7 +68,7 @@ fn rotation_can_be_locked_at_creation() {
 
     assert_eq!(
         bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .get(*app.world.get(entity).unwrap())
             .unwrap()
             .effective_world_inv_inertia_sqrt,
         0.0
@@ -77,7 +82,11 @@ fn rotation_can_be_locked_after_creation() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -92,7 +101,7 @@ fn rotation_can_be_locked_after_creation() {
 
     assert_eq!(
         bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .get(*app.world.get(entity).unwrap())
             .unwrap()
             .effective_world_inv_inertia_sqrt,
         0.0
@@ -108,7 +117,8 @@ fn rotation_is_unlocked_if_component_is_removed() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
             RotationConstraints::lock(),
         ))
         .id();
@@ -123,7 +133,7 @@ fn rotation_is_unlocked_if_component_is_removed() {
 
     assert!(
         bodies
-            .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
+            .get(*app.world.get(entity).unwrap())
             .unwrap()
             .effective_world_inv_inertia_sqrt
             > 0.0

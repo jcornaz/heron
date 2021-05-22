@@ -8,7 +8,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, BodyType, CollisionEvent, Velocity};
+use heron_core::{CollisionEvent, CollisionShape, RigidBody, Velocity};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
@@ -41,8 +41,8 @@ fn collision_events_are_fired() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
-            BodyType::Sensor,
+            CollisionShape::Sphere { radius: 10.0 },
+            RigidBody::Sensor,
         ))
         .id();
 
@@ -52,7 +52,8 @@ fn collision_events_are_fired() {
         .insert_bundle((
             Transform::from_translation(Vec3::X * -30.0),
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
             Velocity::from_linear(Vec3::X * 30.0),
         ))
         .id();

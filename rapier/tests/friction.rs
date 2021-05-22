@@ -7,10 +7,10 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Body, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -34,7 +34,8 @@ fn friction_can_be_defined_when_creating_body() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 10.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
             PhysicMaterial {
                 friction,
                 ..Default::default()
@@ -45,9 +46,7 @@ fn friction_can_be_defined_when_creating_body() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders
-        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-        .unwrap();
+    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(friction, collider.friction)
 }
@@ -59,7 +58,11 @@ fn friction_can_be_updated() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
@@ -73,9 +76,7 @@ fn friction_can_be_updated() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders
-        .get(app.world.get::<BodyHandle>(entity).unwrap().collider())
-        .unwrap();
+    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(friction, collider.friction)
 }

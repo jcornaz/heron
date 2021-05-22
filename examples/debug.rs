@@ -16,8 +16,8 @@ fn spawn(mut commands: Commands) {
     // Sphere
     commands
         .spawn_bundle((Transform::default(), GlobalTransform::default()))
-        .insert(Body::Sphere { radius: 50.0 })
-        .insert(BodyType::Static);
+        .insert(CollisionShape::Sphere { radius: 50.0 })
+        .insert(RigidBody::Static);
 
     // Cuboid
     commands
@@ -25,10 +25,10 @@ fn spawn(mut commands: Commands) {
             Transform::from_translation(Vec3::X * 300.0),
             GlobalTransform::default(),
         ))
-        .insert(Body::Cuboid {
+        .insert(CollisionShape::Cuboid {
             half_extends: Vec2::new(50.0, 50.0).extend(0.0),
         })
-        .insert(BodyType::Static);
+        .insert(RigidBody::Static);
 
     // Capsule
     commands
@@ -36,11 +36,11 @@ fn spawn(mut commands: Commands) {
             Transform::from_translation(Vec3::X * -300.0),
             GlobalTransform::default(),
         ))
-        .insert(Body::Capsule {
+        .insert(CollisionShape::Capsule {
             radius: 50.0,
             half_segment: 50.0,
         })
-        .insert(BodyType::Static);
+        .insert(RigidBody::Static);
 
     // ConvexHull, in this case describing a triangle
     commands
@@ -48,12 +48,12 @@ fn spawn(mut commands: Commands) {
             Transform::from_translation(Vec3::Y * 150.0),
             GlobalTransform::default(),
         ))
-        .insert(Body::ConvexHull {
+        .insert(CollisionShape::ConvexHull {
             points: vec![
                 Vec3::new(0.0, -50.0, 0.0),
                 Vec3::new(50.0, 0.0, 0.0),
                 Vec3::new(-50.0, 0.0, 0.0),
             ],
         })
-        .insert(BodyType::Static);
+        .insert(RigidBody::Static);
 }

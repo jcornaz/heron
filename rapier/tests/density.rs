@@ -8,10 +8,10 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
-use heron_core::{Body, PhysicMaterial};
+use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::dynamics::{IntegrationParameters, MassProperties, RigidBodySet};
-use heron_rapier::{BodyHandle, RapierPlugin};
+use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -32,15 +32,17 @@ fn bodies_are_created_with_a_default_density() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 10.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 10.0 },
+        ))
         .id();
 
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
     assert!(body.mass() > 0.0);
 
     let center: Vec3 = body.mass_properties().local_com.coords.into_bevy();
@@ -56,7 +58,8 @@ fn bodies_are_created_with_defined_density() {
         .spawn()
         .insert_bundle((
             GlobalTransform::default(),
-            Body::Sphere { radius: 1.0 },
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
             PhysicMaterial {
                 density: 2.0,
                 ..Default::default()
@@ -67,9 +70,7 @@ fn bodies_are_created_with_defined_density() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }
@@ -81,7 +82,11 @@ fn density_can_be_updated_after_creation() {
     let entity = app
         .world
         .spawn()
-        .insert_bundle((GlobalTransform::default(), Body::Sphere { radius: 1.0 }))
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
+        ))
         .id();
 
     app.update();
@@ -94,9 +99,7 @@ fn density_can_be_updated_after_creation() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies
-        .get(app.world.get::<BodyHandle>(entity).unwrap().rigid_body())
-        .unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
 
     assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }

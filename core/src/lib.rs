@@ -80,8 +80,8 @@ impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
-            .register_type::<Body>()
-            .register_type::<BodyType>()
+            .register_type::<CollisionShape>()
+            .register_type::<RigidBody>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<Acceleration>()
@@ -99,7 +99,11 @@ impl Plugin for CorePlugin {
     }
 }
 
-/// Components that defines a body subject to physics and collision
+/// Components that defines the collision shape of a rigid body
+///
+/// The collision shape will be attached to the [`RigidBody`] of the same entity.
+/// If there isn't any [`RigidBody`] in the entity,
+/// the collision shape will be attached to the [`RigidBody`] of the parent entity.
 ///
 /// # Example
 ///
@@ -108,11 +112,11 @@ impl Plugin for CorePlugin {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 });
+///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
+///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
-/// ```
 #[derive(Debug, Clone, Reflect)]
-pub enum Body {
+pub enum CollisionShape {
     /// A sphere (or circle in 2d) shape defined by its radius
     Sphere {
         /// Radius of the sphere
@@ -143,13 +147,15 @@ pub enum Body {
     },
 }
 
-impl Default for Body {
+impl Default for CollisionShape {
     fn default() -> Self {
         Self::Sphere { radius: 1.0 }
     }
 }
 
-/// Component that defines the *type* of rigid body.
+/// Component that mark the entity as being a rigid body
+///
+/// It'll need some [`CollisionShape`] to be attached. Either in the same entity or in a direct child
 ///
 /// # Example
 ///
@@ -158,12 +164,12 @@ impl Default for Body {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
-///         .insert(BodyType::Static); // Make it static (so that it doesn't move and is not affected by forces like gravity)
+///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
+///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
-pub enum BodyType {
+pub enum RigidBody {
     /// A dynamic body is normally affected by physic forces and affect the other bodies normally too.
     ///
     /// This is the most "natural" type in the sense that, in real life, everything is dynamic.
@@ -199,19 +205,19 @@ pub enum BodyType {
     Sensor,
 }
 
-impl Default for BodyType {
+impl Default for RigidBody {
     fn default() -> Self {
         Self::Dynamic
     }
 }
 
-impl BodyType {
+impl RigidBody {
     /// Returns true if this body type can be moved by [`Velocity`]
     #[must_use]
     pub fn can_have_velocity(self) -> bool {
         match self {
-            BodyType::Dynamic | BodyType::Kinematic => true,
-            BodyType::Static | BodyType::Sensor => false,
+            RigidBody::Dynamic | RigidBody::Kinematic => true,
+            RigidBody::Static | RigidBody::Sensor => false,
         }
     }
 }
@@ -243,6 +249,8 @@ pub enum CollisionEvent {
 
 /// Component that defines the physics properties of the rigid body
 ///
+/// It must be inserted on the same entity of a [`RigidBody`]
+///
 /// # Example
 ///
 /// ```
@@ -250,7 +258,7 @@ pub enum CollisionEvent {
 /// # use heron_core::*;
 /// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
-///         .insert(Body::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(CollisionShape::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .insert(PhysicMaterial {
 ///             restitution: 0.5, // Define the restitution. Higher value means more "bouncy"
 ///             density: 2.0, // Define the density. Higher value means heavier.

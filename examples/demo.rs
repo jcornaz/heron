@@ -27,12 +27,12 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
             transform: Transform::from_translation(Vec3::new(0.0, -300.0, 0.0)),
             ..Default::default()
         })
-        // Make it a rigid body by picking a collision shape
-        .insert(Body::Cuboid {
+        // Make it a rigid body
+        .insert(RigidBody::Static)
+        // Attach a collision shape
+        .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
         })
-        // Bodies, are "dynamic" by default. Let's make the ground static (doesn't move)
-        .insert(BodyType::Static)
         // Define restitution (so that it bounces)
         .insert(PhysicMaterial {
             restitution: 0.5,
@@ -49,8 +49,10 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
             transform: Transform::from_translation(Vec3::new(-400.0, 200.0, 0.0)),
             ..Default::default()
         })
-        // Make it a rigid body by picking a collision shape
-        .insert(Body::Cuboid {
+        // Make it a rigid body
+        .insert(RigidBody::Dynamic)
+        // Attach a collision shape
+        .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
         })
         // Add an initial velocity. (it is also possible to read/mutate this component later)

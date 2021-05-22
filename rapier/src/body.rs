@@ -1,61 +1,36 @@
 use bevy::ecs::prelude::*;
-use bevy::math::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{Body, BodyType, PhysicMaterial, RotationConstraints, Velocity};
+use heron_core::{PhysicMaterial, RigidBody, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
     BodyStatus, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet,
 };
-use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderSet};
-use crate::rapier::math::Point;
-use crate::BodyHandle;
+use crate::rapier::geometry::{ColliderHandle, ColliderSet};
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
-
-trait ColliderFactory {
-    fn collider_builder(&self) -> ColliderBuilder;
-
-    fn build(&self, entity: Entity, body_type: BodyType, material: PhysicMaterial) -> Collider {
-        let mut collider_builder = self.collider_builder();
-        collider_builder = collider_builder
-            .user_data(entity.to_bits().into())
-            .sensor(matches!(body_type, BodyType::Sensor))
-            .restitution(material.restitution)
-            .density(material.density)
-            .friction(material.friction);
-        collider_builder.build()
-    }
-}
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn create(
     mut commands: Commands<'_>,
     mut bodies: ResMut<'_, RigidBodySet>,
-    mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
     query: Query<
         '_,
         (
             Entity,
-            &Body,
             &GlobalTransform,
-            Option<&BodyType>,
+            &RigidBody,
             Option<&Velocity>,
-            Option<&PhysicMaterial>,
             Option<&RotationConstraints>,
         ),
-        Without<BodyHandle>,
+        Without<RigidBodyHandle>,
     >,
 ) {
-    for (entity, body, transform, body_type, velocity, material, rotation_constraints) in
-        query.iter()
-    {
-        let body_type = body_type.copied().unwrap_or_default();
-
-        let mut builder = RigidBodyBuilder::new(body_status(body_type))
+    for (entity, transform, body, velocity, rotation_constraints) in query.iter() {
+        let mut builder = RigidBodyBuilder::new(body_status(*body))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
 
@@ -89,32 +64,35 @@ pub(crate) fn create(
             builder = builder.angvel(v.angular.into_rapier());
         }
 
-        let rigid_body = bodies.insert(builder.build());
-        let collider = body.build(entity, body_type, material.copied().unwrap_or_default());
+        let rigid_body_handle = bodies.insert(builder.build());
 
-        let collider_handle = colliders.insert(collider, rigid_body, &mut bodies);
-        handles.insert(entity, rigid_body);
-        commands.entity(entity).insert(BodyHandle {
-            rigid_body,
-            collider: collider_handle,
-        });
+        handles.insert(entity, rigid_body_handle);
+        commands.entity(entity).insert(rigid_body_handle);
     }
 }
 
-pub(crate) fn remove(
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
-    removed: RemovedComponents<'_, Body>,
+    bodies_removed: RemovedComponents<'_, RigidBody>,
+    constraints_removed: RemovedComponents<'_, RotationConstraints>,
+    materials_removed: RemovedComponents<'_, PhysicMaterial>,
 ) {
-    for entity in removed.iter() {
-        if let Some(handle) = handles.remove(&entity) {
-            bodies.remove(handle, &mut colliders, &mut joints);
-            commands.entity(entity).remove::<BodyHandle>();
-        }
-    }
+    bodies_removed
+        .iter()
+        .chain(constraints_removed.iter())
+        .chain(materials_removed.iter())
+        .for_each(|entity| {
+            if let Some(handle) = handles.remove(&entity) {
+                remove_collider_handles(&mut commands, &bodies, &colliders, handle);
+                bodies.remove(handle, &mut colliders, &mut joints);
+                commands.entity(entity).remove::<RigidBodyHandle>();
+            }
+        });
 }
 
 #[allow(clippy::type_complexity)]
@@ -126,48 +104,51 @@ pub(crate) fn remove_invalids_after_component_changed(
     mut joints: ResMut<'_, JointSet>,
     changed: Query<
         '_,
-        (Entity, &BodyHandle),
+        (Entity, &RigidBodyHandle),
         Or<(
-            Changed<Body>,
+            Changed<RigidBody>,
             Changed<RotationConstraints>,
-            Changed<BodyType>,
             Changed<PhysicMaterial>,
         )>,
     >,
 ) {
     for (entity, handle) in changed.iter() {
-        bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
-        commands.entity(entity).remove::<BodyHandle>();
+        remove_collider_handles(&mut commands, &bodies, &colliders, *handle);
+        bodies.remove(*handle, &mut colliders, &mut joints);
+        commands.entity(entity).remove::<RigidBodyHandle>();
         handles.remove(&entity);
     }
 }
 
-pub(crate) fn remove_invalids_after_component_removed(
-    mut commands: Commands<'_>,
-    mut handles: ResMut<'_, HandleMap>,
-    mut bodies: ResMut<'_, RigidBodySet>,
-    mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
-    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
-    constraints_removed: RemovedComponents<'_, RotationConstraints>,
+#[allow(clippy::filter_map)]
+fn remove_collider_handles(
+    commands: &mut Commands<'_>,
+    bodies: &RigidBodySet,
+    colliders: &ColliderSet,
+    handle: RigidBodyHandle,
 ) {
-    for entity in constraints_removed.iter() {
-        if let Ok((entity, handle)) = with_body_handle.get(entity) {
-            bodies.remove(handle.rigid_body, &mut colliders, &mut joints);
-            commands.entity(entity).remove::<BodyHandle>();
-            handles.remove(&entity);
-        }
-    }
+    bodies
+        .get(handle)
+        .iter()
+        .flat_map(|it| it.colliders().iter())
+        .filter_map(|it| colliders.get(*it))
+        .map(|it| {
+            #[allow(clippy::cast_possible_truncation)]
+            Entity::from_bits(it.user_data as u64)
+        })
+        .for_each(|collider_entity| {
+            commands.entity(collider_entity).remove::<ColliderHandle>();
+        });
 }
 
 pub(crate) fn update_rapier_status(
     mut bodies: ResMut<'_, RigidBodySet>,
-    with_type_changed: Query<'_, (&BodyType, &BodyHandle), Changed<BodyType>>,
-    with_body_handle: Query<'_, (Entity, &BodyHandle)>,
-    type_removed: RemovedComponents<'_, BodyType>,
+    with_type_changed: Query<'_, (&RigidBody, &RigidBodyHandle), Changed<RigidBody>>,
+    with_body_handle: Query<'_, (Entity, &RigidBodyHandle)>,
+    type_removed: RemovedComponents<'_, RigidBody>,
 ) {
     for (body_type, handle) in with_type_changed.iter() {
-        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+        if let Some(body) = bodies.get_mut(*handle) {
             body.set_body_status(body_status(*body_type));
         }
     }
@@ -176,19 +157,19 @@ pub(crate) fn update_rapier_status(
         if let Some(body) = with_body_handle
             .get(entity)
             .ok()
-            .and_then(|(_, handle)| bodies.get_mut(handle.rigid_body))
+            .and_then(|(_, handle)| bodies.get_mut(*handle))
         {
-            body.set_body_status(body_status(BodyType::default()));
+            body.set_body_status(body_status(RigidBody::default()));
         }
     }
 }
 
 pub(crate) fn update_rapier_position(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&GlobalTransform, &BodyHandle), Changed<GlobalTransform>>,
+    query: Query<'_, (&GlobalTransform, &RigidBodyHandle), Changed<GlobalTransform>>,
 ) {
     for (transform, handle) in query.iter() {
-        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+        if let Some(body) = bodies.get_mut(*handle) {
             let isometry = (transform.translation, transform.rotation).into_rapier();
             if body.is_kinematic() {
                 body.set_next_kinematic_position(isometry);
@@ -206,8 +187,8 @@ pub(crate) fn update_bevy_transform(
         (
             Option<&mut Transform>,
             &mut GlobalTransform,
-            &BodyHandle,
-            Option<&BodyType>,
+            &RigidBodyHandle,
+            Option<&RigidBody>,
         ),
     >,
 ) {
@@ -216,7 +197,7 @@ pub(crate) fn update_bevy_transform(
             continue;
         }
 
-        let body = match bodies.get(handle.rigid_body) {
+        let body = match bodies.get(*handle) {
             None => continue,
             Some(body) => body,
         };
@@ -247,108 +228,10 @@ pub(crate) fn update_bevy_transform(
     }
 }
 
-impl ColliderFactory for Body {
-    fn collider_builder(&self) -> ColliderBuilder {
-        match self {
-            Body::Sphere { radius } => ColliderBuilder::ball(*radius),
-            Body::Capsule {
-                half_segment: half_height,
-                radius,
-            } => ColliderBuilder::capsule_y(*half_height, *radius),
-            Body::Cuboid { half_extends } => cuboid_builder(*half_extends),
-            Body::ConvexHull { points } => convex_hull_builder(points.as_slice()),
-        }
-    }
-}
-
-#[inline]
-#[cfg(feature = "2d")]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y)
-}
-
-#[inline]
-#[cfg(feature = "3d")]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
-}
-
-#[inline]
-fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
-    let points: Vec<Point<f32>> = points.into_rapier();
-    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
-}
-
-fn body_status(body_type: BodyType) -> BodyStatus {
+fn body_status(body_type: RigidBody) -> BodyStatus {
     match body_type {
-        BodyType::Dynamic => BodyStatus::Dynamic,
-        BodyType::Static | BodyType::Sensor => BodyStatus::Static,
-        BodyType::Kinematic => BodyStatus::Kinematic,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use bevy::math::Vec3;
-
-    use super::*;
-
-    #[test]
-    fn build_sphere() {
-        let collider = Body::Sphere { radius: 4.2 }.build(
-            Entity::new(0),
-            BodyType::default(),
-            Default::default(),
-        );
-
-        let ball = collider
-            .shape()
-            .as_ball()
-            .expect("Created shape was not a ball");
-        assert_eq!(ball.radius, 4.2);
-    }
-
-    #[test]
-    fn build_cuboid() {
-        let collider = Body::Cuboid {
-            half_extends: Vec3::new(1.0, 2.0, 3.0),
-        }
-        .build(Entity::new(0), BodyType::default(), Default::default());
-
-        let cuboid = collider
-            .shape()
-            .as_cuboid()
-            .expect("Created shape was not a cuboid");
-
-        assert_eq!(cuboid.half_extents.x, 1.0);
-        assert_eq!(cuboid.half_extents.y, 2.0);
-
-        #[cfg(feature = "3d")]
-        assert_eq!(cuboid.half_extents.z, 3.0);
-    }
-
-    #[test]
-    fn build_capsule() {
-        let collider = Body::Capsule {
-            half_segment: 10.0,
-            radius: 5.0,
-        }
-        .build(Entity::new(0), BodyType::default(), Default::default());
-
-        let capsule = collider
-            .shape()
-            .as_capsule()
-            .expect("Created shape was not a capsule");
-
-        assert_eq!(capsule.radius, 5.0);
-        assert_eq!(capsule.segment.a.x, 0.0);
-        assert_eq!(capsule.segment.b.x, 0.0);
-        assert_eq!(capsule.segment.a.y, -10.0);
-        assert_eq!(capsule.segment.b.y, 10.0);
-
-        #[cfg(feature = "3d")]
-        assert_eq!(capsule.segment.a.z, 0.0);
-        #[cfg(feature = "3d")]
-        assert_eq!(capsule.segment.b.z, 0.0);
+        RigidBody::Dynamic => BodyStatus::Dynamic,
+        RigidBody::Static | RigidBody::Sensor => BodyStatus::Static,
+        RigidBody::Kinematic => BodyStatus::Kinematic,
     }
 }

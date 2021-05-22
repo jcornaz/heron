@@ -35,3 +35,11 @@ required-features = ["2d"]
 [[example]]
 name = "debug"
 required-features = ["2d", "debug"]
+
+[[example]]
+name = "quickstart"
+required-features = ["2d"]
+
+[[example]]
+name = "collision_shapes_in_child_entity"
+required-features = ["2d", "debug"]

@@ -7,16 +7,15 @@ use rapier::{
 use heron_core::{utils::NearZero, Acceleration};
 
 use crate::convert::IntoRapier;
-use crate::rapier::dynamics::RigidBodySet;
+use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 use crate::rapier::math::AngVector;
-use crate::BodyHandle;
 
 pub(crate) fn update_rapier_force_and_torque(
     mut bodies: ResMut<'_, RigidBodySet>,
-    accelerations: Query<'_, (&BodyHandle, &Acceleration)>,
+    accelerations: Query<'_, (&RigidBodyHandle, &Acceleration)>,
 ) {
     for (handle, acceleration) in accelerations.iter() {
-        if let Some(body) = bodies.get_mut(handle.rigid_body) {
+        if let Some(body) = bodies.get_mut(*handle) {
             update_acceleration(body, acceleration)
         }
     }

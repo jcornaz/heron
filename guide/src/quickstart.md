@@ -35,8 +35,8 @@ very basic green `box` sprite and place it on `x` and `y` coordinates. Note
 that we have to use `Vec3` even though we are in 2d space. In 2d we simply set
 the `z` coordinate to zero always.
 
-To make it work with the physics engine, we must add a Heron `Body` component.
-In this case we add a cuboid (rectangular in 2d) collision shape.
+To make it work with the physics engine, we must add a `RigidBody` and `CollisionShape` components.
+In this case we make it a dynamic body with a cuboid (rectangular in 2d) collision shape.
 
 And that's all there is to it! Heron, using the Rapier physics engine, makes
 your sprite behave according to physics!
