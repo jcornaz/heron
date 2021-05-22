@@ -1,7 +1,0 @@
-# Reference: https://github.com/sunng87/cargo-release/blob/master/docs/reference.md
-
-consolidate-commits = true
-dev-version-ext = "dev"
-tag-prefix = ""
-pre-release-commit-message = "chore: Release"
-post-release-commit-message = "chore: Start next iteration"

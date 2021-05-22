@@ -1,6 +1,6 @@
 [package]
 name = "heron_debug"
-version = "0.5.1"
+version = "0.5.1" # auto-version
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
