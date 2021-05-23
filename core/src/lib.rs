@@ -10,7 +10,7 @@ use bevy::prelude::*;
 pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
-pub use layers::{CollisionLayers, Layer};
+pub use layers::{CollisionLayers, PhysicsLayer};
 pub use physics_time::PhysicsTime;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 

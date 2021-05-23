@@ -9,7 +9,7 @@ use bevy::reflect::Reflect;
 /// ```
 /// # use heron::prelude::*;
 ///
-/// #[derive(Layer)]
+/// #[derive(PhysicsLayer)]
 /// enum GameLayer {
 ///   World,
 ///   Player,
@@ -17,12 +17,12 @@ use bevy::reflect::Reflect;
 /// }
 /// ```
 #[allow(missing_docs)]
-pub trait Layer: Sized {
+pub trait PhysicsLayer: Sized {
     fn to_bits(&self) -> u16;
     fn all_bits() -> u16;
 }
 
-impl<T: Layer> Layer for &T {
+impl<T: PhysicsLayer> PhysicsLayer for &T {
     fn to_bits(&self) -> u16 {
         T::to_bits(self)
     }
@@ -58,7 +58,7 @@ impl<T: Layer> Layer for &T {
 ///
 /// // Define an enum to list the physics layer of your game
 /// // You can have up to 16 layers
-/// #[derive(Layer)]
+/// #[derive(PhysicsLayer)]
 /// enum GameLayer {
 ///   World,
 ///   Player,
@@ -97,7 +97,7 @@ impl CollisionLayers {
     /// Create a new collision layers configuration with a single group and mask.
     ///
     /// You may add more groups and mask with `with_group` and `with_mask`.
-    pub fn new<L: Layer>(group: L, mask: L) -> Self {
+    pub fn new<L: PhysicsLayer>(group: L, mask: L) -> Self {
         Self {
             groups: group.to_bits(),
             masks: mask.to_bits(),
@@ -108,7 +108,7 @@ impl CollisionLayers {
     ///
     /// The entity,will interacts with everything (except the entities that interact with nothing)
     #[must_use]
-    pub fn all<L: Layer>() -> Self {
+    pub fn all<L: PhysicsLayer>() -> Self {
         Self {
             groups: L::all_bits(),
             masks: L::all_bits(),
@@ -134,20 +134,20 @@ impl CollisionLayers {
 
     /// Returns true if the given layer is contained in the "groups"
     #[must_use]
-    pub fn contains_group(self, layer: impl Layer) -> bool {
+    pub fn contains_group(self, layer: impl PhysicsLayer) -> bool {
         (self.groups & layer.to_bits()) != 0
     }
 
     /// Add the given layer in the "groups"
     #[must_use]
-    pub fn with_group(mut self, layer: impl Layer) -> Self {
+    pub fn with_group(mut self, layer: impl PhysicsLayer) -> Self {
         self.groups |= layer.to_bits();
         self
     }
 
     /// Add the given layers in the "groups"
     #[must_use]
-    pub fn with_groups(mut self, layers: impl IntoIterator<Item = impl Layer>) -> Self {
+    pub fn with_groups(mut self, layers: impl IntoIterator<Item = impl PhysicsLayer>) -> Self {
         for layer in layers.into_iter().map(|l| l.to_bits()) {
             self.groups |= layer;
         }
@@ -157,27 +157,27 @@ impl CollisionLayers {
 
     /// Remove the given layer from the "groups"
     #[must_use]
-    pub fn without_group(mut self, layer: impl Layer) -> Self {
+    pub fn without_group(mut self, layer: impl PhysicsLayer) -> Self {
         self.groups &= !layer.to_bits();
         self
     }
 
     /// Returns true if the given layer is contained in the "masks"
     #[must_use]
-    pub fn contains_mask(self, layer: impl Layer) -> bool {
+    pub fn contains_mask(self, layer: impl PhysicsLayer) -> bool {
         (self.masks & layer.to_bits()) != 0
     }
 
     /// Add the given layer in the "masks"
     #[must_use]
-    pub fn with_mask(mut self, layer: impl Layer) -> Self {
+    pub fn with_mask(mut self, layer: impl PhysicsLayer) -> Self {
         self.masks |= layer.to_bits();
         self
     }
 
     /// Add the given layers in the "masks"
     #[must_use]
-    pub fn with_masks(mut self, layers: impl IntoIterator<Item = impl Layer>) -> Self {
+    pub fn with_masks(mut self, layers: impl IntoIterator<Item = impl PhysicsLayer>) -> Self {
         for layer in layers.into_iter().map(|l| l.to_bits()) {
             self.masks |= layer;
         }
@@ -187,7 +187,7 @@ impl CollisionLayers {
 
     /// Remove the given layer from the "masks"
     #[must_use]
-    pub fn without_mask(mut self, layer: impl Layer) -> Self {
+    pub fn without_mask(mut self, layer: impl PhysicsLayer) -> Self {
         self.masks &= !layer.to_bits();
         self
     }
@@ -216,7 +216,7 @@ mod tests {
         Two,
     }
 
-    impl Layer for TestLayer {
+    impl PhysicsLayer for TestLayer {
         fn to_bits(&self) -> u16 {
             match self {
                 TestLayer::One => 1,

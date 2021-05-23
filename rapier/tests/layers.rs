@@ -7,7 +7,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionLayers, CollisionShape, Layer, RigidBody};
+use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, RigidBody};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
@@ -17,7 +17,7 @@ enum TestLayer {
     B,
 }
 
-impl Layer for TestLayer {
+impl PhysicsLayer for TestLayer {
     fn to_bits(&self) -> u16 {
         match self {
             TestLayer::A => 1,

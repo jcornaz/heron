@@ -1,16 +1,16 @@
 use rstest::rstest;
 
-use heron_core::Layer;
+use heron_core::PhysicsLayer;
 use heron_macros::*;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Layer)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PhysicsLayer)]
 enum MyLayer {
     World,
     Player,
     Enemies,
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Layer)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PhysicsLayer)]
 #[allow(unused)]
 enum MaxLayerCount {
     A,

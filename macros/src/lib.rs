@@ -3,7 +3,7 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, Data, DeriveInput};
 
-#[proc_macro_derive(Layer)]
+#[proc_macro_derive(PhysicsLayer)]
 pub fn derive_layer(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let enum_ident = input.ident;
@@ -32,7 +32,7 @@ pub fn derive_layer(input: TokenStream) -> TokenStream {
     };
 
     let expanded = quote! {
-        impl heron::Layer for #enum_ident {
+        impl heron::PhysicsLayer for #enum_ident {
             fn all_bits() -> u16 {
                 #all_bits
             }
