@@ -13,4 +13,3 @@ duplicate = "^0.2.9"
 
 [dev-dependencies]
 rstest = "0.7"
-heron = { path = ".." }

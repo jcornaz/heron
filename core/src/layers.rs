@@ -3,19 +3,6 @@ use bevy::reflect::Reflect;
 /// Describes a collision layer
 ///
 /// It is recommended to implement it using the derive macro.
-///
-/// # Example
-///
-/// ```
-/// # use heron::prelude::*;
-///
-/// #[derive(PhysicsLayer)]
-/// enum GameLayer {
-///   World,
-///   Player,
-///   Enemies,
-/// }
-/// ```
 #[allow(missing_docs)]
 pub trait PhysicsLayer: Sized {
     fn to_bits(&self) -> u16;
@@ -47,24 +34,26 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 /// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or `CollisionLayers::none()`,
 /// and then add or remove layers by calling  `with_group`/`without_group` and `with_mask`/`without_mask`.
 ///
-/// Theses methods take a type that implement [`Layer`]. The best option is to create an enum and add a `#[derive(Layer)]` clause.
+/// Theses methods take a type that implement [`Layer`]. The best option is to create an enum with a `#[derive(Layer)]` clause.
 ///
 /// # Example
 ///
 /// ```
-/// # use heron::prelude::*;
+/// # use heron_core::*;
 /// # use bevy::prelude::*;
-/// use heron::CollisionLayers;
-///
-/// // Define an enum to list the physics layer of your game
-/// // You can have up to 16 layers
-/// #[derive(PhysicsLayer)]
-/// enum GameLayer {
-///   World,
-///   Player,
-///   Enemies,
-/// }
-///
+/// # enum GameLayer {
+/// #   World,
+/// #   Player,
+/// #   Enemies,
+/// # }
+/// # impl PhysicsLayer for GameLayer {
+/// #     fn to_bits(&self) -> u16 {
+/// #         todo!()
+/// #     }
+/// #     fn all_bits() -> u16 {
+/// #         todo!()
+/// #     }
+/// # }
 /// fn spawn(mut commands: Commands) {
 ///    commands.spawn_bundle(todo!("Spawn a bundle of your choice"))
 ///         .insert(RigidBody::Dynamic) // <-- Create a rigid body
