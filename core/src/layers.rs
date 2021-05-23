@@ -94,6 +94,16 @@ impl Default for CollisionLayers {
 }
 
 impl CollisionLayers {
+    /// Create a new collision layers configuration with a single group and mask.
+    ///
+    /// You may add more groups and mask with `with_group` and `with_mask`.
+    pub fn new<L: Layer>(group: L, mask: L) -> Self {
+        Self {
+            groups: group.to_bits(),
+            masks: mask.to_bits(),
+        }
+    }
+
     /// Contains all layers
     ///
     /// The entity,will interacts with everything (except the entities that interact with nothing)
