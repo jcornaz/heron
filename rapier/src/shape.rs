@@ -175,6 +175,7 @@ impl ColliderFactory for CollisionShape {
             } => ColliderBuilder::capsule_y(*half_height, *radius),
             CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
             CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
+            CollisionShape::HeightField { scale, heights } => heightfield_builder(*scale, &heights),
         }
     }
 }
@@ -195,6 +196,31 @@ fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
 fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
     let points: Vec<Point<f32>> = points.into_rapier();
     ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
+}
+
+#[inline]
+#[cfg(feature = "2d")]
+fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
+    let len = heights.get(0).map(|x| x.len()).unwrap_or_default();
+    ColliderBuilder::heightfield(
+        crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).cloned()),
+        crate::rapier::na::Vector2::new((len as f32) * scale - scale, 1.0),
+    )
+}
+
+#[inline]
+#[cfg(feature = "3d")]
+fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
+    let nrows = heights.len();
+    let ncols = heights.get(0).map(|x| x.len()).unwrap_or_default();
+    ColliderBuilder::heightfield(
+        crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
+        crate::rapier::na::Vector3::new(
+            (ncols as f32) * scale - scale,
+            1.0,
+            (nrows as f32) * scale - scale,
+        ),
+    )
 }
 
 #[cfg(test)]
@@ -262,5 +288,37 @@ mod tests {
         assert_eq!(capsule.segment.a.z, 0.0);
         #[cfg(feature = "3d")]
         assert_eq!(capsule.segment.b.z, 0.0);
+    }
+
+    #[test]
+    fn build_heightfield() {
+        let collider = CollisionShape::HeightField {
+            scale: 3.0,
+            heights: vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]],
+        }
+        .build(Entity::new(0), RigidBody::default(), None, None);
+
+        let field = collider
+            .shape()
+            .as_heightfield()
+            .expect("Created shape was not a height field");
+
+        #[cfg(feature = "2d")]
+        {
+            assert_eq!(field.num_cells(), 2); // Three points = 2 segments
+            assert_eq!(field.cell_width(), 3.0);
+        }
+
+        #[cfg(feature = "3d")]
+        {
+            assert_eq!(field.nrows(), 1);
+            assert_eq!(field.ncols(), 2);
+            assert_eq!(
+                field.scale(),
+                &crate::rapier::na::Vector3::new(6.0, 1.0, 3.0)
+            );
+            assert_eq!(field.cell_height(), 3.0);
+            assert_eq!(field.cell_width(), 3.0);
+        }
     }
 }

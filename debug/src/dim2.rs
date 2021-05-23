@@ -148,6 +148,18 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 });
             }
         }
+        CollisionShape::HeightField { scale, heights } => {
+            if let Some(points) = heights.get(0) {
+                builder.add(&shapes::Polygon {
+                    points: points
+                        .iter()
+                        .enumerate()
+                        .map(|(i, p)| Vec2::new((i as f32) * scale, *p))
+                        .collect(),
+                    closed: false,
+                });
+            }
+        }
     };
 
     builder

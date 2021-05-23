@@ -148,6 +148,20 @@ pub enum CollisionShape {
         /// A vector of points describing the convex hull
         points: Vec<Vec3>,
     },
+
+    /// A shape defined by the height of points.
+    ///
+    /// This shape is usefull for floors with relief.
+    HeightField {
+        /// The distance between two points of the field
+        scale: f32,
+
+        /// The height of each point.
+        ///
+        /// In 2D, the outer `Vec` should contain only one
+        /// inner `Vec`, any other element will be ignored.
+        heights: Vec<Vec<f32>>,
+    },
 }
 
 impl Default for CollisionShape {
