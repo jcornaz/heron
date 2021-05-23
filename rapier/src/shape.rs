@@ -81,6 +81,21 @@ pub(crate) fn update_collision_groups(
     }
 }
 
+pub(crate) fn reset_collision_groups(
+    mut colliders: ResMut<'_, ColliderSet>,
+    handles: Query<'_, &ColliderHandle>,
+    removed: RemovedComponents<'_, CollisionLayers>,
+) {
+    removed
+        .iter()
+        .filter_map(|entity| handles.get(entity).ok())
+        .for_each(|handle| {
+            if let Some(collider) = colliders.get_mut(*handle) {
+                collider.set_collision_groups(InteractionGroups::default());
+            }
+        });
+}
+
 pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,

@@ -55,7 +55,6 @@ pub struct RapierPlugin {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum PhysicsSystem {
     TransformPropagation,
-    CreateRapierEntity,
     Step,
 }
 
@@ -157,49 +156,24 @@ fn body_update_stage() -> SystemStage {
         .with_system(
             body::update_rapier_position
                 .system()
-                .after(PhysicsSystem::TransformPropagation)
-                .before(PhysicsSystem::CreateRapierEntity),
+                .after(PhysicsSystem::TransformPropagation),
         )
-        .with_system(
-            velocity::update_rapier_velocity
-                .system()
-                .before(PhysicsSystem::CreateRapierEntity),
-        )
-        .with_system(
-            body::update_rapier_status
-                .system()
-                .before(PhysicsSystem::CreateRapierEntity),
-        )
-        .with_system(
-            acceleration::update_rapier_force_and_torque
-                .system()
-                .before(PhysicsSystem::CreateRapierEntity),
-        )
+        .with_system(velocity::update_rapier_velocity.system())
+        .with_system(body::update_rapier_status.system())
+        .with_system(acceleration::update_rapier_force_and_torque.system())
         .with_system(
             body::create
                 .system()
-                .label(PhysicsSystem::CreateRapierEntity)
                 .after(PhysicsSystem::TransformPropagation),
         )
 }
 
 fn collider_update_stage() -> SystemStage {
     SystemStage::single_threaded()
-        .with_system(
-            shape::update_position
-                .system()
-                .before(PhysicsSystem::CreateRapierEntity),
-        )
-        .with_system(
-            shape::update_collision_groups
-                .system()
-                .before(PhysicsSystem::CreateRapierEntity),
-        )
-        .with_system(
-            shape::create
-                .system()
-                .label(PhysicsSystem::CreateRapierEntity),
-        )
+        .with_system(shape::update_position.system())
+        .with_system(shape::update_collision_groups.system())
+        .with_system(shape::reset_collision_groups.system())
+        .with_system(shape::create.system())
 }
 
 fn step_stage() -> SystemStage {
