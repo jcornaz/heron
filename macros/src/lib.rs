@@ -25,17 +25,16 @@ pub fn derive_layer(input: TokenStream) -> TokenStream {
         quote! { #enum_ident::#ident => #bits, }
     });
 
-    let mut all: u16 = 1;
-
-    for _ in 1..variants.len() {
-        all <<= 1;
-        all += 1;
-    }
+    let all_bits: u16 = if variants.len() == 16 {
+        0xffff
+    } else {
+        (1 << variants.len()) - 1
+    };
 
     let expanded = quote! {
         impl heron::Layer for #enum_ident {
             fn all_bits() -> u16 {
-                #all
+                #all_bits
             }
 
             fn to_bits(&self) -> u16 {
