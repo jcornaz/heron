@@ -181,6 +181,18 @@ impl CollisionLayers {
         self.masks &= !layer.to_bits();
         self
     }
+
+    #[must_use]
+    #[allow(missing_docs)]
+    pub fn groups_bits(self) -> u16 {
+        self.groups
+    }
+
+    #[must_use]
+    #[allow(missing_docs)]
+    pub fn masks_bits(self) -> u16 {
+        self.masks
+    }
 }
 
 #[cfg(test)]

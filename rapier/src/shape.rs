@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{CollisionShape, PhysicMaterial, RigidBody};
+use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
-use crate::rapier::geometry::{Collider, ColliderBuilder, ColliderHandle, ColliderSet};
+use crate::rapier::geometry::{
+    Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
+};
 use crate::rapier::math::Point;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
@@ -18,21 +20,27 @@ pub(crate) fn create(
     rigid_bodies: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
     collision_shapes: Query<
         '_,
-        (Entity, &CollisionShape, Option<&Parent>, Option<&Transform>),
+        (
+            Entity,
+            &CollisionShape,
+            Option<&Parent>,
+            Option<&Transform>,
+            Option<&CollisionLayers>,
+        ),
         Without<ColliderHandle>,
     >,
 ) {
-    for (entity, shape, parent, transform) in collision_shapes.iter() {
+    for (entity, shape, parent, transform, layers) in collision_shapes.iter() {
         let collider = if let Ok((body, rigid_body_handle, material)) = rigid_bodies.get(entity) {
             Some((
-                shape.build(entity, *body, material, None),
+                shape.build(entity, *body, material, None, layers),
                 rigid_body_handle,
             ))
         } else if let Some((body, rigid_body_handle, material)) =
             parent.and_then(|p| rigid_bodies.get(p.0).ok())
         {
             Some((
-                shape.build(entity, *body, material, transform),
+                shape.build(entity, *body, material, transform, layers),
                 rigid_body_handle,
             ))
         } else {
@@ -98,6 +106,7 @@ trait ColliderFactory {
         body_type: RigidBody,
         material: Option<&PhysicMaterial>,
         transform: Option<&Transform>,
+        layers: Option<&CollisionLayers>,
     ) -> Collider {
         let mut builder = self
             .collider_builder()
@@ -114,6 +123,13 @@ trait ColliderFactory {
         if let Some(transform) = transform {
             builder = builder
                 .position_wrt_parent((transform.translation, transform.rotation).into_rapier());
+        }
+
+        if let Some(layers) = layers {
+            builder = builder.collision_groups(InteractionGroups::new(
+                layers.groups_bits(),
+                layers.masks_bits(),
+            ));
         }
 
         builder.build()
@@ -165,6 +181,7 @@ mod tests {
             RigidBody::default(),
             None,
             None,
+            None,
         );
 
         let ball = collider
@@ -179,7 +196,7 @@ mod tests {
         let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
         }
-        .build(Entity::new(0), RigidBody::default(), None, None);
+        .build(Entity::new(0), RigidBody::default(), None, None, None);
 
         let cuboid = collider
             .shape()
@@ -199,7 +216,7 @@ mod tests {
             half_segment: 10.0,
             radius: 5.0,
         }
-        .build(Entity::new(0), RigidBody::default(), None, None);
+        .build(Entity::new(0), RigidBody::default(), None, None, None);
 
         let capsule = collider
             .shape()
