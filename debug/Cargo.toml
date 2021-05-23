@@ -9,8 +9,8 @@ repository = "https://github.com/jcornaz/heron/"
 
 [features]
 default = []
-2d = ["bevy_prototype_lyon"]
-3d = []
+2d = ["heron_rapier/2d", "bevy_prototype_lyon"]
+3d = ["heron_rapier/3d"]
 
 [dependencies]
 heron_core = { version = "^0.5.1", path = "../core" }
