@@ -15,16 +15,6 @@ pub fn derive_layer(input: TokenStream) -> TokenStream {
 
     assert!(variants.len() <= 16, "Reached the maximum of 16 layers");
 
-    let from_bits = variants.iter().enumerate().map(|(index, variant)| {
-        let bits: u16 = 1 << index;
-        assert!(
-            variant.fields.is_empty(),
-            "Can only derive Layer for enums without fields"
-        );
-        let ident = &variant.ident;
-        quote! { #bits => #enum_ident::#ident, }
-    });
-
     let to_bits = variants.iter().enumerate().map(|(index, variant)| {
         let bits: u16 = 1 << index;
         assert!(
@@ -35,14 +25,19 @@ pub fn derive_layer(input: TokenStream) -> TokenStream {
         quote! { #enum_ident::#ident => #bits, }
     });
 
+    let mut all: u16 = 1;
+
+    for _ in 1..variants.len() {
+        all <<= 1;
+        all += 1;
+    }
+
     let expanded = quote! {
-        impl heron_core::Layer for #enum_ident {
-            fn from_bits(bits: u16) -> Self {
-                match bits {
-                    #(#from_bits)*
-                    _ => panic!("No layer with this bits: {}", bits),
-                }
+        impl heron::Layer for #enum_ident {
+            fn all_bits() -> u16 {
+                #all
             }
+
             fn to_bits(&self) -> u16 {
                 match self {
                     #(#to_bits)*
