@@ -41,7 +41,16 @@ fn spawn(mut commands: Commands) {
         .insert(Velocity::from_linear(Vec3::X * 2.0))
         .insert(Acceleration::from_linear(Vec3::X * 1.0))
         .insert(PhysicMaterial { friction: 1.0, density: 10.0, ..Default::default() })
-        .insert(RotationConstraints::lock());
+        .insert(RotationConstraints::lock())
+        .insert(CollisionLayers:none().with_group(Layer::Player).with_mask(Layer::World));
+}
+
+// Define your physics layers
+#[derive(Layer)]
+enum Layer {
+    World,
+    Player,
+    Enemies,
 }
 ```
 

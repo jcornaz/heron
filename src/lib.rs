@@ -138,6 +138,7 @@
 use bevy::app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
+pub use heron_macros::*;
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
@@ -150,9 +151,12 @@ pub mod rapier_plugin {
 
 /// Re-exports of the most commons/useful types
 pub mod prelude {
+    pub use heron_macros::*;
+
     pub use crate::{
-        ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionShape, Gravity,
-        PhysicMaterial, PhysicsPlugin, PhysicsTime, RigidBody, RotationConstraints, Velocity,
+        ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
+        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsTime, RigidBody,
+        RotationConstraints, Velocity,
     };
 }
 
