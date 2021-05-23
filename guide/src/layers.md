@@ -27,7 +27,7 @@ Two entities A and B will interact if:
  * There is a layer in the groups of A that is also in the masks of B
  * There is a layer in the groups of B that is also in the masks of A
 
-To build an instance of this component, start with either `CollisionLayers::all()` or `CollisionLayers::none()`,
+To build an instance of this component, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or `CollisionLayers::none()`,
 and then add or remove layers by calling  `with_group`/`without_group` and `with_mask`/`without_mask`.
 
 ### Mark an entity to be in the "world" group and collide with the "player"

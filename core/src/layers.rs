@@ -44,7 +44,7 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///
 /// This component must be on the same entity of a [`CollisionShape`](crate::CollisionShape)
 ///
-/// To build an instance, start with either `CollisionLayers::all()` or `CollisionLayers::none()`,
+/// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or `CollisionLayers::none()`,
 /// and then add or remove layers by calling  `with_group`/`without_group` and `with_mask`/`without_mask`.
 ///
 /// Theses methods take a type that implement [`Layer`]. The best option is to create an enum and add a `#[derive(Layer)]` clause.
