@@ -191,6 +191,11 @@ fn collider_update_stage() -> SystemStage {
                 .before(PhysicsSystem::CreateRapierEntity),
         )
         .with_system(
+            shape::update_collision_groups
+                .system()
+                .before(PhysicsSystem::CreateRapierEntity),
+        )
+        .with_system(
             shape::create
                 .system()
                 .label(PhysicsSystem::CreateRapierEntity),

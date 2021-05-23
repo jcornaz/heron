@@ -67,6 +67,20 @@ pub(crate) fn update_position(
     }
 }
 
+pub(crate) fn update_collision_groups(
+    mut colliders: ResMut<'_, ColliderSet>,
+    query: Query<'_, (&CollisionLayers, &ColliderHandle), Changed<CollisionLayers>>,
+) {
+    for (layers, handle) in query.iter() {
+        if let Some(collider) = colliders.get_mut(*handle) {
+            collider.set_collision_groups(InteractionGroups::new(
+                layers.groups_bits(),
+                layers.masks_bits(),
+            ));
+        }
+    }
+}
+
 pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,

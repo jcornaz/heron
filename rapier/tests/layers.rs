@@ -66,3 +66,33 @@ fn sets_the_collision_groups() {
 
     assert_eq!(collider.collision_groups().0, (1 << 16) + 2)
 }
+
+#[test]
+fn updates_the_collision_groups() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            RigidBody::Sensor,
+            CollisionShape::Sphere { radius: 1.0 },
+            GlobalTransform::default(),
+        ))
+        .id();
+
+    app.update();
+
+    app.world.entity_mut(entity).insert(
+        CollisionLayers::none()
+            .with_group(TestLayer::A)
+            .with_mask(TestLayer::B),
+    );
+
+    app.update();
+
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+
+    assert_eq!(collider.collision_groups().0, (1 << 16) + 2)
+}
