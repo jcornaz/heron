@@ -2,7 +2,7 @@ use bevy::reflect::Reflect;
 
 /// Component that restrict what rotations can be caused by forces.
 ///
-/// It must be inserted on the same entity of a [`crate::RigidBody`]
+/// It must be inserted on the same entity of a [`RigidBody`](crate::RigidBody)
 ///
 /// Note that angular velocity may still be applied programmatically. This only restrict how rotation
 /// can change when force/torques are applied.

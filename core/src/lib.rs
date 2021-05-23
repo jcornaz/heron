@@ -10,12 +10,14 @@ use bevy::prelude::*;
 pub use constraints::RotationConstraints;
 pub use ext::*;
 pub use gravity::Gravity;
+pub use layers::{CollisionLayers, Layer};
 pub use physics_time::PhysicsTime;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 pub mod ext;
 mod gravity;
+mod layers;
 mod physics_time;
 pub mod utils;
 mod velocity;
@@ -86,6 +88,7 @@ impl Plugin for CorePlugin {
             .register_type::<Velocity>()
             .register_type::<Acceleration>()
             .register_type::<RotationConstraints>()
+            .register_type::<CollisionLayers>()
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
