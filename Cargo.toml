@@ -45,3 +45,7 @@ required-features = ["2d"]
 [[example]]
 name = "collision_shapes_in_child_entity"
 required-features = ["2d", "debug"]
+
+[[example]]
+name = "layers"
+required-features = ["2d"]

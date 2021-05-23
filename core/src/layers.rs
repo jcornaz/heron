@@ -40,7 +40,7 @@ impl<T: Layer> Layer for &T {
 ///  * There is a layer in the groups of A that is also in the masks of B
 ///  * There is a layer in the groups of B that is also in the masks of A
 ///
-/// An entiy without this component is considered has having all layers in its "groups" and "masks", and will interact with everything.
+/// An entity without this component is considered has having all layers in its "groups" and "masks", and will interact with everything.
 ///
 /// This component must be on the same entity of a [`CollisionShape`](crate::CollisionShape)
 ///
