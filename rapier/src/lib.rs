@@ -123,8 +123,9 @@ impl Plugin for RapierPlugin {
         app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage("heron-remove", removal_stage())
-                .add_stage("heron-update-rigid-bodies", body_update_stage())
-                .add_stage("heron-update-colliders", collider_update_stage())
+                .add_stage("heron-update-rapier-world", update_rapier_world_stage())
+                .add_stage("heron-create-new-bodies", body_update_stage())
+                .add_stage("heron-create-new-colliders", create_collider_stage())
                 .add_stage("heron-step", step_stage())
         });
     }
@@ -146,8 +147,8 @@ fn removal_stage() -> SystemStage {
         .with_system(shape::remove_invalids_after_component_changed.system())
 }
 
-fn body_update_stage() -> SystemStage {
-    SystemStage::single_threaded()
+fn update_rapier_world_stage() -> SystemStage {
+    SystemStage::parallel()
         .with_system(
             bevy::transform::transform_propagate_system::transform_propagate_system
                 .system()
@@ -161,19 +162,17 @@ fn body_update_stage() -> SystemStage {
         .with_system(velocity::update_rapier_velocity.system())
         .with_system(body::update_rapier_status.system())
         .with_system(acceleration::update_rapier_force_and_torque.system())
-        .with_system(
-            body::create
-                .system()
-                .after(PhysicsSystem::TransformPropagation),
-        )
-}
-
-fn collider_update_stage() -> SystemStage {
-    SystemStage::single_threaded()
         .with_system(shape::update_position.system())
         .with_system(shape::update_collision_groups.system())
         .with_system(shape::reset_collision_groups.system())
-        .with_system(shape::create.system())
+}
+
+fn body_update_stage() -> SystemStage {
+    SystemStage::single_threaded().with_system(body::create.system())
+}
+
+fn create_collider_stage() -> SystemStage {
+    SystemStage::single_threaded().with_system(shape::create.system())
 }
 
 fn step_stage() -> SystemStage {
