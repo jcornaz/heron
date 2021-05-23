@@ -91,6 +91,7 @@ impl Plugin for CorePlugin {
             .register_type::<Acceleration>()
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
+            .register_type::<Sensor>()
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
@@ -226,6 +227,39 @@ impl RigidBody {
         }
     }
 }
+
+/// Mark the [`CollisionShape`] of the same entity as being a *sensor*.
+///
+/// This is especially useful to add sensor to an existing (non-sensor) rigid body without the need to create a [`RigidBody::Sensor`] in between.
+///
+/// It has no effect if the concerned rigid body is already a [`RigidBody::Sensor`].
+///
+/// # Example
+///
+/// ```rust
+/// # use heron_core::*;
+/// # use bevy::prelude::*;
+/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+///   commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///     .insert(RigidBody::Dynamic) // <-- A non-sensor rigid body
+///     .with_children(|children| {
+///       children.spawn_bundle((
+///             CollisionShape::Sphere { radius: 1.0 }, // <-- A physics collision shape
+///             Transform::default(), // <-- Optionally define it's position
+///             GlobalTransform::default(),
+///       ));
+///  
+///       children.spawn_bundle((
+///           CollisionShape::Sphere { radius: 1.0 }, // <-- A *sensor* collision shape.
+///           Sensor,
+///           Transform::default(), // <-- Optionally define it's position
+///           GlobalTransform::default(),
+///       ));
+///     });
+/// }
+/// ```
+#[derive(Debug, Copy, Clone, Default, Reflect)]
+pub struct Sensor;
 
 /// Component that defines the physics properties of the rigid body
 ///
