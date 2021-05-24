@@ -3,7 +3,7 @@ use bevy::ecs::prelude::*;
 use bevy::math::Vec3;
 use crossbeam::channel::Receiver;
 
-use heron_core::{CollisionEvent, Gravity, PhysicsTime};
+use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsTime};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
@@ -55,7 +55,7 @@ pub(crate) fn step(
         &event_manager.handler,
     );
 
-    event_manager.fire_events(&colliders, &mut events);
+    event_manager.fire_events(&bodies, &colliders, &mut events);
 }
 
 pub(crate) struct EventManager {
@@ -78,17 +78,22 @@ impl Default for EventManager {
 }
 
 impl EventManager {
-    fn fire_events(&self, colliders: &ColliderSet, events: &mut Events<CollisionEvent>) {
+    fn fire_events(
+        &self,
+        bodies: &RigidBodySet,
+        colliders: &ColliderSet,
+        events: &mut Events<CollisionEvent>,
+    ) {
         while let Ok(event) = self.contacts.try_recv() {
             match event {
                 ContactEvent::Started(h1, h2) => {
-                    if let Some((e1, e2)) = Self::entity_pair(colliders, h1, h2) {
-                        events.send(CollisionEvent::Started(e1, e2));
+                    if let Some((d1, d2)) = Self::data(bodies, colliders, h1, h2) {
+                        events.send(CollisionEvent::Started(d1, d2));
                     }
                 }
                 ContactEvent::Stopped(h1, h2) => {
-                    if let Some((e1, e2)) = Self::entity_pair(colliders, h1, h2) {
-                        events.send(CollisionEvent::Stopped(e1, e2));
+                    if let Some((d1, d2)) = Self::data(bodies, colliders, h1, h2) {
+                        events.send(CollisionEvent::Stopped(d1, d2));
                     }
                 }
             }
@@ -100,7 +105,7 @@ impl EventManager {
             intersecting,
         }) = self.intersections.try_recv()
         {
-            if let Some((e1, e2)) = Self::entity_pair(colliders, collider1, collider2) {
+            if let Some((e1, e2)) = Self::data(bodies, colliders, collider1, collider2) {
                 if intersecting {
                     events.send(CollisionEvent::Started(e1, e2));
                 } else {
@@ -111,15 +116,18 @@ impl EventManager {
     }
 
     #[allow(clippy::cast_possible_truncation)]
-    fn entity_pair(
+    fn data(
+        bodies: &RigidBodySet,
         colliders: &ColliderSet,
         h1: ColliderHandle,
         h2: ColliderHandle,
-    ) -> Option<(Entity, Entity)> {
+    ) -> Option<(CollisionData, CollisionData)> {
         if let (Some(b1), Some(b2)) = (colliders.get(h1), colliders.get(h2)) {
             let e1 = Entity::from_bits(b1.user_data as u64);
             let e2 = Entity::from_bits(b2.user_data as u64);
-            Some(if e1 < e2 { (e1, e2) } else { (e2, e2) })
+            let d1 = CollisionData::new(e1, e1, Default::default());
+            let d2 = CollisionData::new(e2, e2, Default::default());
+            Some(if e1 < e2 { (d1, d2) } else { (d1, d2) })
         } else {
             None
         }
@@ -136,6 +144,7 @@ mod tests {
     use super::*;
 
     struct TestContext {
+        bodies: RigidBodySet,
         colliders: ColliderSet,
         entity1: Entity,
         entity2: Entity,
@@ -168,6 +177,7 @@ mod tests {
             );
 
             Self {
+                bodies,
                 colliders,
                 entity1,
                 entity2,
@@ -187,12 +197,15 @@ mod tests {
             .handle_contact_event(ContactEvent::Started(context.handle1, context.handle2));
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.colliders, &mut events);
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
         let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
+        assert_eq!(events.len(), 1);
+        let event = events[0];
+        assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
-            events,
-            vec![CollisionEvent::Started(context.entity1, context.entity2),]
+            event.collision_shape_entities(),
+            (context.entity1, context.entity2)
         );
     }
 
@@ -206,12 +219,15 @@ mod tests {
             .handle_contact_event(ContactEvent::Stopped(context.handle1, context.handle2));
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.colliders, &mut events);
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
         let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
+        assert_eq!(events.len(), 1);
+        let event = events[0];
+        assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
-            events,
-            vec![CollisionEvent::Stopped(context.entity1, context.entity2),]
+            event.collision_shape_entities(),
+            (context.entity1, context.entity2)
         );
     }
 
@@ -229,12 +245,15 @@ mod tests {
             ));
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.colliders, &mut events);
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
         let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
+        assert_eq!(events.len(), 1);
+        let event = events[0];
+        assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
-            events,
-            vec![CollisionEvent::Started(context.entity1, context.entity2),]
+            event.collision_shape_entities(),
+            (context.entity1, context.entity2)
         );
     }
 
@@ -252,12 +271,15 @@ mod tests {
             ));
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.colliders, &mut events);
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
         let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
 
+        assert_eq!(events.len(), 1);
+        let event = events[0];
+        assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
-            events,
-            vec![CollisionEvent::Stopped(context.entity1, context.entity2)]
+            event.collision_shape_entities(),
+            (context.entity1, context.entity2)
         );
     }
 }

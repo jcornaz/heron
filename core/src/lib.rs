@@ -8,7 +8,7 @@ use bevy::core::FixedTimestep;
 use bevy::prelude::*;
 
 pub use constraints::RotationConstraints;
-pub use events::CollisionEvent;
+pub use events::{CollisionData, CollisionEvent};
 pub use ext::*;
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};

@@ -72,13 +72,11 @@ fn collision_events_are_fired() {
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
 
-    assert_eq!(
-        events,
-        vec![
-            CollisionEvent::Started(entity1, entity2),
-            CollisionEvent::Stopped(entity1, entity2)
-        ]
-    );
+    assert_eq!(events.len(), 2);
+    assert!(matches!(events[0], CollisionEvent::Started(_, _)));
+    assert!(matches!(events[1], CollisionEvent::Stopped(_, _)));
+    assert_eq!(events[0].collision_shape_entities(), (entity1, entity2));
+    assert_eq!(events[1].collision_shape_entities(), (entity1, entity2));
 }
 
 fn collect_events(
