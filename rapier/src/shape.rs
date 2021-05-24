@@ -102,6 +102,18 @@ pub(crate) fn update_sensor_flag(
     }
 }
 
+pub(crate) fn remove_sensor_flag(
+    mut colliders: ResMut<'_, ColliderSet>,
+    handles: Query<'_, &ColliderHandle>,
+    removed: RemovedComponents<'_, SensorShape>,
+) {
+    for handle in removed.iter().filter_map(|e| handles.get(e).ok()) {
+        if let Some(collider) = colliders.get_mut(*handle) {
+            collider.set_sensor(false);
+        }
+    }
+}
+
 pub(crate) fn reset_collision_groups(
     mut colliders: ResMut<'_, ColliderSet>,
     handles: Query<'_, &ColliderHandle>,

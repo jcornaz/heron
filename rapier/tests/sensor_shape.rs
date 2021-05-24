@@ -3,7 +3,7 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-use bevy::app::{Events, ManualEventReader};
+use bevy::app::ManualEventReader;
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
@@ -87,4 +87,35 @@ fn sensor_flag_can_be_added_after_creation() {
         .unwrap();
 
     assert!(collider.is_sensor());
+}
+
+#[test]
+fn sensor_flag_can_removed() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 1.0 },
+            SensorShape,
+        ))
+        .id();
+
+    app.update();
+
+    app.world.entity_mut(entity).remove::<SensorShape>();
+
+    app.update();
+
+    let collider = app
+        .world
+        .get_resource::<ColliderSet>()
+        .unwrap()
+        .get(*app.world.get(entity).unwrap())
+        .unwrap();
+
+    assert!(!collider.is_sensor());
 }
