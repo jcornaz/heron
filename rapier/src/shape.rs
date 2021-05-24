@@ -91,6 +91,17 @@ pub(crate) fn update_collision_groups(
     }
 }
 
+pub(crate) fn update_sensor_flag(
+    mut colliders: ResMut<'_, ColliderSet>,
+    query: Query<'_, &ColliderHandle, Changed<SensorShape>>,
+) {
+    for handle in query.iter() {
+        if let Some(collider) = colliders.get_mut(*handle) {
+            collider.set_sensor(true);
+        }
+    }
+}
+
 pub(crate) fn reset_collision_groups(
     mut colliders: ResMut<'_, ColliderSet>,
     handles: Query<'_, &ColliderHandle>,

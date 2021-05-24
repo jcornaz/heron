@@ -164,6 +164,7 @@ fn update_rapier_world_stage() -> SystemStage {
         .with_system(acceleration::update_rapier_force_and_torque.system())
         .with_system(shape::update_position.system())
         .with_system(shape::update_collision_groups.system())
+        .with_system(shape::update_sensor_flag.system())
         .with_system(shape::reset_collision_groups.system())
 }
 
