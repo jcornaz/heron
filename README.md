@@ -107,3 +107,7 @@ One must choose to use either `2d` or `3d` (but not both). If none of theses two
 You can open issues/discussions here or you can discuss with me (`Jomag#2675`) in the [bevy discord](https://discord.com/invite/gMUk5Ph)
 
 See [how to contribute](https://github.com/jcornaz/heron/blob/main/CONTRIBUTING.md)
+
+
+[bevy]: https://bevyengine.org
+[rapier]: https://rapier.rs
