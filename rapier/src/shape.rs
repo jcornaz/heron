@@ -200,8 +200,9 @@ fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
 
 #[inline]
 #[cfg(feature = "2d")]
+#[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
-    let len = heights.get(0).map(|x| x.len()).unwrap_or_default();
+    let len = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
         crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).cloned()),
         crate::rapier::na::Vector2::new((len as f32) * scale - scale, 1.0),
@@ -210,9 +211,10 @@ fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
 
 #[inline]
 #[cfg(feature = "3d")]
+#[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
     let nrows = heights.len();
-    let ncols = heights.get(0).map(|x| x.len()).unwrap_or_default();
+    let ncols = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
         crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
         crate::rapier::na::Vector3::new(
@@ -296,7 +298,7 @@ mod tests {
             scale: 3.0,
             heights: vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]],
         }
-        .build(Entity::new(0), RigidBody::default(), None, None);
+        .build(Entity::new(0), RigidBody::default(), None, None, None);
 
         let field = collider
             .shape()
