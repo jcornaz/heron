@@ -8,6 +8,7 @@ use bevy::core::FixedTimestep;
 use bevy::prelude::*;
 
 pub use constraints::RotationConstraints;
+pub use events::CollisionEvent;
 pub use ext::*;
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
@@ -15,6 +16,7 @@ pub use physics_time::PhysicsTime;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
+mod events;
 pub mod ext;
 mod gravity;
 mod layers;
@@ -223,31 +225,6 @@ impl RigidBody {
             RigidBody::Static | RigidBody::Sensor => false,
         }
     }
-}
-
-/// An event fired when the collision state between two entities changed
-///
-/// # Example
-///
-/// ```
-/// # use bevy::prelude::*;
-/// # use heron_core::*;
-/// fn detect_collisions(mut events: EventReader<CollisionEvent>) {
-///     for event in events.iter() {
-///         match event {
-///             CollisionEvent::Started(entity1, entity2) => println!("Entity {:?} and {:?} started to collide", entity1, entity2),
-///             CollisionEvent::Stopped(entity1, entity2) => println!("Entity {:?} and {:?} stopped to collide", entity1, entity2),
-///         }
-///     }
-/// }
-/// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum CollisionEvent {
-    /// The two entities started to collide
-    Started(Entity, Entity),
-
-    /// The two entities no longer collide
-    Stopped(Entity, Entity),
 }
 
 /// Component that defines the physics properties of the rigid body
