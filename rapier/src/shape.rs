@@ -102,6 +102,7 @@ pub(crate) fn update_sensor_flag(
     }
 }
 
+#[allow(clippy::cast_possible_truncation)]
 pub(crate) fn remove_sensor_flag(
     bodies: Res<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,

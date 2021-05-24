@@ -160,7 +160,6 @@ fn update_rapier_world_stage() -> SystemStage {
                 .after(PhysicsSystem::TransformPropagation),
         )
         .with_system(velocity::update_rapier_velocity.system())
-        .with_system(body::update_rapier_status.system())
         .with_system(acceleration::update_rapier_force_and_torque.system())
         .with_system(shape::update_position.system())
         .with_system(shape::update_collision_groups.system())

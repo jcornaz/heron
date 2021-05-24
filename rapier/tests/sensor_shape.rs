@@ -3,7 +3,6 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
-use bevy::app::ManualEventReader;
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
