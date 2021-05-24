@@ -46,7 +46,7 @@ fn spawn(mut commands: Commands) {
 }
 
 // Define your physics layers
-#[derive(Layer)]
+#[derive(PhysicsLayer)]
 enum Layer {
     World,
     Player,
@@ -100,21 +100,6 @@ One must choose to use either `2d` or `3d` (but not both). If none of theses two
 
 * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
 * `debug` Render collision shapes. Works only in 2d, support for 3d will be added later.
-
-
-## Motivation
-
-I think [rapier] is very powerful as a physics engine. But using it directly or via [bevy_rapier] in a [bevy] game is
-not ergonomic enough for my taste.
-
-Ideally I would like to have the *power* of [rapier] accessible behind an API focused on [bevy] *games*.
-
-
-[bevy]: https://bevyengine.org
-
-[rapier]: https://rapier.rs
-
-[bevy_rapier]: https://github.com/dimforge/bevy_rapier
 
 
 ## Contribute / Contact
