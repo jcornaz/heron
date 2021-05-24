@@ -65,6 +65,13 @@ impl CollisionEvent {
             CollisionEvent::Stopped(d1, d2) => (d1.rigid_body_entity, d2.rigid_body_entity),
         }
     }
+
+    pub fn collision_layers(&self) -> (CollisionLayers, CollisionLayers) {
+        match self {
+            CollisionEvent::Started(d1, d2) => (d1.collision_layers, d2.collision_layers),
+            CollisionEvent::Stopped(d1, d2) => (d1.collision_layers, d2.collision_layers),
+        }
+    }
 }
 
 impl CollisionData {

@@ -5,7 +5,7 @@ use crossbeam::channel::Receiver;
 
 use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsTime};
 
-use crate::convert::IntoRapier;
+use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{
     BroadPhase, ColliderHandle, ColliderSet, ContactEvent, IntersectionEvent, NarrowPhase,
@@ -130,12 +130,12 @@ impl EventManager {
                 let d1 = CollisionData::new(
                     Entity::from_bits(rb1.user_data as u64),
                     Entity::from_bits(collider1.user_data as u64),
-                    Default::default(),
+                    collider1.collision_groups().into_bevy(),
                 );
                 let d2 = CollisionData::new(
                     Entity::from_bits(rb2.user_data as u64),
                     Entity::from_bits(collider2.user_data as u64),
-                    Default::default(),
+                    collider2.collision_groups().into_bevy(),
                 );
                 Some(
                     if Entity::from_bits(rb1.user_data as u64)
@@ -157,6 +157,8 @@ impl EventManager {
 
 #[cfg(test)]
 mod tests {
+    use heron_core::CollisionLayers;
+
     use crate::pipeline::EventManager;
     use crate::rapier::dynamics::RigidBodyBuilder;
     use crate::rapier::geometry::{ColliderBuilder, ColliderHandle};
@@ -171,6 +173,8 @@ mod tests {
         rb_entity_2: Entity,
         collider_entity_1: Entity,
         collider_entity_2: Entity,
+        layers_1: CollisionLayers,
+        layers_2: CollisionLayers,
         handle1: ColliderHandle,
         handle2: ColliderHandle,
     }
@@ -184,6 +188,8 @@ mod tests {
             let rb_entity_2 = Entity::new(1);
             let collider_entity_1 = Entity::new(2);
             let collider_entity_2 = Entity::new(3);
+            let layers_1 = CollisionLayers::from_bits(1, 2);
+            let layers_2 = CollisionLayers::from_bits(3, 4);
             let body1 = bodies.insert(
                 RigidBodyBuilder::new_dynamic()
                     .user_data(rb_entity_1.to_bits().into())
@@ -197,6 +203,7 @@ mod tests {
             let handle1 = colliders.insert(
                 ColliderBuilder::ball(1.0)
                     .user_data(collider_entity_1.to_bits().into())
+                    .collision_groups(layers_1.into_rapier())
                     .build(),
                 body1,
                 &mut bodies,
@@ -204,6 +211,7 @@ mod tests {
             let handle2 = colliders.insert(
                 ColliderBuilder::ball(1.0)
                     .user_data(collider_entity_2.to_bits().into())
+                    .collision_groups(layers_2.into_rapier())
                     .build(),
                 body2,
                 &mut bodies,
@@ -216,6 +224,8 @@ mod tests {
                 rb_entity_2,
                 collider_entity_1,
                 collider_entity_2,
+                layers_1,
+                layers_2,
                 handle1,
                 handle2,
             }
@@ -337,6 +347,28 @@ mod tests {
                 .unwrap()
                 .rigid_body_entities(),
             (context.rb_entity_1, context.rb_entity_2)
+        );
+    }
+
+    #[test]
+    fn contains_collision_layers() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager
+            .handler
+            .handle_contact_event(ContactEvent::Started(context.handle1, context.handle2));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
+        assert_eq!(
+            events
+                .get_reader()
+                .iter(&events)
+                .next()
+                .unwrap()
+                .collision_layers(),
+            (context.layers_1, context.layers_2)
         );
     }
 }
