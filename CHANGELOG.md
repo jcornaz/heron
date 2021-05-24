@@ -1,3 +1,25 @@
+## 0.6.0 - 2021-05-24
+
+### Breaking changes
+
+* The `Body` component is renamed to `CollisionShape`
+* The `BodyType` component is renamed to `RigidBody` and is now mandatory. (The rigid bodies are no longer automatically "dynamic" when the component is not found)
+* The `BodyHandle` component is removed. The rapier's `RigidBodyHandle` and `ColliderHandle` are now used instead.
+
+
+### Features
+
+* Allow to define (multiple) collision shapes in the child entity of a rigid body (#97)
+* Collision layers (#101)
+
+
+### Bug fixes
+
+* Frame delay after a spawn/update of the entity transform (#92)
+* The acceleration component is now registered for bevy reflection
+
+
+
 ## [0.5.1] - 2021-05-01
 
 ### PhysicsTime resource

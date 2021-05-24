@@ -1,6 +1,6 @@
 [package]
 name = "heron_debug"
-version = "0.5.1" # auto-version
+version = "0.6.0" # auto-version
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -13,8 +13,8 @@ default = []
 3d = ["heron_rapier/3d"]
 
 [dependencies]
-heron_core = { version = "^0.5.1", path = "../core" }
-heron_rapier = { version = "^0.5.1", path = "../rapier" }
+heron_core = { version = "^0.6.0", path = "../core" }
+heron_rapier = { version = "^0.6.0", path = "../rapier" }
 bevy = { version = "^0.5.0", default-features = false, features = ["render"] }
 bevy_prototype_lyon = { version = "0.3.0", optional = true }
 fnv = "^1.0"
