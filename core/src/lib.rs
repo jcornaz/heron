@@ -91,7 +91,7 @@ impl Plugin for CorePlugin {
             .register_type::<Acceleration>()
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
-            .register_type::<Sensor>()
+            .register_type::<SensorShape>()
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 let mut schedule = Schedule::default();
 
@@ -251,7 +251,7 @@ impl RigidBody {
 ///  
 ///       children.spawn_bundle((
 ///           CollisionShape::Sphere { radius: 1.0 }, // <-- A *sensor* collision shape.
-///           Sensor,
+///           SensorShape,
 ///           Transform::default(), // <-- Optionally define it's position
 ///           GlobalTransform::default(),
 ///       ));
@@ -259,7 +259,7 @@ impl RigidBody {
 /// }
 /// ```
 #[derive(Debug, Copy, Clone, Default, Reflect)]
-pub struct Sensor;
+pub struct SensorShape;
 
 /// Component that defines the physics properties of the rigid body
 ///
