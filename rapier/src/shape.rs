@@ -103,15 +103,25 @@ pub(crate) fn update_sensor_flag(
 }
 
 pub(crate) fn remove_sensor_flag(
+    bodies: Res<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    handles: Query<'_, &ColliderHandle>,
+    rigid_bodies: Query<'_, &RigidBody>,
+    collider_handles: Query<'_, &ColliderHandle>,
     removed: RemovedComponents<'_, SensorShape>,
 ) {
-    for handle in removed.iter().filter_map(|e| handles.get(e).ok()) {
-        if let Some(collider) = colliders.get_mut(*handle) {
-            collider.set_sensor(false);
-        }
-    }
+    removed
+        .iter()
+        .filter_map(|e| collider_handles.get(e).ok())
+        .for_each(|handle| {
+            if let Some(collider) = colliders.get_mut(*handle) {
+                let rigid_body = bodies
+                    .get(collider.parent())
+                    .map(|b| Entity::from_bits(b.user_data as u64))
+                    .and_then(|e| rigid_bodies.get(e).ok());
+
+                collider.set_sensor(matches!(rigid_body, Some(RigidBody::Sensor)));
+            }
+        });
 }
 
 pub(crate) fn reset_collision_groups(
