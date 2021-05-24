@@ -64,8 +64,8 @@ fn spawn(mut commands: Commands) {
             GlobalTransform::default(),
         ))
         .insert(CollisionShape::HeightField {
-            scale: 20.0,
-            heights: vec![vec![0.0, 10.0, 30.0, 20.0, 0.0]],
+            scale: 50.0,
+            heights: vec![vec![50.0, 0.0, 10.0, 30.0, 20.0, 0.0, 20.0]],
         })
         .insert(RigidBody::Static);
 }
