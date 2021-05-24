@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody};
+use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, SensorShape};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
@@ -26,21 +26,34 @@ pub(crate) fn create(
             Option<&Parent>,
             Option<&Transform>,
             Option<&CollisionLayers>,
+            Option<&SensorShape>,
         ),
         Without<ColliderHandle>,
     >,
 ) {
-    for (entity, shape, parent, transform, layers) in collision_shapes.iter() {
+    for (entity, shape, parent, transform, layers, sensor_flag) in collision_shapes.iter() {
         let collider = if let Ok((body, rigid_body_handle, material)) = rigid_bodies.get(entity) {
             Some((
-                shape.build(entity, *body, material, None, layers),
+                shape.build(
+                    entity,
+                    sensor_flag.is_some() || matches!(body, RigidBody::Sensor),
+                    material,
+                    None,
+                    layers,
+                ),
                 rigid_body_handle,
             ))
         } else if let Some((body, rigid_body_handle, material)) =
             parent.and_then(|p| rigid_bodies.get(p.0).ok())
         {
             Some((
-                shape.build(entity, *body, material, transform, layers),
+                shape.build(
+                    entity,
+                    sensor_flag.is_some() || matches!(body, RigidBody::Sensor),
+                    material,
+                    transform,
+                    layers,
+                ),
                 rigid_body_handle,
             ))
         } else {
@@ -76,6 +89,40 @@ pub(crate) fn update_collision_groups(
             collider.set_collision_groups(layers.into_rapier());
         }
     }
+}
+
+pub(crate) fn update_sensor_flag(
+    mut colliders: ResMut<'_, ColliderSet>,
+    query: Query<'_, &ColliderHandle, Changed<SensorShape>>,
+) {
+    for handle in query.iter() {
+        if let Some(collider) = colliders.get_mut(*handle) {
+            collider.set_sensor(true);
+        }
+    }
+}
+
+#[allow(clippy::cast_possible_truncation)]
+pub(crate) fn remove_sensor_flag(
+    bodies: Res<'_, RigidBodySet>,
+    mut colliders: ResMut<'_, ColliderSet>,
+    rigid_bodies: Query<'_, &RigidBody>,
+    collider_handles: Query<'_, &ColliderHandle>,
+    removed: RemovedComponents<'_, SensorShape>,
+) {
+    removed
+        .iter()
+        .filter_map(|e| collider_handles.get(e).ok())
+        .for_each(|handle| {
+            if let Some(collider) = colliders.get_mut(*handle) {
+                let rigid_body = bodies
+                    .get(collider.parent())
+                    .map(|b| Entity::from_bits(b.user_data as u64))
+                    .and_then(|e| rigid_bodies.get(e).ok());
+
+                collider.set_sensor(matches!(rigid_body, Some(RigidBody::Sensor)));
+            }
+        });
 }
 
 pub(crate) fn reset_collision_groups(
@@ -129,7 +176,7 @@ trait ColliderFactory {
     fn build(
         &self,
         entity: Entity,
-        body_type: RigidBody,
+        is_sensor: bool,
         material: Option<&PhysicMaterial>,
         transform: Option<&Transform>,
         layers: Option<&CollisionLayers>,
@@ -137,7 +184,7 @@ trait ColliderFactory {
         let mut builder = self
             .collider_builder()
             .user_data(entity.to_bits().into())
-            .sensor(matches!(body_type, RigidBody::Sensor));
+            .sensor(is_sensor);
 
         if let Some(material) = material {
             builder = builder
@@ -199,13 +246,9 @@ mod tests {
 
     #[test]
     fn build_sphere() {
-        let collider = CollisionShape::Sphere { radius: 4.2 }.build(
-            Entity::new(0),
-            RigidBody::default(),
-            None,
-            None,
-            None,
-        );
+        let collider = CollisionShape::Sphere { radius: 4.2 }
+            .collider_builder()
+            .build();
 
         let ball = collider
             .shape()
@@ -219,7 +262,8 @@ mod tests {
         let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
         }
-        .build(Entity::new(0), RigidBody::default(), None, None, None);
+        .collider_builder()
+        .build();
 
         let cuboid = collider
             .shape()
@@ -239,7 +283,8 @@ mod tests {
             half_segment: 10.0,
             radius: 5.0,
         }
-        .build(Entity::new(0), RigidBody::default(), None, None, None);
+        .collider_builder()
+        .build();
 
         let capsule = collider
             .shape()
