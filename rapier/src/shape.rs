@@ -73,10 +73,7 @@ pub(crate) fn update_collision_groups(
 ) {
     for (layers, handle) in query.iter() {
         if let Some(collider) = colliders.get_mut(*handle) {
-            collider.set_collision_groups(InteractionGroups::new(
-                layers.groups_bits(),
-                layers.masks_bits(),
-            ));
+            collider.set_collision_groups(layers.into_rapier());
         }
     }
 }
@@ -155,10 +152,7 @@ trait ColliderFactory {
         }
 
         if let Some(layers) = layers {
-            builder = builder.collision_groups(InteractionGroups::new(
-                layers.groups_bits(),
-                layers.masks_bits(),
-            ));
+            builder = builder.collision_groups(layers.into_rapier());
         }
 
         builder.build()

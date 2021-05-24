@@ -7,11 +7,12 @@
 
 use bevy::math::prelude::*;
 
-use heron_core::AxisAngle;
+use heron_core::{AxisAngle, CollisionLayers};
 
 use crate::nalgebra::{
     self, Point2, Point3, Quaternion, UnitComplex, UnitQuaternion, Vector2, Vector3,
 };
+use crate::rapier::geometry::InteractionGroups;
 use crate::rapier::math::{Isometry, Translation, Vector};
 
 pub trait IntoBevy<T> {
@@ -164,6 +165,19 @@ impl IntoRapier<f32> for AxisAngle {
 impl IntoRapier<Vector3<f32>> for AxisAngle {
     fn into_rapier(self) -> Vector3<f32> {
         Vec3::from(self).into_rapier()
+    }
+}
+
+impl IntoRapier<InteractionGroups> for CollisionLayers {
+    fn into_rapier(self) -> InteractionGroups {
+        InteractionGroups::new(self.groups_bits(), self.masks_bits())
+    }
+}
+
+impl IntoBevy<CollisionLayers> for InteractionGroups {
+    fn into_bevy(self) -> CollisionLayers {
+        #[allow(clippy::cast_possible_truncation)]
+        CollisionLayers::from_bits((self.0 >> 16) as u16, self.0 as u16)
     }
 }
 
