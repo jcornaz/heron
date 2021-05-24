@@ -67,11 +67,11 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 fn log_collisions(mut events: EventReader<CollisionEvent>) {
     for event in events.iter() {
         match event {
-            CollisionEvent::Started(e1, e2) => {
-                println!("Collision started between {:?} and {:?}", e1, e2)
+            CollisionEvent::Started(d1, d2) => {
+                println!("Collision started between {:?} and {:?}", d1, d2)
             }
-            CollisionEvent::Stopped(e1, e2) => {
-                println!("Collision stopped between {:?} and {:?}", e1, e2)
+            CollisionEvent::Stopped(d1, d2) => {
+                println!("Collision stopped between {:?} and {:?}", d1, d2)
             }
         }
     }
