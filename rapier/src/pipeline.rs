@@ -122,12 +122,33 @@ impl EventManager {
         h1: ColliderHandle,
         h2: ColliderHandle,
     ) -> Option<(CollisionData, CollisionData)> {
-        if let (Some(b1), Some(b2)) = (colliders.get(h1), colliders.get(h2)) {
-            let e1 = Entity::from_bits(b1.user_data as u64);
-            let e2 = Entity::from_bits(b2.user_data as u64);
-            let d1 = CollisionData::new(e1, e1, Default::default());
-            let d2 = CollisionData::new(e2, e2, Default::default());
-            Some(if e1 < e2 { (d1, d2) } else { (d1, d2) })
+        if let (Some(collider1), Some(collider2)) = (colliders.get(h1), colliders.get(h2)) {
+            if let (Some(rb1), Some(rb2)) = (
+                bodies.get(collider1.parent()),
+                bodies.get(collider2.parent()),
+            ) {
+                let d1 = CollisionData::new(
+                    Entity::from_bits(rb1.user_data as u64),
+                    Entity::from_bits(collider1.user_data as u64),
+                    Default::default(),
+                );
+                let d2 = CollisionData::new(
+                    Entity::from_bits(rb2.user_data as u64),
+                    Entity::from_bits(collider2.user_data as u64),
+                    Default::default(),
+                );
+                Some(
+                    if Entity::from_bits(rb1.user_data as u64)
+                        < Entity::from_bits(rb2.user_data as u64)
+                    {
+                        (d1, d2)
+                    } else {
+                        (d1, d2)
+                    },
+                )
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -146,8 +167,10 @@ mod tests {
     struct TestContext {
         bodies: RigidBodySet,
         colliders: ColliderSet,
-        entity1: Entity,
-        entity2: Entity,
+        rb_entity_1: Entity,
+        rb_entity_2: Entity,
+        collider_entity_1: Entity,
+        collider_entity_2: Entity,
         handle1: ColliderHandle,
         handle2: ColliderHandle,
     }
@@ -157,20 +180,30 @@ mod tests {
             let mut bodies = RigidBodySet::new();
             let mut colliders = ColliderSet::new();
 
-            let entity1 = Entity::new(0);
-            let entity2 = Entity::new(1);
-            let body1 = bodies.insert(RigidBodyBuilder::new_dynamic().build());
-            let body2 = bodies.insert(RigidBodyBuilder::new_dynamic().build());
+            let rb_entity_1 = Entity::new(0);
+            let rb_entity_2 = Entity::new(1);
+            let collider_entity_1 = Entity::new(2);
+            let collider_entity_2 = Entity::new(3);
+            let body1 = bodies.insert(
+                RigidBodyBuilder::new_dynamic()
+                    .user_data(rb_entity_1.to_bits().into())
+                    .build(),
+            );
+            let body2 = bodies.insert(
+                RigidBodyBuilder::new_dynamic()
+                    .user_data(rb_entity_2.to_bits().into())
+                    .build(),
+            );
             let handle1 = colliders.insert(
                 ColliderBuilder::ball(1.0)
-                    .user_data(entity1.to_bits().into())
+                    .user_data(collider_entity_1.to_bits().into())
                     .build(),
                 body1,
                 &mut bodies,
             );
             let handle2 = colliders.insert(
                 ColliderBuilder::ball(1.0)
-                    .user_data(entity2.to_bits().into())
+                    .user_data(collider_entity_2.to_bits().into())
                     .build(),
                 body2,
                 &mut bodies,
@@ -179,8 +212,10 @@ mod tests {
             Self {
                 bodies,
                 colliders,
-                entity1,
-                entity2,
+                rb_entity_1,
+                rb_entity_2,
+                collider_entity_1,
+                collider_entity_2,
                 handle1,
                 handle2,
             }
@@ -205,7 +240,7 @@ mod tests {
         assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
-            (context.entity1, context.entity2)
+            (context.collider_entity_1, context.collider_entity_2)
         );
     }
 
@@ -227,7 +262,7 @@ mod tests {
         assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
-            (context.entity1, context.entity2)
+            (context.collider_entity_1, context.collider_entity_2)
         );
     }
 
@@ -253,7 +288,7 @@ mod tests {
         assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
-            (context.entity1, context.entity2)
+            (context.collider_entity_1, context.collider_entity_2)
         );
     }
 
@@ -279,7 +314,29 @@ mod tests {
         assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
-            (context.entity1, context.entity2)
+            (context.collider_entity_1, context.collider_entity_2)
+        );
+    }
+
+    #[test]
+    fn contains_rigid_body_entities() {
+        let manager = EventManager::default();
+        let context = TestContext::default();
+
+        manager
+            .handler
+            .handle_contact_event(ContactEvent::Started(context.handle1, context.handle2));
+
+        let mut events = Events::<CollisionEvent>::default();
+        manager.fire_events(&context.bodies, &context.colliders, &mut events);
+        assert_eq!(
+            events
+                .get_reader()
+                .iter(&events)
+                .next()
+                .unwrap()
+                .rigid_body_entities(),
+            (context.rb_entity_1, context.rb_entity_2)
         );
     }
 }
