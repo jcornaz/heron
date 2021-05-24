@@ -4,6 +4,9 @@ on:
   schedule:
     - cron: '0 0 * * 1,5'
 
+  push:
+    branches:
+      - main
 
 jobs:
   release:
@@ -41,7 +44,7 @@ jobs:
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Install autorel
-        run: cargo install --git "https://github.com/jcornaz/autorel.git" --rev "e5d3b1952800236fd551020bd3884e1a3f1f4d12"
+        run: cargo install --git "https://github.com/jcornaz/autorel.git" --tag v0.1.4
 
       - name: Release
-        run: ./autorel
+        run: autorel
