@@ -19,32 +19,40 @@ fn spawn(mut commands: Commands) {
 
     // ANCHOR: add-child-shape
     rigid_body_entity
-        // The rigid body
+        // A (parent) dynamic rigid body
         .insert(RigidBody::Dynamic)
+        .insert(Transform::from_translation(Vec3::new(-400.0, 200.0, 0.0)))
+        .insert(GlobalTransform::default())
         .with_children(|children| {
+            // A first physics shape
             children.spawn_bundle((
-                // Position of the shape relative to its parent
-                Transform::from_translation(Vec3::Y * 15.0),
                 CollisionShape::Cuboid {
                     half_extends: Vec3::new(15.0, 15.0, 0.0),
                 },
+                Transform::default(),
                 GlobalTransform::default(),
             ));
 
+            // A second physics shape
             children.spawn_bundle((
-                // Position of the shape relative to its parent
-                Transform::from_translation(Vec3::X * 100.0),
                 CollisionShape::Cuboid {
                     half_extends: Vec3::new(50.0, 50.0, 0.0),
                 },
+                Transform::from_translation(Vec3::X * 100.0),
+                GlobalTransform::default(),
+            ));
+
+            // A sensor
+            children.spawn_bundle((
+                SensorShape,
+                CollisionShape::Sphere { radius: 30.0 },
+                Transform::from_translation(Vec3::X * -100.0),
                 GlobalTransform::default(),
             ));
         });
     // ANCHOR_END: add-child-shape
 
     rigid_body_entity
-        .insert(Transform::from_translation(Vec3::new(-400.0, 200.0, 0.0)))
-        .insert(GlobalTransform::default())
         .insert(Velocity::from(Vec2::X * 150.0).with_angular(AxisAngle::new(Vec3::Z, PI * -0.7)))
         .insert(PhysicMaterial {
             restitution: 0.7,
