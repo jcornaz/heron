@@ -86,6 +86,7 @@ impl CollisionLayers {
     /// Create a new collision layers configuration with a single group and mask.
     ///
     /// You may add more groups and mask with `with_group` and `with_mask`.
+    #[must_use]
     pub fn new<L: PhysicsLayer>(group: L, mask: L) -> Self {
         Self::from_bits(group.to_bits(), mask.to_bits())
     }
@@ -106,6 +107,7 @@ impl CollisionLayers {
         Self::from_bits(0, 0)
     }
 
+    #[must_use]
     #[allow(missing_docs)]
     pub fn from_bits(groups: u16, masks: u16) -> Self {
         Self { groups, masks }

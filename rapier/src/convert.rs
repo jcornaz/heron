@@ -176,6 +176,7 @@ impl IntoRapier<InteractionGroups> for CollisionLayers {
 
 impl IntoBevy<CollisionLayers> for InteractionGroups {
     fn into_bevy(self) -> CollisionLayers {
+        #[allow(clippy::cast_possible_truncation)]
         CollisionLayers::from_bits((self.0 >> 16) as u16, self.0 as u16)
     }
 }
