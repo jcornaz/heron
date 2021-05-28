@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "jcornaz@users.noreply.github.com"
 
       - name: Global cache
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         with:
           path: |
             ~/.cargo
