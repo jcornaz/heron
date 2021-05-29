@@ -4,6 +4,7 @@
 ))]
 
 use std::f32::consts::PI;
+use std::time::Duration;
 
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
@@ -12,22 +13,16 @@ use rstest::rstest;
 
 use heron_core::*;
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
+use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters: {
-                let mut params = IntegrationParameters::default();
-                params.dt = 1.0;
-                params
-            },
-        });
+        .add_plugin(RapierPlugin);
     builder.app
 }
 

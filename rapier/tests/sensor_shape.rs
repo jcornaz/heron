@@ -3,11 +3,13 @@
     not(all(feature = "2d", feature = "3d")),
 ))]
 
+use std::time::Duration;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionShape, RigidBody, SensorShape};
+use heron_core::{CollisionShape, PhysicsSteps, RigidBody, SensorShape};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
@@ -19,15 +21,9 @@ fn test_app() -> App {
 
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters,
-        })
-        .add_system_to_stage(
-            bevy::app::CoreStage::PostUpdate,
-            bevy::transform::transform_propagate_system::transform_propagate_system.system(),
-        );
+        .add_plugin(RapierPlugin);
     builder.app
 }
 

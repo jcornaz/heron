@@ -8,9 +8,10 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionEvent, CollisionShape, RigidBody, Velocity};
+use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
+use std::time::Duration;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -19,11 +20,9 @@ fn test_app() -> App {
 
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters,
-        })
+        .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),

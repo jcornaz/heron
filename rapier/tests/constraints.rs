@@ -1,22 +1,22 @@
 #![cfg(feature = "2d")]
 
+use std::time::Duration;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionShape, RigidBody, RotationConstraints};
-use heron_rapier::rapier::dynamics::{IntegrationParameters, RigidBodySet};
+use heron_core::{CollisionShape, PhysicsSteps, RigidBody, RotationConstraints};
+use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::RapierPlugin;
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters: IntegrationParameters::default(),
-        });
+        .add_plugin(RapierPlugin);
     builder.app
 }
 

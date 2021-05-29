@@ -7,10 +7,11 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, RigidBody};
+use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, PhysicsSteps, RigidBody};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
+use std::time::Duration;
 
 enum TestLayer {
     A,
@@ -34,11 +35,9 @@ fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters: IntegrationParameters::default(),
-        });
+        .add_plugin(RapierPlugin);
     builder.app
 }
 
