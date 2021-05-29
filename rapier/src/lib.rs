@@ -13,12 +13,10 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy::{ecs::schedule::ShouldRun, prelude::*};
+use bevy::prelude::*;
 
-use heron_core::utils::NearZero;
 use heron_core::{CollisionEvent, PhysicsTime};
 
-use crate::pipeline::PhysicsStepPerSecond;
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -113,14 +111,8 @@ impl Plugin for RapierPlugin {
         .insert_resource(RigidBodySet::new())
         .insert_resource(ColliderSet::new())
         .insert_resource(JointSet::new())
-        .insert_resource(CCDSolver::new());
-
-        if let Some(steps_per_second) = self.step_per_second {
-            #[allow(clippy::cast_possible_truncation)]
-            app.insert_resource(PhysicsStepPerSecond(steps_per_second as f32));
-        }
-
-        app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+        .insert_resource(CCDSolver::new())
+        .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
             schedule
                 .add_stage("heron-remove", removal_stage())
                 .add_stage("heron-update-rapier-world", update_rapier_world_stage())
@@ -128,14 +120,6 @@ impl Plugin for RapierPlugin {
                 .add_stage("heron-create-new-colliders", create_collider_stage())
                 .add_stage("heron-step", step_stage())
         });
-    }
-}
-
-fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
-    if physics_time.scale().is_near_zero() {
-        ShouldRun::No
-    } else {
-        ShouldRun::Yes
     }
 }
 
@@ -178,7 +162,6 @@ fn create_collider_stage() -> SystemStage {
 
 fn step_stage() -> SystemStage {
     SystemStage::parallel()
-        .with_run_criteria(should_run.system())
         .with_system(
             velocity::apply_velocity_to_kinematic_bodies
                 .system()

@@ -4,15 +4,15 @@
 
 //! Core components and resources to use Heron
 
-use bevy::core::FixedTimestep;
+use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
 pub use constraints::RotationConstraints;
 pub use events::{CollisionData, CollisionEvent};
-pub use ext::*;
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
 pub use physics_time::PhysicsTime;
+pub use step::PhysicsSteps;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
@@ -21,6 +21,7 @@ pub mod ext;
 mod gravity;
 mod layers;
 mod physics_time;
+mod step;
 pub mod utils;
 mod velocity;
 
@@ -84,6 +85,7 @@ impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
+            .init_resource::<PhysicsSteps>()
             .register_type::<CollisionShape>()
             .register_type::<RigidBody>()
             .register_type::<PhysicMaterial>()
@@ -92,16 +94,23 @@ impl Plugin for CorePlugin {
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
+            .add_system_to_stage(CoreStage::First, PhysicsSteps::update.system())
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
-                let mut schedule = Schedule::default();
-
-                if let Some(steps_per_second) = self.steps_per_second {
-                    schedule = schedule
-                        .with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
-                }
-
-                schedule.with_stage(crate::stage::UPDATE, SystemStage::parallel())
+                Schedule::default()
+                    .with_run_criteria(should_run.system())
+                    .with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });
+    }
+}
+
+pub fn should_run(
+    physics_steps: Res<'_, PhysicsSteps>,
+    physics_time: Res<'_, PhysicsTime>,
+) -> ShouldRun {
+    if physics_steps.step_frame() && physics_time.scale() > 0.0 {
+        ShouldRun::Yes
+    } else {
+        ShouldRun::No
     }
 }
 
