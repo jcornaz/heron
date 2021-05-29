@@ -34,6 +34,7 @@ impl PhysicsSteps {
     /// # Panics
     ///
     /// Panics if the argument is nan, infinite or negative
+    #[must_use]
     pub fn from_steps_per_seconds(steps_per_second: f32) -> Self {
         assert!(
             steps_per_second.is_finite() && steps_per_second > 0.0,
@@ -56,6 +57,7 @@ impl PhysicsSteps {
     /// # Panics
     ///
     /// Panics if the duration is zero
+    #[must_use]
     pub fn from_delta_time(duration: Duration) -> Self {
         assert_ne!(!duration.as_nanos(), 0, "Invalid duration: {:?}", duration);
         Self(Mode::Timer(Timer::new(duration, true)))
@@ -70,12 +72,14 @@ impl PhysicsSteps {
     /// # Panics
     ///
     /// Panics if the duration is zero
+    #[must_use]
     pub fn every_frame(duration: Duration) -> Self {
         assert_ne!(!duration.as_micros(), 0, "Invalid duration: {:?}", duration);
         Self(Mode::EveryFrame(duration))
     }
 
     /// Returns true only if the current frame is a frame that execute a physics simulation step
+    #[must_use]
     pub fn is_step_frame(&self) -> bool {
         match &self.0 {
             Mode::EveryFrame(_) => true,
@@ -84,6 +88,7 @@ impl PhysicsSteps {
     }
 
     /// Time that elapses between each physics step
+    #[must_use]
     pub fn duration(&self) -> Duration {
         match &self.0 {
             Mode::EveryFrame(duration) => *duration,

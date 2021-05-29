@@ -1,6 +1,6 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions, clippy::needless_pass_by_value)]
 
 //! Core components and resources to use Heron
 
@@ -76,6 +76,7 @@ impl Plugin for CorePlugin {
 }
 
 /// Run criteria system that decides if the physics systems should run.
+#[must_use]
 pub fn should_run(
     physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
