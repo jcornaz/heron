@@ -80,7 +80,7 @@ pub fn should_run(
     physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
 ) -> ShouldRun {
-    if physics_steps.step_frame() && physics_time.scale() > 0.0 {
+    if physics_steps.is_step_frame() && physics_time.scale() > 0.0 {
         ShouldRun::Yes
     } else {
         ShouldRun::No

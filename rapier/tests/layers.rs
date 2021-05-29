@@ -8,7 +8,6 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, PhysicsSteps, RigidBody};
-use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
 use std::time::Duration;

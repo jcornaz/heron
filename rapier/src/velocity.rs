@@ -5,7 +5,7 @@ use heron_core::utils::NearZero;
 use heron_core::{PhysicsSteps, RigidBody, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{IntegrationParameters, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
