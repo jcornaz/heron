@@ -161,61 +161,16 @@ pub mod prelude {
 }
 
 /// Plugin to install to enable collision detection and physics behavior.
-///
-/// When creating the plugin, you may choose the number of physics steps per second.
-/// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
 #[must_use]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct PhysicsPlugin {
-    rapier: RapierPlugin,
-
     #[cfg(feature = "debug")]
     debug: heron_debug::DebugPlugin,
 }
 
-impl PhysicsPlugin {
-    /// Configure how many times per second the physics world needs to be updated
-    ///
-    /// # Panics
-    ///
-    /// Panic if the number of `steps_per_second` is 0
-    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
-        Self::from(RapierPlugin::from_steps_per_second(steps_per_second))
-    }
-
-    /// Returns a version using the given color to render collision shapes
-    #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy::render::color::Color) -> Self {
-        self.debug = color.into();
-        self
-    }
-}
-
-impl From<RapierPlugin> for PhysicsPlugin {
-    fn from(rapier: RapierPlugin) -> Self {
-        Self {
-            rapier,
-
-            #[cfg(feature = "debug")]
-            debug: Default::default(),
-        }
-    }
-}
-
-impl Default for PhysicsPlugin {
-    fn default() -> Self {
-        Self::from(RapierPlugin::default())
-    }
-}
-
-impl From<rapier_plugin::rapier::dynamics::IntegrationParameters> for PhysicsPlugin {
-    fn from(parameters: IntegrationParameters) -> Self {
-        Self::from(RapierPlugin::from(parameters))
-    }
-}
-
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(self.rapier.clone());
+        app.add_plugin(RapierPlugin);
 
         #[cfg(feature = "debug")]
         app.add_plugin(self.debug);

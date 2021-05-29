@@ -50,36 +50,8 @@ pub mod stage {
 /// Plugin that registers stage resources and components.
 ///
 /// It does **NOT** enable physics behavior.
-#[derive(Debug, Copy, Clone)]
-pub struct CorePlugin {
-    /// Number of physics step per second. `None` means to run physics step as part of the application update instead.
-    pub steps_per_second: Option<f64>,
-}
-
-impl Default for CorePlugin {
-    fn default() -> Self {
-        Self::from_steps_per_second(60)
-    }
-}
-
-impl CorePlugin {
-    /// Configure how many times per second the physics world needs to be updated
-    ///
-    /// # Panics
-    ///
-    /// Panic if the number of `steps_per_second` is 0
-    #[must_use]
-    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
-        assert!(
-            steps_per_second > 0,
-            "Invalid number of step per second: {}",
-            steps_per_second
-        );
-        Self {
-            steps_per_second: Some(steps_per_second.into()),
-        }
-    }
-}
+#[derive(Debug, Copy, Clone, Default)]
+pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -103,6 +75,7 @@ impl Plugin for CorePlugin {
     }
 }
 
+/// Run criteria system that decides if the physics systems should run.
 pub fn should_run(
     physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
