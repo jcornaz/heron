@@ -72,36 +72,6 @@
 //! }
 //! ```
 //!
-//! ## Run systems synchronously with the physics step
-//!
-//! The physics step runs at a fixed rate (60 times per second by default) and is out of sync of the
-//! bevy frame.
-//!
-//! But modifying any physics component (such as the transform or velocity), should often be done synchronously with
-//! the physics step.
-//!
-//! The simplest way is to add these systems with `add_physics_system`:
-//!
-//! ```no_run
-//! # use bevy::prelude::*;
-//! # use heron::prelude::*;
-//! App::build()
-//!     .add_plugins(DefaultPlugins)
-//!     .add_plugin(PhysicsPlugin::default())
-//!
-//!     // This system should NOT update transforms, velocities and other physics components
-//!     // In other game engines this would be the "update" function
-//!     .add_system(cannot_update_physics.system())
-//!
-//!     // This system can update transforms, velocities and other physics components
-//!     // In other game engines this would be the "physics update" function
-//!     .add_physics_system(update_velocities.system())
-//!
-//!     .run();
-//! # fn cannot_update_physics() {}
-//! # fn update_velocities() {}
-//! ```
-//!
 //! ## Move rigid bodies programmatically
 //!
 //! When creating games, it is often useful to interact with the physics engine and move bodies programmatically.

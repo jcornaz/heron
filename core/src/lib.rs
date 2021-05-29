@@ -25,25 +25,11 @@ mod step;
 pub mod utils;
 mod velocity;
 
-/// Physics stages for user systems. These stages are executed once per physics step.
-///
-/// That usually means they don't run each frame and may run more than once in a single frame.
-///
-/// In general, end-users shouldn't have to deal with these stages directly.
-///
-/// Instead, it is possible to call the [`add_physiscs_system`](ext::AppBuilderExt::add_physics_system) extension function on `AppBuilder`
-/// to register systems that should run during the physics update.
+#[deprecated(
+    note = "Physics system can be added to the bevy update stage. Use bevy's add_system instead."
+)]
 pub mod stage {
-
-    /// The root **`Schedule`** stage
     pub const ROOT: &str = "heron-physics";
-
-    /// A **child** `SystemStage` running before each physics step.
-    ///
-    /// Use this stage to modify rigid-body transforms or any other physics component.
-    ///
-    /// **This is not a root stage**. So you cannot simply call `add_system_to_stage` on bevy's app builder.
-    /// Instead consider calling the [`add_physiscs_system`](crate::ext::AppBuilderExt::add_physics_system) extension function.
     pub const UPDATE: &str = "heron-before-step";
 }
 
@@ -53,6 +39,7 @@ pub mod stage {
 #[derive(Debug, Copy, Clone, Default)]
 pub struct CorePlugin;
 
+#[allow(deprecated)]
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
