@@ -44,6 +44,9 @@ pub enum PhysicsSystem {
 
     /// System that update the bevy `Transform` component to reflect the velocity in the physics world
     TransformUpdate,
+
+    /// System that emits collision events
+    Events,
 }
 
 /// Plugin that registers stage resources and components.

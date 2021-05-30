@@ -37,7 +37,6 @@ pub struct RapierPlugin;
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum InternalSystem {
     TransformPropagation,
-    Step,
 }
 
 impl Plugin for RapierPlugin {
@@ -108,24 +107,24 @@ fn step_systems() -> SystemSet {
         .with_system(
             velocity::apply_velocity_to_kinematic_bodies
                 .system()
-                .before(InternalSystem::Step),
+                .before(PhysicsSystem::Events),
         )
         .with_system(
             pipeline::update_integration_parameters
                 .system()
-                .before(InternalSystem::Step),
+                .before(PhysicsSystem::Events),
         )
-        .with_system(pipeline::step.system().label(InternalSystem::Step))
+        .with_system(pipeline::step.system().label(PhysicsSystem::Events))
         .with_system(
             body::update_bevy_transform
                 .system()
                 .label(PhysicsSystem::TransformUpdate)
-                .after(InternalSystem::Step),
+                .after(PhysicsSystem::Events),
         )
         .with_system(
             velocity::update_velocity_component
                 .system()
                 .label(PhysicsSystem::VelocityUpdate)
-                .after(InternalSystem::Step),
+                .after(PhysicsSystem::Events),
         )
 }
