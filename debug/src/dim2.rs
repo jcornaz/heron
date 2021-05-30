@@ -148,7 +148,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 });
             }
         }
-        CollisionShape::HeightField { scale, heights } => {
+        CollisionShape::HeightField { size, heights } => {
             if let Some(heights) = heights.get(0) {
                 let mut points: Vec<Vec2> = Vec::with_capacity(heights.len() + 2);
                 let mut min_y = f32::MAX;
@@ -156,7 +156,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 heights
                     .iter()
                     .enumerate()
-                    .map(|(i, p)| Vec2::new((i as f32) * scale, *p))
+                    .map(|(i, p)| Vec2::new(i as f32, *p))
                     .for_each(|p| {
                         if p.y < min_y {
                             min_y = p.y;
@@ -165,7 +165,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                     });
 
                 #[allow(clippy::cast_precision_loss)]
-                points.push(Vec2::new(heights.len() as f32 * scale, min_y));
+                points.push(Vec2::new(size.x, min_y));
                 points.push(Vec2::new(0.0, min_y));
 
                 builder.add(&shapes::Polygon {

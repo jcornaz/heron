@@ -153,8 +153,10 @@ pub enum CollisionShape {
     ///
     /// This shape is usefull for floors with relief.
     HeightField {
-        /// The distance between two points of the field
-        scale: f32,
+        /// The dimensions of the field.
+        ///
+        /// In 2D, only the first element is taken into account.
+        size: Vec2,
 
         /// The height of each point.
         ///

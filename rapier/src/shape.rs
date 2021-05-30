@@ -175,7 +175,7 @@ impl ColliderFactory for CollisionShape {
             } => ColliderBuilder::capsule_y(*half_height, *radius),
             CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
             CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
-            CollisionShape::HeightField { scale, heights } => heightfield_builder(*scale, &heights),
+            CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
         }
     }
 }
@@ -201,26 +201,26 @@ fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
 #[inline]
 #[cfg(feature = "2d")]
 #[allow(clippy::cast_precision_loss)]
-fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
+fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let len = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
         crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).cloned()),
-        crate::rapier::na::Vector2::new((len as f32) * scale - scale, 1.0),
+        crate::rapier::na::Vector2::new(size.x, 1.0),
     )
 }
 
 #[inline]
 #[cfg(feature = "3d")]
 #[allow(clippy::cast_precision_loss)]
-fn heightfield_builder(scale: f32, heights: &[Vec<f32>]) -> ColliderBuilder {
+fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let nrows = heights.len();
     let ncols = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
         crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
         crate::rapier::na::Vector3::new(
-            (ncols as f32) * scale - scale,
+            size.x,
             1.0,
-            (nrows as f32) * scale - scale,
+            size.y,
         ),
     )
 }
@@ -295,7 +295,7 @@ mod tests {
     #[test]
     fn build_heightfield() {
         let collider = CollisionShape::HeightField {
-            scale: 3.0,
+            size: Vec2::new(2.0, 1.0),
             heights: vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]],
         }
         .build(Entity::new(0), RigidBody::default(), None, None, None);
@@ -308,7 +308,7 @@ mod tests {
         #[cfg(feature = "2d")]
         {
             assert_eq!(field.num_cells(), 2); // Three points = 2 segments
-            assert_eq!(field.cell_width(), 3.0);
+            assert_eq!(field.cell_width(), 1.0);
         }
 
         #[cfg(feature = "3d")]
@@ -317,10 +317,10 @@ mod tests {
             assert_eq!(field.ncols(), 2);
             assert_eq!(
                 field.scale(),
-                &crate::rapier::na::Vector3::new(6.0, 1.0, 3.0)
+                &crate::rapier::na::Vector3::new(2.0, 1.0, 1.0)
             );
-            assert_eq!(field.cell_height(), 3.0);
-            assert_eq!(field.cell_width(), 3.0);
+            assert_eq!(field.cell_height(), 1.0);
+            assert_eq!(field.cell_width(), 1.0);
         }
     }
 }
