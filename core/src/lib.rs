@@ -34,6 +34,18 @@ pub mod stage {
     pub const UPDATE: &str = "heron-before-step";
 }
 
+/// Physics system labels
+///
+/// The systems run during the bevy `CoreStage::PostUpdate` stage
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
+pub enum PhysicsSystem {
+    /// System that update the [`Velocity`] component to reflect the velocity in the physics world
+    VelocityUpdate,
+
+    /// System that update the bevy `Transform` component to reflect the velocity in the physics world
+    TransformUpdate,
+}
+
 /// Plugin that registers stage resources and components.
 ///
 /// It does **NOT** enable physics behavior.

@@ -15,7 +15,7 @@ pub extern crate rapier3d as rapier;
 
 use bevy::prelude::*;
 
-use heron_core::CollisionEvent;
+use heron_core::{CollisionEvent, PhysicsSystem};
 
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
@@ -29,20 +29,13 @@ mod pipeline;
 mod shape;
 mod velocity;
 
-#[allow(unused)]
-mod stage {
-    pub(crate) const PRE_STEP: &str = "heron-pre-step";
-    pub(crate) const STEP: &str = "heron-step";
-    pub(crate) const POST_STEP: &str = "heron-post-step";
-}
-
 /// Plugin that enables collision detection and physics behavior, powered by rapier.
 #[must_use]
 #[derive(Debug, Copy, Clone, Default)]
 pub struct RapierPlugin;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
-enum PhysicsSystem {
+enum InternalSystem {
     TransformPropagation,
     Step,
 }
@@ -67,8 +60,8 @@ impl Plugin for RapierPlugin {
                     .add_stage("heron-update-rapier-world", update_rapier_world_stage())
                     .add_stage("heron-create-new-bodies", body_update_stage())
                     .add_stage("heron-create-new-colliders", create_collider_stage())
-                    .add_stage("heron-step", step_stage())
-            });
+            })
+            .add_system_set_to_stage(CoreStage::PostUpdate, step_systems());
     }
 }
 
@@ -85,12 +78,12 @@ fn update_rapier_world_stage() -> SystemStage {
         .with_system(
             bevy::transform::transform_propagate_system::transform_propagate_system
                 .system()
-                .label(PhysicsSystem::TransformPropagation),
+                .label(InternalSystem::TransformPropagation),
         )
         .with_system(
             body::update_rapier_position
                 .system()
-                .after(PhysicsSystem::TransformPropagation),
+                .after(InternalSystem::TransformPropagation),
         )
         .with_system(velocity::update_rapier_velocity.system())
         .with_system(acceleration::update_rapier_force_and_torque.system())
@@ -109,27 +102,30 @@ fn create_collider_stage() -> SystemStage {
     SystemStage::single_threaded().with_system(shape::create.system())
 }
 
-fn step_stage() -> SystemStage {
-    SystemStage::parallel()
+fn step_systems() -> SystemSet {
+    SystemSet::new()
+        .with_run_criteria(heron_core::should_run.system())
         .with_system(
             velocity::apply_velocity_to_kinematic_bodies
                 .system()
-                .before(PhysicsSystem::Step),
+                .before(InternalSystem::Step),
         )
         .with_system(
             pipeline::update_integration_parameters
                 .system()
-                .before(PhysicsSystem::Step),
+                .before(InternalSystem::Step),
         )
-        .with_system(pipeline::step.system().label(PhysicsSystem::Step))
+        .with_system(pipeline::step.system().label(InternalSystem::Step))
         .with_system(
             body::update_bevy_transform
                 .system()
-                .after(PhysicsSystem::Step),
+                .label(PhysicsSystem::TransformUpdate)
+                .after(InternalSystem::Step),
         )
         .with_system(
             velocity::update_velocity_component
                 .system()
-                .after(PhysicsSystem::Step),
+                .label(PhysicsSystem::VelocityUpdate)
+                .after(InternalSystem::Step),
         )
 }
