@@ -3,7 +3,7 @@ use bevy::ecs::prelude::*;
 use bevy::math::Vec3;
 use crossbeam::channel::Receiver;
 
-use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsTime};
+use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsSteps, PhysicsTime};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
@@ -12,18 +12,13 @@ use crate::rapier::geometry::{
 };
 use crate::rapier::pipeline::{ChannelEventCollector, PhysicsPipeline};
 
-#[derive(Copy, Clone)]
-pub(crate) struct PhysicsStepPerSecond(pub(crate) f32);
-
 pub(crate) fn update_integration_parameters(
-    steps_per_second: Option<Res<'_, PhysicsStepPerSecond>>,
+    physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
     mut integration_parameters: ResMut<'_, IntegrationParameters>,
 ) {
-    if let Some(steps_per_second) = steps_per_second {
-        if steps_per_second.is_changed() {
-            integration_parameters.dt = physics_time.scale() / steps_per_second.0;
-        }
+    if physics_steps.is_changed() || physics_time.is_changed() {
+        integration_parameters.dt = physics_steps.duration().as_secs_f32() * physics_time.scale();
     }
 }
 

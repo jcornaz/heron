@@ -1,18 +1,18 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::module_name_repetitions)]
+#![allow(clippy::module_name_repetitions, clippy::needless_pass_by_value)]
 
 //! Core components and resources to use Heron
 
-use bevy::core::FixedTimestep;
+use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
 pub use constraints::RotationConstraints;
 pub use events::{CollisionData, CollisionEvent};
-pub use ext::*;
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
 pub use physics_time::PhysicsTime;
+pub use step::PhysicsSteps;
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
@@ -21,69 +21,46 @@ pub mod ext;
 mod gravity;
 mod layers;
 mod physics_time;
+mod step;
 pub mod utils;
 mod velocity;
 
-/// Physics stages for user systems. These stages are executed once per physics step.
-///
-/// That usually means they don't run each frame and may run more than once in a single frame.
-///
-/// In general, end-users shouldn't have to deal with these stages directly.
-///
-/// Instead, it is possible to call the [`add_physiscs_system`](ext::AppBuilderExt::add_physics_system) extension function on `AppBuilder`
-/// to register systems that should run during the physics update.
+#[deprecated(
+    note = "Physics system can be added to the bevy update stage. Use bevy's add_system instead."
+)]
+#[allow(missing_docs)]
 pub mod stage {
-
-    /// The root **`Schedule`** stage
     pub const ROOT: &str = "heron-physics";
-
-    /// A **child** `SystemStage` running before each physics step.
-    ///
-    /// Use this stage to modify rigid-body transforms or any other physics component.
-    ///
-    /// **This is not a root stage**. So you cannot simply call `add_system_to_stage` on bevy's app builder.
-    /// Instead consider calling the [`add_physiscs_system`](crate::ext::AppBuilderExt::add_physics_system) extension function.
     pub const UPDATE: &str = "heron-before-step";
+}
+
+/// Physics system labels
+///
+/// The systems run during the bevy `CoreStage::PostUpdate` stage
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
+pub enum PhysicsSystem {
+    /// System that update the [`Velocity`] component to reflect the velocity in the physics world
+    VelocityUpdate,
+
+    /// System that update the bevy `Transform` component to reflect the velocity in the physics world
+    TransformUpdate,
+
+    /// System that emits collision events
+    Events,
 }
 
 /// Plugin that registers stage resources and components.
 ///
 /// It does **NOT** enable physics behavior.
-#[derive(Debug, Copy, Clone)]
-pub struct CorePlugin {
-    /// Number of physics step per second. `None` means to run physics step as part of the application update instead.
-    pub steps_per_second: Option<f64>,
-}
+#[derive(Debug, Copy, Clone, Default)]
+pub struct CorePlugin;
 
-impl Default for CorePlugin {
-    fn default() -> Self {
-        Self::from_steps_per_second(60)
-    }
-}
-
-impl CorePlugin {
-    /// Configure how many times per second the physics world needs to be updated
-    ///
-    /// # Panics
-    ///
-    /// Panic if the number of `steps_per_second` is 0
-    #[must_use]
-    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
-        assert!(
-            steps_per_second > 0,
-            "Invalid number of step per second: {}",
-            steps_per_second
-        );
-        Self {
-            steps_per_second: Some(steps_per_second.into()),
-        }
-    }
-}
-
+#[allow(deprecated)]
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
+            .init_resource::<PhysicsSteps>()
             .register_type::<CollisionShape>()
             .register_type::<RigidBody>()
             .register_type::<PhysicMaterial>()
@@ -92,16 +69,25 @@ impl Plugin for CorePlugin {
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
+            .add_system_to_stage(CoreStage::First, PhysicsSteps::update.system())
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
-                let mut schedule = Schedule::default();
-
-                if let Some(steps_per_second) = self.steps_per_second {
-                    schedule = schedule
-                        .with_run_criteria(FixedTimestep::steps_per_second(steps_per_second))
-                }
-
-                schedule.with_stage(crate::stage::UPDATE, SystemStage::parallel())
+                Schedule::default()
+                    .with_run_criteria(should_run.system())
+                    .with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });
+    }
+}
+
+/// Run criteria system that decides if the physics systems should run.
+#[must_use]
+pub fn should_run(
+    physics_steps: Res<'_, PhysicsSteps>,
+    physics_time: Res<'_, PhysicsTime>,
+) -> ShouldRun {
+    if physics_steps.is_step_frame() && physics_time.scale() > 0.0 {
+        ShouldRun::Yes
+    } else {
+        ShouldRun::No
     }
 }
 

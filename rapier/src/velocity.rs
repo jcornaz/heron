@@ -2,10 +2,10 @@ use bevy::ecs::prelude::*;
 use bevy::math::prelude::*;
 
 use heron_core::utils::NearZero;
-use heron_core::{RigidBody, Velocity};
+use heron_core::{PhysicsSteps, RigidBody, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{IntegrationParameters, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
@@ -26,10 +26,10 @@ pub(crate) fn update_rapier_velocity(
 
 pub(crate) fn apply_velocity_to_kinematic_bodies(
     mut bodies: ResMut<'_, RigidBodySet>,
-    integration_parameters: Res<'_, IntegrationParameters>,
+    physics_step: Res<'_, PhysicsSteps>,
     query: Query<'_, (&RigidBodyHandle, &RigidBody, &Velocity)>,
 ) {
-    let delta_time = integration_parameters.dt;
+    let delta_time = physics_step.duration().as_secs_f32();
     let kinematic_bodies = query
         .iter()
         .filter(|(_, body_type, _)| matches!(body_type, RigidBody::Kinematic));

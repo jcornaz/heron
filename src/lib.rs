@@ -72,36 +72,6 @@
 //! }
 //! ```
 //!
-//! ## Run systems synchronously with the physics step
-//!
-//! The physics step runs at a fixed rate (60 times per second by default) and is out of sync of the
-//! bevy frame.
-//!
-//! But modifying any physics component (such as the transform or velocity), should often be done synchronously with
-//! the physics step.
-//!
-//! The simplest way is to add these systems with `add_physics_system`:
-//!
-//! ```no_run
-//! # use bevy::prelude::*;
-//! # use heron::prelude::*;
-//! App::build()
-//!     .add_plugins(DefaultPlugins)
-//!     .add_plugin(PhysicsPlugin::default())
-//!
-//!     // This system should NOT update transforms, velocities and other physics components
-//!     // In other game engines this would be the "update" function
-//!     .add_system(cannot_update_physics.system())
-//!
-//!     // This system can update transforms, velocities and other physics components
-//!     // In other game engines this would be the "physics update" function
-//!     .add_physics_system(update_velocities.system())
-//!
-//!     .run();
-//! # fn cannot_update_physics() {}
-//! # fn update_velocities() {}
-//! ```
-//!
 //! ## Move rigid bodies programmatically
 //!
 //! When creating games, it is often useful to interact with the physics engine and move bodies programmatically.
@@ -139,7 +109,6 @@ use bevy::app::{AppBuilder, Plugin};
 
 pub use heron_core::*;
 pub use heron_macros::*;
-use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 
 /// Physics behavior powered by [rapier](https://rapier.rs)
@@ -153,69 +122,25 @@ pub mod rapier_plugin {
 pub mod prelude {
     pub use heron_macros::*;
 
+    #[allow(deprecated)]
     pub use crate::{
         ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
-        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsTime, RigidBody,
-        RotationConstraints, Velocity,
+        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime,
+        RigidBody, RotationConstraints, Velocity,
     };
 }
 
 /// Plugin to install to enable collision detection and physics behavior.
-///
-/// When creating the plugin, you may choose the number of physics steps per second.
-/// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
 #[must_use]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct PhysicsPlugin {
-    rapier: RapierPlugin,
-
     #[cfg(feature = "debug")]
     debug: heron_debug::DebugPlugin,
 }
 
-impl PhysicsPlugin {
-    /// Configure how many times per second the physics world needs to be updated
-    ///
-    /// # Panics
-    ///
-    /// Panic if the number of `steps_per_second` is 0
-    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
-        Self::from(RapierPlugin::from_steps_per_second(steps_per_second))
-    }
-
-    /// Returns a version using the given color to render collision shapes
-    #[cfg(feature = "debug")]
-    pub fn with_debug_color(mut self, color: bevy::render::color::Color) -> Self {
-        self.debug = color.into();
-        self
-    }
-}
-
-impl From<RapierPlugin> for PhysicsPlugin {
-    fn from(rapier: RapierPlugin) -> Self {
-        Self {
-            rapier,
-
-            #[cfg(feature = "debug")]
-            debug: Default::default(),
-        }
-    }
-}
-
-impl Default for PhysicsPlugin {
-    fn default() -> Self {
-        Self::from(RapierPlugin::default())
-    }
-}
-
-impl From<rapier_plugin::rapier::dynamics::IntegrationParameters> for PhysicsPlugin {
-    fn from(parameters: IntegrationParameters) -> Self {
-        Self::from(RapierPlugin::from(parameters))
-    }
-}
-
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(self.rapier.clone());
+        app.add_plugin(RapierPlugin);
 
         #[cfg(feature = "debug")]
         app.add_plugin(self.debug);

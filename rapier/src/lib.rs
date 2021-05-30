@@ -13,12 +13,10 @@ pub extern crate rapier2d as rapier;
 #[cfg(feature = "3d")]
 pub extern crate rapier3d as rapier;
 
-use bevy::{ecs::schedule::ShouldRun, prelude::*};
+use bevy::prelude::*;
 
-use heron_core::utils::NearZero;
-use heron_core::{CollisionEvent, PhysicsTime};
+use heron_core::{CollisionEvent, PhysicsSystem};
 
-use crate::pipeline::PhysicsStepPerSecond;
 use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -31,111 +29,38 @@ mod pipeline;
 mod shape;
 mod velocity;
 
-#[allow(unused)]
-mod stage {
-    pub(crate) const PRE_STEP: &str = "heron-pre-step";
-    pub(crate) const STEP: &str = "heron-step";
-    pub(crate) const POST_STEP: &str = "heron-post-step";
-}
-
-/// Plugin to install in order to enable collision detection and physics behavior, powered by rapier.
-///
-/// When creating the plugin, you may choose the number of physics steps per second.
-/// For more advanced configuration, you can create the plugin from a rapier `IntegrationParameters` definition.
+/// Plugin that enables collision detection and physics behavior, powered by rapier.
 #[must_use]
-#[derive(Clone)]
-pub struct RapierPlugin {
-    /// Number of step per second, None for a step each frame.
-    pub step_per_second: Option<f64>,
-
-    /// Integration parameters, incl. delta-time at each step.
-    pub parameters: IntegrationParameters,
-}
+#[derive(Debug, Copy, Clone, Default)]
+pub struct RapierPlugin;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
-enum PhysicsSystem {
+enum InternalSystem {
     TransformPropagation,
-    Step,
-}
-
-impl RapierPlugin {
-    /// Configure how many times per second the physics world needs to be updated.
-    ///
-    /// # Panics
-    ///
-    /// Panic if the number of `steps_per_second` is 0.
-    pub fn from_steps_per_second(steps_per_second: u8) -> Self {
-        assert!(
-            steps_per_second > 0,
-            "Invalid number of step per second: {}",
-            steps_per_second
-        );
-        let parameters = IntegrationParameters {
-            dt: 1.0 / f32::from(steps_per_second),
-            ..IntegrationParameters::default()
-        };
-
-        Self {
-            parameters,
-            step_per_second: Some(steps_per_second.into()),
-        }
-    }
-}
-
-impl Default for RapierPlugin {
-    fn default() -> Self {
-        Self::from(IntegrationParameters::default())
-    }
-}
-
-impl From<IntegrationParameters> for RapierPlugin {
-    fn from(parameters: IntegrationParameters) -> Self {
-        Self {
-            #[allow(clippy::cast_possible_truncation)]
-            step_per_second: Some(1.0 / f64::from(parameters.dt)),
-            parameters,
-        }
-    }
 }
 
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(heron_core::CorePlugin {
-            steps_per_second: self.step_per_second,
-        })
-        .init_resource::<PhysicsPipeline>()
-        .init_resource::<body::HandleMap>()
-        .init_resource::<shape::HandleMap>()
-        .add_event::<CollisionEvent>()
-        .insert_resource(self.parameters)
-        .insert_resource(BroadPhase::new())
-        .insert_resource(NarrowPhase::new())
-        .insert_resource(RigidBodySet::new())
-        .insert_resource(ColliderSet::new())
-        .insert_resource(JointSet::new())
-        .insert_resource(CCDSolver::new());
-
-        if let Some(steps_per_second) = self.step_per_second {
-            #[allow(clippy::cast_possible_truncation)]
-            app.insert_resource(PhysicsStepPerSecond(steps_per_second as f32));
-        }
-
-        app.stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
-            schedule
-                .add_stage("heron-remove", removal_stage())
-                .add_stage("heron-update-rapier-world", update_rapier_world_stage())
-                .add_stage("heron-create-new-bodies", body_update_stage())
-                .add_stage("heron-create-new-colliders", create_collider_stage())
-                .add_stage("heron-step", step_stage())
-        });
-    }
-}
-
-fn should_run(physics_time: Res<'_, PhysicsTime>) -> ShouldRun {
-    if physics_time.scale().is_near_zero() {
-        ShouldRun::No
-    } else {
-        ShouldRun::Yes
+        app.add_plugin(heron_core::CorePlugin)
+            .init_resource::<PhysicsPipeline>()
+            .init_resource::<body::HandleMap>()
+            .init_resource::<shape::HandleMap>()
+            .init_resource::<IntegrationParameters>()
+            .add_event::<CollisionEvent>()
+            .insert_resource(BroadPhase::new())
+            .insert_resource(NarrowPhase::new())
+            .insert_resource(RigidBodySet::new())
+            .insert_resource(ColliderSet::new())
+            .insert_resource(JointSet::new())
+            .insert_resource(CCDSolver::new())
+            .stage("heron-physics", |schedule: &mut Schedule| {
+                schedule
+                    .add_stage("heron-remove", removal_stage())
+                    .add_stage("heron-update-rapier-world", update_rapier_world_stage())
+                    .add_stage("heron-create-new-bodies", body_update_stage())
+                    .add_stage("heron-create-new-colliders", create_collider_stage())
+            })
+            .add_system_set_to_stage(CoreStage::PostUpdate, step_systems());
     }
 }
 
@@ -152,12 +77,12 @@ fn update_rapier_world_stage() -> SystemStage {
         .with_system(
             bevy::transform::transform_propagate_system::transform_propagate_system
                 .system()
-                .label(PhysicsSystem::TransformPropagation),
+                .label(InternalSystem::TransformPropagation),
         )
         .with_system(
             body::update_rapier_position
                 .system()
-                .after(PhysicsSystem::TransformPropagation),
+                .after(InternalSystem::TransformPropagation),
         )
         .with_system(velocity::update_rapier_velocity.system())
         .with_system(acceleration::update_rapier_force_and_torque.system())
@@ -176,28 +101,30 @@ fn create_collider_stage() -> SystemStage {
     SystemStage::single_threaded().with_system(shape::create.system())
 }
 
-fn step_stage() -> SystemStage {
-    SystemStage::parallel()
-        .with_run_criteria(should_run.system())
+fn step_systems() -> SystemSet {
+    SystemSet::new()
+        .with_run_criteria(heron_core::should_run.system())
         .with_system(
             velocity::apply_velocity_to_kinematic_bodies
                 .system()
-                .before(PhysicsSystem::Step),
+                .before(PhysicsSystem::Events),
         )
         .with_system(
             pipeline::update_integration_parameters
                 .system()
-                .before(PhysicsSystem::Step),
+                .before(PhysicsSystem::Events),
         )
-        .with_system(pipeline::step.system().label(PhysicsSystem::Step))
+        .with_system(pipeline::step.system().label(PhysicsSystem::Events))
         .with_system(
             body::update_bevy_transform
                 .system()
-                .after(PhysicsSystem::Step),
+                .label(PhysicsSystem::TransformUpdate)
+                .after(PhysicsSystem::Events),
         )
         .with_system(
             velocity::update_velocity_component
                 .system()
-                .after(PhysicsSystem::Step),
+                .label(PhysicsSystem::VelocityUpdate)
+                .after(PhysicsSystem::Events),
         )
 }
