@@ -125,8 +125,8 @@ pub mod prelude {
     #[allow(deprecated)]
     pub use crate::{
         ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
-        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsTime, RigidBody,
-        RotationConstraints, Velocity,
+        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime,
+        RigidBody, RotationConstraints, Velocity,
     };
 }
 
