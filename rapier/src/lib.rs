@@ -61,7 +61,7 @@ impl Plugin for RapierPlugin {
             .insert_resource(ColliderSet::new())
             .insert_resource(JointSet::new())
             .insert_resource(CCDSolver::new())
-            .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
+            .stage("heron-physics", |schedule: &mut Schedule| {
                 schedule
                     .add_stage("heron-remove", removal_stage())
                     .add_stage("heron-update-rapier-world", update_rapier_world_stage())

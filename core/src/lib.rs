@@ -28,6 +28,7 @@ mod velocity;
 #[deprecated(
     note = "Physics system can be added to the bevy update stage. Use bevy's add_system instead."
 )]
+#[allow(missing_docs)]
 pub mod stage {
     pub const ROOT: &str = "heron-physics";
     pub const UPDATE: &str = "heron-before-step";
