@@ -49,6 +49,9 @@ jobs:
       - name: Install autorel
         run: cargo install --git "https://github.com/jcornaz/autorel.git" --tag v0.1.4
 
+      - name: Login to createss.io
+        run: cargo login ${{ secrets.CRATES_TOKEN }}
+
       - name: Release
         run: autorel
         env:
