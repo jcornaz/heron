@@ -155,6 +155,33 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 });
             }
         }
+        CollisionShape::HeightField { size, heights } => {
+            if let Some(heights) = heights.get(0) {
+                let mut points: Vec<Vec2> = Vec::with_capacity(heights.len() + 2);
+                let mut min_y = f32::MAX;
+                let half_size = size.x * 0.5;
+                let len = (heights.len() - 1) as f32;
+
+                heights
+                    .iter()
+                    .enumerate()
+                    .map(|(i, p)| Vec2::new((i as f32) * size.x / len - half_size, *p))
+                    .for_each(|p| {
+                        if p.y < min_y {
+                            min_y = p.y;
+                        }
+                        points.push(p);
+                    });
+
+                points.push(Vec2::new(half_size, min_y));
+                points.push(Vec2::new(-half_size, min_y));
+
+                builder.add(&shapes::Polygon {
+                    points,
+                    closed: true,
+                });
+            }
+        }
     };
 
     builder
