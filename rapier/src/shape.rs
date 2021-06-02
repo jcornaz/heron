@@ -258,11 +258,7 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let ncols = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
         crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
-        crate::rapier::na::Vector3::new(
-            size.x,
-            1.0,
-            size.y,
-        ),
+        crate::rapier::na::Vector3::new(size.x, 1.0, size.y),
     )
 }
 
@@ -337,7 +333,8 @@ mod tests {
             size: Vec2::new(2.0, 1.0),
             heights: vec![vec![1.0, 2.0, 3.0], vec![4.0, 5.0, 6.0]],
         }
-        .build(Entity::new(0), RigidBody::default(), None, None, None);
+        .collider_builder()
+        .build();
 
         let field = collider
             .shape()
