@@ -86,11 +86,9 @@ impl CollisionLayers {
     /// Create a new collision layers configuration with a single group and mask.
     ///
     /// You may add more groups and mask with `with_group` and `with_mask`.
+    #[must_use]
     pub fn new<L: PhysicsLayer>(group: L, mask: L) -> Self {
-        Self {
-            groups: group.to_bits(),
-            masks: mask.to_bits(),
-        }
+        Self::from_bits(group.to_bits(), mask.to_bits())
     }
 
     /// Contains all layers
@@ -98,10 +96,7 @@ impl CollisionLayers {
     /// The entity,will interacts with everything (except the entities that interact with nothing)
     #[must_use]
     pub fn all<L: PhysicsLayer>() -> Self {
-        Self {
-            groups: L::all_bits(),
-            masks: L::all_bits(),
-        }
+        Self::from_bits(L::all_bits(), L::all_bits())
     }
 
     /// Contains no layer
@@ -109,10 +104,13 @@ impl CollisionLayers {
     /// The entity, will not interact with anything
     #[must_use]
     pub fn none() -> Self {
-        Self {
-            groups: 0,
-            masks: 0,
-        }
+        Self::from_bits(0, 0)
+    }
+
+    #[must_use]
+    #[allow(missing_docs)]
+    pub fn from_bits(groups: u16, masks: u16) -> Self {
+        Self { groups, masks }
     }
 
     /// Returns true if the entity would interact with an entity containing the `other` [`CollisionLayers]`

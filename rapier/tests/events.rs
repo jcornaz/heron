@@ -8,9 +8,10 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionEvent, CollisionShape, RigidBody, Velocity};
+use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
 use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
+use std::time::Duration;
 
 fn test_app() -> App {
     let mut builder = App::build();
@@ -19,11 +20,9 @@ fn test_app() -> App {
 
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters,
-        })
+        .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),
@@ -72,13 +71,11 @@ fn collision_events_are_fired() {
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
 
-    assert_eq!(
-        events,
-        vec![
-            CollisionEvent::Started(entity1, entity2),
-            CollisionEvent::Stopped(entity1, entity2)
-        ]
-    );
+    assert_eq!(events.len(), 2);
+    assert!(matches!(events[0], CollisionEvent::Started(_, _)));
+    assert!(matches!(events[1], CollisionEvent::Stopped(_, _)));
+    assert_eq!(events[0].collision_shape_entities(), (entity1, entity2));
+    assert_eq!(events[1].collision_shape_entities(), (entity1, entity2));
 }
 
 fn collect_events(

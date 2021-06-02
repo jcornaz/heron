@@ -8,28 +8,20 @@ use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{Acceleration, AxisAngle, CollisionShape, RigidBody};
+use heron_core::{Acceleration, AxisAngle, CollisionShape, PhysicsSteps, RigidBody};
 use heron_rapier::convert::IntoBevy;
 #[cfg(feature = "3d")]
 use heron_rapier::rapier::math::Vector;
-use heron_rapier::{
-    rapier::dynamics::{IntegrationParameters, RigidBodySet},
-    RapierPlugin,
-};
+use heron_rapier::{rapier::dynamics::RigidBodySet, RapierPlugin};
+use std::time::Duration;
 
 fn test_app() -> App {
     let mut builder = App::build();
     builder
         .init_resource::<TypeRegistryArc>()
+        .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin {
-            step_per_second: None,
-            parameters: {
-                let mut params = IntegrationParameters::default();
-                params.dt = 1.0;
-                params
-            },
-        });
+        .add_plugin(RapierPlugin);
     builder.app
 }
 

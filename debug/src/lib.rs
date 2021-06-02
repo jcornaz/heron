@@ -45,32 +45,14 @@ impl Default for DebugPlugin {
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
         #[cfg(feature = "2d")]
-        app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin);
+        app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
+            .add_system_set_to_stage(CoreStage::PostUpdate, dim2::systems());
 
         app.insert_resource(DebugColor(self.0))
             .init_resource::<DebugEntityMap>()
-            .stage(heron_core::stage::ROOT, |schedule: &mut Schedule| {
-                schedule.add_stage_after(heron_core::stage::UPDATE, "heron-debug", debug_stage())
-            });
+            .add_system_to_stage(CoreStage::Last, track_debug_entities.system())
+            .add_system_to_stage(CoreStage::Last, scale_debug_entities.system());
     }
-}
-
-fn debug_stage() -> SystemStage {
-    let mut stage = SystemStage::single_threaded();
-
-    #[cfg(feature = "2d")]
-    {
-        stage
-            .add_system(dim2::delete_debug_sprite.system())
-            .add_system(dim2::replace_debug_sprite.system())
-            .add_system(dim2::create_debug_sprites.system());
-    }
-
-    stage
-        .add_system(track_debug_entities.system())
-        .add_system(scale_debug_entities.system());
-
-    stage
 }
 
 impl From<Color> for DebugColor {

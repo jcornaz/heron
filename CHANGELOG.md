@@ -1,3 +1,21 @@
+## 0.7.0 - 2021-05-31
+
+### Breaking changes
+
+* The `CollisionEvent` now contains a pair of `CollisionData` instead of a pair of `Entity`
+* The physics step rate is not defined on the plugin type anymore. It is replaced by a `PhysicsSteps` resource.
+* The `IntegrationParameters` can no longer be defined when installing the plugin. The `IntegrationParameters` should should be inserted/mutated instead.
+* The `Velocity` and `Transform` are now updated during the `CoreStage::PostUpdate`. If a user-system need to run *after* the physics update, it should explicitly declares that dependency using the `PhysicsSystem` labels.
+
+
+### Features
+
+* More data in collision events (#103)
+* `SensorShape` component to mark individual collision shape as sensor (#104)
+* Runs physics step at most once per frame (#109)
+
+
+
 ## 0.6.0 - 2021-05-24
 
 ### Breaking changes

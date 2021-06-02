@@ -2,7 +2,7 @@ name: Release
 
 on:
   schedule:
-    - cron: '0 0 * * 1,5'
+    - cron: '0 0 * * 1'
 
 
 jobs:
@@ -28,7 +28,7 @@ jobs:
           git config --global user.email "jcornaz@users.noreply.github.com"
 
       - name: Global cache
-        uses: actions/cache@v2.1.5
+        uses: actions/cache@v2.1.6
         with:
           path: |
             ~/.cargo
@@ -48,6 +48,9 @@ jobs:
 
       - name: Install autorel
         run: cargo install --git "https://github.com/jcornaz/autorel.git" --tag v0.1.4
+
+      - name: Login to createss.io
+        run: cargo login ${{ secrets.CRATES_TOKEN }}
 
       - name: Release
         run: autorel

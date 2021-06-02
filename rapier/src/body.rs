@@ -141,29 +141,6 @@ fn remove_collider_handles(
         });
 }
 
-pub(crate) fn update_rapier_status(
-    mut bodies: ResMut<'_, RigidBodySet>,
-    with_type_changed: Query<'_, (&RigidBody, &RigidBodyHandle), Changed<RigidBody>>,
-    with_body_handle: Query<'_, (Entity, &RigidBodyHandle)>,
-    type_removed: RemovedComponents<'_, RigidBody>,
-) {
-    for (body_type, handle) in with_type_changed.iter() {
-        if let Some(body) = bodies.get_mut(*handle) {
-            body.set_body_status(body_status(*body_type));
-        }
-    }
-
-    for entity in type_removed.iter() {
-        if let Some(body) = with_body_handle
-            .get(entity)
-            .ok()
-            .and_then(|(_, handle)| bodies.get_mut(*handle))
-        {
-            body.set_body_status(body_status(RigidBody::default()));
-        }
-    }
-}
-
 pub(crate) fn update_rapier_position(
     mut bodies: ResMut<'_, RigidBodySet>,
     query: Query<'_, (&GlobalTransform, &RigidBodyHandle), Changed<GlobalTransform>>,

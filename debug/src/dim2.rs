@@ -11,7 +11,14 @@ use heron_rapier::rapier::geometry::{ColliderHandle, ColliderSet, Shape};
 
 use super::*;
 
-pub(crate) fn create_debug_sprites(
+pub(crate) fn systems() -> SystemSet {
+    SystemSet::new()
+        .with_system(dim2::delete_debug_sprite.system())
+        .with_system(dim2::replace_debug_sprite.system())
+        .with_system(dim2::create_debug_sprites.system())
+}
+
+fn create_debug_sprites(
     mut commands: Commands<'_>,
     colliders: Res<'_, ColliderSet>,
     query: Query<
@@ -40,7 +47,7 @@ pub(crate) fn create_debug_sprites(
     }
 }
 
-pub(crate) fn replace_debug_sprite(
+fn replace_debug_sprite(
     mut commands: Commands<'_>,
     mut map: ResMut<'_, DebugEntityMap>,
     colliders: Res<'_, ColliderSet>,
@@ -70,7 +77,7 @@ pub(crate) fn replace_debug_sprite(
     }
 }
 
-pub(crate) fn delete_debug_sprite(
+fn delete_debug_sprite(
     mut commands: Commands<'_>,
     mut map: ResMut<'_, DebugEntityMap>,
     removed_bodies: RemovedComponents<'_, CollisionShape>,
