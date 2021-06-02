@@ -159,11 +159,13 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             if let Some(heights) = heights.get(0) {
                 let mut points: Vec<Vec2> = Vec::with_capacity(heights.len() + 2);
                 let mut min_y = f32::MAX;
+                let half_size = size.x * 0.5;
+                let len = (heights.len() - 1) as f32;
 
                 heights
                     .iter()
                     .enumerate()
-                    .map(|(i, p)| Vec2::new(i as f32, *p))
+                    .map(|(i, p)| Vec2::new((i as f32) * size.x / len - half_size, *p))
                     .for_each(|p| {
                         if p.y < min_y {
                             min_y = p.y;
@@ -171,9 +173,8 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                         points.push(p);
                     });
 
-                #[allow(clippy::cast_precision_loss)]
-                points.push(Vec2::new(size.x, min_y));
-                points.push(Vec2::new(0.0, min_y));
+                points.push(Vec2::new(half_size, min_y));
+                points.push(Vec2::new(-half_size, min_y));
 
                 builder.add(&shapes::Polygon {
                     points,

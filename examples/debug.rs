@@ -60,11 +60,11 @@ fn spawn(mut commands: Commands) {
     // Height field
     commands
         .spawn_bundle((
-            Transform::from_translation(Vec3::Y * 200.0),
+            Transform::from_translation(Vec3::Y * -200.0),
             GlobalTransform::default(),
         ))
         .insert(CollisionShape::HeightField {
-            size: Vec2::new(6.0, 0.0),
+            size: Vec2::new(700.0, 0.0),
             heights: vec![vec![50.0, 0.0, 10.0, 30.0, 20.0, 0.0, 20.0]],
         })
         .insert(RigidBody::Static);
