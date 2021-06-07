@@ -9,6 +9,8 @@ updates:
       - "jcornaz"
     assignees:
       - "jcornaz"
+    ignore:
+      - dependency-name: "rapier2d"
 
   - package-ecosystem: "github-actions"
     directory: "/"
