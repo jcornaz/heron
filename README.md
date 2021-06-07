@@ -60,13 +60,13 @@ enum Layer {
 **For a 3d game:**
 ```toml
 bevy = "^0.5.0"
-heron = "0.7.0"
+heron = "0.8.0"
 ```
 
 **For a 2d game:**
 ```toml
 bevy = "^0.5.0"
-heron = { version = "0.7.0", default-features = false, features = ["2d"] }
+heron = { version = "0.8.0", default-features = false, features = ["2d"] }
 ```
 
 

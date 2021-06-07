@@ -1,3 +1,16 @@
+## 0.8.0 - 2021-06-07
+
+### Breaking changes
+
+* There is a new variant `HeightField` to the `CollisionShape` enum
+
+
+### Features
+
+* HeightField collision shape (#102, thanks @elegaanz)
+
+
+
 ## 0.7.0 - 2021-05-31
 
 ### Breaking changes
