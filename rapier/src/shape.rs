@@ -218,8 +218,14 @@ impl ColliderFactory for CollisionShape {
                 half_segment: half_height,
                 radius,
             } => ColliderBuilder::capsule_y(*half_height, *radius),
-            CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
-            CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
+            CollisionShape::Cuboid {
+                half_extends,
+                border_radius,
+            } => cuboid_builder(*half_extends, *border_radius),
+            CollisionShape::ConvexHull {
+                points,
+                border_radius,
+            } => convex_hull_builder(points.as_slice(), *border_radius),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
         }
         // General all types of collision events
@@ -228,36 +234,57 @@ impl ColliderFactory for CollisionShape {
 }
 
 #[inline]
-#[cfg(feature = "2d")]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y)
+#[cfg(dim2)]
+fn cuboid_builder(half_extends: Vec3, border_radius: Option<f32>) -> ColliderBuilder {
+    border_radius.map_or_else(
+        || ColliderBuilder::cuboid(half_extends.x, half_extends.y),
+        |border_radius| {
+            ColliderBuilder::round_cuboid(half_extends.x, half_extends.y, border_radius)
+        },
+    )
 }
 
 #[inline]
-#[cfg(feature = "3d")]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+#[cfg(dim3)]
+fn cuboid_builder(half_extends: Vec3, border_radius: Option<f32>) -> ColliderBuilder {
+    border_radius.map_or_else(
+        || ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z),
+        |border_radius| {
+            ColliderBuilder::round_cuboid(
+                half_extends.x,
+                half_extends.y,
+                half_extends.z,
+                border_radius,
+            )
+        },
+    )
 }
 
 #[inline]
-fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
+fn convex_hull_builder(points: &[Vec3], border_radius: Option<f32>) -> ColliderBuilder {
     let points: Vec<Point<f32>> = points.into_rapier();
-    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
+    border_radius.map_or_else(
+        || ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull"),
+        |border_radius| {
+            ColliderBuilder::round_convex_hull(points.as_slice(), border_radius)
+                .expect("Failed to create convex-hull")
+        },
+    )
 }
 
 #[inline]
-#[cfg(feature = "2d")]
+#[cfg(dim2)]
 #[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let len = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
-        crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).cloned()),
+        crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).copied()),
         crate::rapier::na::Vector2::new(size.x, 1.0),
     )
 }
 
 #[inline]
-#[cfg(feature = "3d")]
+#[cfg(dim3)]
 #[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let nrows = heights.len();
@@ -291,6 +318,7 @@ mod tests {
     fn build_cuboid() {
         let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
+            border_radius: None,
         }
         .collider_builder()
         .build();
@@ -347,13 +375,13 @@ mod tests {
             .as_heightfield()
             .expect("Created shape was not a height field");
 
-        #[cfg(feature = "2d")]
+        #[cfg(dim2)]
         {
             assert_eq!(field.num_cells(), 2); // Three points = 2 segments
             assert_eq!(field.cell_width(), 1.0);
         }
 
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         {
             assert_eq!(field.nrows(), 1);
             assert_eq!(field.ncols(), 2);

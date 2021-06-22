@@ -9,7 +9,7 @@ repository = "https://github.com/jcornaz/heron/"
 
 [features]
 default = []
-2d = ["heron_rapier/2d", "bevy_prototype_lyon"]
+2d = ["heron_rapier/2d", "bevy_prototype_lyon", "lyon_path"]
 3d = ["heron_rapier/3d"]
 
 [dependencies]
@@ -17,4 +17,5 @@ heron_core = { version = "^0.8.0", path = "../core" }
 heron_rapier = { version = "^0.8.0", path = "../rapier" }
 bevy = { version = "^0.5.0", default-features = false, features = ["render"] }
 bevy_prototype_lyon = { version = "0.3.0", optional = true }
+lyon_path = { version = "0.17.4", optional = true }
 fnv = "^1.0"

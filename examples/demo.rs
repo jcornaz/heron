@@ -32,6 +32,7 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         // Attach a collision shape
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         })
         // Define restitution (so that it bounces)
         .insert(PhysicMaterial {
@@ -54,6 +55,7 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         // Attach a collision shape
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         })
         // Add an initial velocity. (it is also possible to read/mutate this component later)
         .insert(Velocity::from(Vec2::X * 300.0).with_angular(AxisAngle::new(Vec3::Z, -PI)))
