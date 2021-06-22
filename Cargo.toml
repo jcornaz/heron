@@ -14,8 +14,10 @@ categories = ["game-development", "simulation"]
 
 [features]
 default = ["3d"]
-2d = ["heron_rapier/2d", "heron_debug/2d"]
-3d = ["heron_rapier/3d", "heron_debug/3d"]
+2d = ["heron_rapier/2d"]
+3d = ["heron_rapier/3d"]
+debug-2d = ["heron_debug/2d", "debug"]
+debug-3d = ["heron_debug/3d", "debug"]
 debug = ["heron_debug"]
 
 [dependencies]
@@ -36,7 +38,7 @@ required-features = ["2d"]
 
 [[example]]
 name = "debug"
-required-features = ["2d", "debug"]
+required-features = ["2d", "debug-2d"]
 
 [[example]]
 name = "quickstart"
@@ -44,7 +46,7 @@ required-features = ["2d"]
 
 [[example]]
 name = "collision_shapes_in_child_entity"
-required-features = ["2d", "debug"]
+required-features = ["2d", "debug-2d"]
 
 [[example]]
 name = "layers"
