@@ -50,6 +50,7 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
             .insert(RigidBody::Static)
             .insert(CollisionShape::Cuboid {
                 half_extends: size.extend(0.0) / 2.0,
+                border_radius: None,
             });
     }
 
@@ -83,6 +84,7 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         .insert(RigidBody::Static)
         .insert(CollisionShape::Cuboid {
             half_extends: Vec3::new(50., 50., 0.),
+            border_radius: None,
         })
         .insert(ShapeCastIgnored);
 }
@@ -153,6 +155,7 @@ fn shape_cast_from_center(
 
     let shape = CollisionShape::Cuboid {
         half_extends: shape_size.extend(0.) / 2.,
+        border_radius: None,
     };
 
     // Cast a ray from the center of the world, to the targeter.

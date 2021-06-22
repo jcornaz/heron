@@ -27,6 +27,7 @@ fn spawn(mut commands: Commands) {
         ))
         .insert(CollisionShape::Cuboid {
             half_extends: Vec2::new(50.0, 50.0).extend(0.0),
+            border_radius: None,
         })
         .insert(RigidBody::Static);
 
@@ -54,6 +55,7 @@ fn spawn(mut commands: Commands) {
                 Vec3::new(50.0, 0.0, 0.0),
                 Vec3::new(-50.0, 0.0, 0.0),
             ],
+            border_radius: None,
         })
         .insert(RigidBody::Static);
 
