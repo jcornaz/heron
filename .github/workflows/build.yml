@@ -74,8 +74,8 @@ jobs:
         feature-set:
           - "2d"
           - "3d"
-          - "2d, debug"
-          - "3d, debug"
+          - "debug-2d"
+          - "2d, debug-2d"
 
     steps:
       - name: Checkout repository
