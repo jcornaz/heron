@@ -120,7 +120,7 @@ pub(crate) fn remove_invalids_after_component_changed(
     }
 }
 
-#[allow(clippy::filter_map)]
+#[allow(clippy::manual_filter_map)]
 fn remove_collider_handles(
     commands: &mut Commands<'_>,
     bodies: &RigidBodySet,
