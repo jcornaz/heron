@@ -5,6 +5,7 @@
 //! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
+//!
 //! [rapier]: https://rapier.rs
 //!
 //! # Get started
@@ -17,11 +18,13 @@
 //! ```
 //!
 //! If you are creating a 2d game, change the default features:
+//!
 //! ```toml
 //! heron = { version = "0.8.0", default-features = false, features = ["2d"] }
 //! ```
 //!
-//! Note: when debugging, you may consider enabling the `debug` feature to render the collision shapes (works only for 2d, at the moment).
+//! Note: when debugging, you may consider enabling the `debug-2d` feature to render the collision
+//! shapes (works only for 2d, at the moment).
 //!
 //! ## Install the plugin
 //!
@@ -42,9 +45,12 @@
 //!
 //! ## Create rigid bodies
 //!
-//! To create a rigid body, add the `RigdBody` to the entity and add a collision shapes with the `CollisionShape` component.
+//! To create a rigid body, add the [`RigidBody`] to the entity and add a collision shapes with the
+//! [`CollisionShape`] component.
 //!
-//! The position and rotation are defined by the bevy `GlobalTransform` component.
+//! The position and rotation are defined by the bevy [`GlobalTransform`] component.
+//!
+//! [`GlobalTransform`]: bevy::prelude::GlobalTransform
 //!
 //! ```
 //! # use bevy::prelude::*;
@@ -54,13 +60,13 @@
 //!
 //!     // Spawn any bundle of your choice. Only make sure there is a `GlobalTransform`
 //!     .spawn_bundle(SpriteBundle::default())
-//!     
+//!
 //!     // Make it a rigid body
 //!     .insert(RigidBody::Dynamic)
-//!     
+//!
 //!     // Attach a collision shape
 //!     .insert(CollisionShape::Sphere { radius: 10.0 })
-//!     
+//!
 //!     // Optionally add other useful components...
 //!     .insert(Velocity::from_linear(Vec3::X * 2.0))
 //!     .insert(Acceleration::from_linear(Vec3::X * 1.0))
@@ -71,22 +77,26 @@
 //!
 //! ## Move rigid bodies programmatically
 //!
-//! When creating games, it is often useful to interact with the physics engine and move bodies programmatically.
-//! For this, you have two options: Updating the `Transform` or applying a [`Velocity`].
+//! When creating games, it is often useful to interact with the physics engine and move bodies
+//! programmatically. For this, you have two options: Updating the [`Transform`] or applying a
+//! [`Velocity`].
+//!
+//! [`Transform`]: bevy::prelude::Transform
 //!
 //! ### Option 1: Update the Transform
 //!
-//! For kinematic bodies ([`RigidBody::Kinematic`]), if the transform is updated,
-//! the body is moved and get an automatically calculated velocity. Physics rules will be applied normally.
-//! Updating the transform is a good way to move a kinematic body.
+//! For positional kinematic bodies ([`RigidBody::KinematicPositionBased`]), if the transform is
+//! updated, the body is moved and get an automatically calculated velocity. Physics rules will be
+//! applied normally. Updating the transform is a good way to move a kinematic body.
 //!
-//! For other types of bodies, if the transform is updated,
-//! the rigid body will be *teleported* to the new position/rotation, **ignoring physic rules**.
+//! For other types of bodies, if the transform is updated, the rigid body will be *teleported* to
+//! the new position/rotation, **ignoring physic rules**.
 //!
 //! ### Option 2: Use the Velocity component
 //!
-//! For [`RigidBody::Dynamic`] and [`RigidBody::Kinematic`] bodies **only**, one can add a [`Velocity`] component to the entity,
-//! that will move the body over time. Physics rules will be applied normally.
+//! For [`RigidBody::Dynamic`] and [`RigidBody::KinematicVelocityBased`] bodies **only**, one can
+//! add a [`Velocity`] component to the entity, that will move the body over time. Physics rules
+//! will be applied normally.
 //!
 //! Note that the velocity component is updated by heron to always reflects the current velocity.
 //!

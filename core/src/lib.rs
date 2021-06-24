@@ -192,17 +192,25 @@ pub enum RigidBody {
     /// It is well suited for terrain and static obstacles.
     Static,
 
-    /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
+    /// A kinematic body is not moved by the physics engine. But it can have user-defined position.
     ///
     /// It affects the other bodies normally but is not affected by them.
     ///
     /// If the transform is updated, then a velocity will be automatically calculated, producing
     /// realistic interaction with other bodies.
     ///
-    /// It can also have a velocity be applied.
+    /// It is well-suited for moving platforms.
+    KinematicPositionBased,
+
+    /// A kinematic body is not moved by the physics engine. But it can have user-defined velocity.
+    ///
+    /// It affects the other bodies normally but is not affected by them.
+    ///
+    /// If the velocity is updated, then a velocity will produce realistic interaction with other
+    /// bodies.
     ///
     /// It is well-suited for moving platforms.
-    Kinematic,
+    KinematicVelocityBased,
 
     /// A sensor is not affected by physics forces and doesn't affect other bodies either.
     ///
@@ -224,8 +232,8 @@ impl RigidBody {
     #[must_use]
     pub fn can_have_velocity(self) -> bool {
         match self {
-            RigidBody::Dynamic | RigidBody::Kinematic => true,
-            RigidBody::Static | RigidBody::Sensor => false,
+            RigidBody::Dynamic | RigidBody::KinematicVelocityBased => true,
+            RigidBody::Static | RigidBody::Sensor | RigidBody::KinematicPositionBased => false,
         }
     }
 }

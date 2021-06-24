@@ -146,7 +146,7 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 
 #[rstest]
 #[case(Some(RigidBody::Dynamic))]
-#[case(Some(RigidBody::Kinematic))]
+#[case(Some(RigidBody::KinematicVelocityBased))]
 #[case(None)]
 fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
     let mut app = test_app();

@@ -5,16 +5,16 @@ use bevy::reflect::Reflect;
 /// It is recommended to implement it using the derive macro.
 #[allow(missing_docs)]
 pub trait PhysicsLayer: Sized {
-    fn to_bits(&self) -> u16;
-    fn all_bits() -> u16;
+    fn to_bits(&self) -> u32;
+    fn all_bits() -> u32;
 }
 
 impl<T: PhysicsLayer> PhysicsLayer for &T {
-    fn to_bits(&self) -> u16 {
+    fn to_bits(&self) -> u32 {
         T::to_bits(self)
     }
 
-    fn all_bits() -> u16 {
+    fn all_bits() -> u32 {
         T::all_bits()
     }
 }
@@ -27,14 +27,17 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///  * There is a layer in the groups of A that is also in the masks of B
 ///  * There is a layer in the groups of B that is also in the masks of A
 ///
-/// An entity without this component is considered has having all layers in its "groups" and "masks", and will interact with everything.
+/// An entity without this component is considered has having all layers in its "groups" and
+/// "masks", and will interact with everything.
 ///
 /// This component must be on the same entity of a [`CollisionShape`](crate::CollisionShape)
 ///
-/// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or `CollisionLayers::none()`,
-/// and then add or remove layers by calling  `with_group`/`without_group` and `with_mask`/`without_mask`.
+/// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or
+/// `CollisionLayers::none()`, and then add or remove layers by calling
+/// `with_group`/`without_group` and `with_mask`/`without_mask`.
 ///
-/// Theses methods take a type that implement [`Layer`]. The best option is to create an enum with a `#[derive(Layer)]` clause.
+/// Theses methods take a type that implement [`PhysicsLayer`]. The best option is to create an enum
+/// with a `#[derive(PhysicsLayer)]` clause.
 ///
 /// # Example
 ///
@@ -47,10 +50,10 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 /// #   Enemies,
 /// # }
 /// # impl PhysicsLayer for GameLayer {
-/// #     fn to_bits(&self) -> u16 {
+/// #     fn to_bits(&self) -> u32 {
 /// #         todo!()
 /// #     }
-/// #     fn all_bits() -> u16 {
+/// #     fn all_bits() -> u32 {
 /// #         todo!()
 /// #     }
 /// # }
@@ -69,15 +72,15 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 /// ```
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
 pub struct CollisionLayers {
-    groups: u16,
-    masks: u16,
+    groups: u32,
+    masks: u32,
 }
 
 impl Default for CollisionLayers {
     fn default() -> Self {
         Self {
-            groups: 0xffff,
-            masks: 0xffff,
+            groups: 0xffff_ffff,
+            masks: 0xffff_ffff,
         }
     }
 }
@@ -109,7 +112,7 @@ impl CollisionLayers {
 
     #[must_use]
     #[allow(missing_docs)]
-    pub fn from_bits(groups: u16, masks: u16) -> Self {
+    pub fn from_bits(groups: u32, masks: u32) -> Self {
         Self { groups, masks }
     }
 
@@ -181,13 +184,13 @@ impl CollisionLayers {
 
     #[must_use]
     #[allow(missing_docs)]
-    pub fn groups_bits(self) -> u16 {
+    pub fn groups_bits(self) -> u32 {
         self.groups
     }
 
     #[must_use]
     #[allow(missing_docs)]
-    pub fn masks_bits(self) -> u16 {
+    pub fn masks_bits(self) -> u32 {
         self.masks
     }
 }
@@ -204,14 +207,14 @@ mod tests {
     }
 
     impl PhysicsLayer for TestLayer {
-        fn to_bits(&self) -> u16 {
+        fn to_bits(&self) -> u32 {
             match self {
                 TestLayer::One => 1,
                 TestLayer::Two => 2,
             }
         }
 
-        fn all_bits() -> u16 {
+        fn all_bits() -> u32 {
             3
         }
     }

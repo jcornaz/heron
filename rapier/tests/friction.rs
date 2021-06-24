@@ -43,7 +43,7 @@ fn friction_can_be_defined_when_creating_body() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(friction, collider.friction)
+    assert_eq!(friction, collider.friction())
 }
 
 #[test]
@@ -73,5 +73,5 @@ fn friction_can_be_updated() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(friction, collider.friction)
+    assert_eq!(friction, collider.friction())
 }
