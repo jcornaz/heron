@@ -1,8 +1,4 @@
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
-
+#![cfg(any(dim2, dim3))]
 use bevy::app::prelude::*;
 use bevy::core::CorePlugin;
 use bevy::math::prelude::*;

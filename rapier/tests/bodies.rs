@@ -1,8 +1,4 @@
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
-
+#![cfg(any(dim2, dim3))]
 use std::f32::consts::PI;
 use std::ops::DerefMut;
 use std::time::Duration;

@@ -26,11 +26,11 @@ fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
     let linear_acceleration: Vector<Real> = acceleration.linear.into_rapier();
     let angular_acceleration: AngVector<f32> = acceleration.angular.into_rapier();
     let inertia = {
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         {
             body.mass_properties().reconstruct_inertia_matrix()
         }
-        #[cfg(feature = "2d")]
+        #[cfg(dim2)]
         {
             let val = body.mass_properties().inv_principal_inertia_sqrt;
             if val == 0.0 {

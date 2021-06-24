@@ -1,8 +1,4 @@
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
-
+#![cfg(any(dim2, dim3))]
 use std::f32::consts::PI;
 use std::time::Duration;
 
@@ -56,13 +52,13 @@ fn body_is_created_with_velocity() {
     assert_eq!(linear.x, actual_linear.x);
     assert_eq!(linear.y, actual_linear.y);
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(linear.z, actual_linear.z);
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(angular, (*body.angvel()).into_bevy().into());
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(angular.angle(), body.angvel());
 }
 
@@ -100,13 +96,13 @@ fn velocity_may_be_added_after_creating_the_body() {
     assert_eq!(linear.x, actual_linear.x);
     assert_eq!(linear.y, actual_linear.y);
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(linear.z, actual_linear.z);
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(angular.angle(), body.angvel());
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(angular, (*body.angvel()).into_bevy().into());
 }
 
@@ -138,13 +134,13 @@ fn velocity_is_updated_to_reflect_rapier_world() {
     assert_eq!(velocity.linear.x, linear.x);
     assert_eq!(velocity.linear.y, linear.y);
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(velocity.linear.z, linear.z);
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(angular, velocity.angular.into());
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert!((angular.angle() - velocity.angular.angle()).abs() < 0.001);
 }
 
@@ -181,10 +177,10 @@ fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
         ..
     } = *app.world.get::<Transform>(entity).unwrap();
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(actual_translation.truncate(), translation.truncate());
 
     let (axis, angle) = rotation.to_axis_angle();

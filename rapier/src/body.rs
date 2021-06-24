@@ -41,22 +41,22 @@ pub(crate) fn create(
             allow_z,
         }) = rotation_constraints.copied()
         {
-            #[cfg(feature = "2d")]
+            #[cfg(dim2)]
             if !allow_z {
                 builder = builder.lock_rotations();
             }
-            #[cfg(feature = "3d")]
+            #[cfg(dim3)]
             {
                 builder = builder.restrict_rotations(allow_x, allow_y, allow_z);
             }
         }
 
         if let Some(v) = velocity {
-            #[cfg(feature = "2d")]
+            #[cfg(dim2)]
             {
                 builder = builder.linvel(v.linear.x, v.linear.y);
             }
-            #[cfg(feature = "3d")]
+            #[cfg(dim3)]
             {
                 builder = builder.linvel(v.linear.x, v.linear.y, v.linear.z);
             }
