@@ -29,7 +29,7 @@ You may (but don't have to) write a message in the issue to say you are working 
 This is a standard `cargo` setup, and you shouldn't be too surprised.
 
 * Run the tests with: `cargo test --workspace`
-* Run the demo: `cargo run --example demo --no-default-features --features "2d"`
+* Run the demo: `cargo run --example demo --features "2d"`
 
 
 ## Coding standards
