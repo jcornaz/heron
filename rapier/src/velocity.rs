@@ -52,12 +52,12 @@ pub(crate) fn update_velocity_component(
         if let Some(body) = bodies.get(*handle).filter(|it| it.is_dynamic()) {
             velocity.linear = (*body.linvel()).into_bevy();
 
-            #[cfg(feature = "2d")]
+            #[cfg(dim2)]
             {
                 velocity.angular = heron_core::AxisAngle::from(bevy::math::Vec3::Z * body.angvel());
             }
 
-            #[cfg(feature = "3d")]
+            #[cfg(dim3)]
             {
                 velocity.angular = (*body.angvel()).into_bevy().into();
             }

@@ -1,16 +1,13 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 #![allow(clippy::needless_pass_by_value, clippy::type_complexity)]
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
+#![cfg(any(dim2, dim3))]
 
 //! Physics behavior for Heron, using [rapier](https://rapier.rs/)
 
-#[cfg(feature = "2d")]
+#[cfg(dim2)]
 pub extern crate rapier2d as rapier;
-#[cfg(feature = "3d")]
+#[cfg(dim3)]
 pub extern crate rapier3d as rapier;
 
 use bevy::prelude::*;

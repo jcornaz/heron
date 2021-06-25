@@ -1,4 +1,4 @@
-#![cfg(feature = "2d")]
+#![cfg(all(feature = "2d", not(feature = "3d")))]
 
 use std::time::Duration;
 

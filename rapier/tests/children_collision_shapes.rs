@@ -1,8 +1,4 @@
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
-
+#![cfg(any(dim2, dim3))]
 use std::time::Duration;
 
 use bevy::core::CorePlugin;
@@ -64,12 +60,12 @@ fn can_use_child_entity_for_the_collision_shape() {
 
     let (actual_translation, actual_rotation) = collider.position_wrt_parent().into_bevy();
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(
         actual_translation,
         Vec3::new(translation.x, translation.y, 0.0)
     );
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 
     assert!((actual_rotation.x - rotation.x).abs() < 0.00001);
@@ -110,12 +106,12 @@ fn can_change_the_position_of_a_shape_inserted_in_child_entity() {
 
     let (actual_translation, _) = collider.position_wrt_parent().into_bevy();
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(
         actual_translation,
         Vec3::new(translation.x, translation.y, 0.0)
     );
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 }
 

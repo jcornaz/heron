@@ -1,3 +1,5 @@
+#![cfg(any(feature = "2d", feature = "3d"))]
+
 use rstest::rstest;
 
 use heron_core::PhysicsLayer;

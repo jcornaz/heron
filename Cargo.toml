@@ -13,10 +13,10 @@ keywords = ["game", "gamedev", "physics", "collision", "bevy"]
 categories = ["game-development", "simulation"]
 
 [features]
-default = ["3d"]
-2d = ["heron_rapier/2d", "heron_debug/2d"]
-3d = ["heron_rapier/3d", "heron_debug/3d"]
-debug = ["heron_debug"]
+default = []
+2d = ["heron_rapier/2d"]
+3d = ["heron_rapier/3d"]
+debug-2d = ["2d", "heron_debug/2d"]
 
 [dependencies]
 heron_core = { version = "^0.8.0", path = "core" }
@@ -30,13 +30,16 @@ bevy = "0.5"
 skeptic = "0.13"
 rstest = "0.7"
 
+[build-dependencies]
+cfg_aliases = "0.1.1"
+
 [[example]]
 name = "demo"
 required-features = ["2d"]
 
 [[example]]
 name = "debug"
-required-features = ["2d", "debug"]
+required-features = ["debug-2d"]
 
 [[example]]
 name = "quickstart"
@@ -44,7 +47,7 @@ required-features = ["2d"]
 
 [[example]]
 name = "collision_shapes_in_child_entity"
-required-features = ["2d", "debug"]
+required-features = ["debug-2d"]
 
 [[example]]
 name = "layers"

@@ -1,10 +1,7 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 #![allow(clippy::needless_pass_by_value, clippy::needless_doctest_main)]
-#![cfg(all(
-    any(feature = "2d", feature = "3d"),
-    not(all(feature = "2d", feature = "3d")),
-))]
+#![cfg(any(dim2, dim3))]
 //! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
@@ -134,7 +131,7 @@ pub mod prelude {
 #[must_use]
 #[derive(Debug, Copy, Clone, Default)]
 pub struct PhysicsPlugin {
-    #[cfg(feature = "debug")]
+    #[cfg(debug)]
     debug: heron_debug::DebugPlugin,
 }
 
@@ -142,7 +139,7 @@ impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_plugin(RapierPlugin);
 
-        #[cfg(feature = "debug")]
+        #[cfg(debug)]
         app.add_plugin(self.debug);
     }
 }

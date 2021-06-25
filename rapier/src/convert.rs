@@ -183,14 +183,14 @@ impl IntoBevy<CollisionLayers> for InteractionGroups {
 
 #[cfg(test)]
 mod tests {
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     use std::f32::consts::PI;
 
     use bevy::math::{Quat, Vec3};
 
     use super::*;
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     mod angle2d {
         use rstest::rstest;
 
@@ -228,12 +228,12 @@ mod tests {
             assert_eq!(translation.x, result.translation.x);
             assert_eq!(translation.y, result.translation.y);
 
-            #[cfg(feature = "3d")]
+            #[cfg(dim3)]
             assert_eq!(translation.z, result.translation.z);
         }
 
         #[test]
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         fn set_rotation() {
             let angle = PI / 2.0;
             let axis = Vec3::new(1.0, 2.0, 3.0);
