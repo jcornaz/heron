@@ -186,10 +186,20 @@ pub(crate) fn update_bevy_transform(
         }
 
         if let Some(local) = &mut local {
+            #[cfg(dim2)]
+            let previous_local_z = local.translation.z;
+
             if local.translation == global.translation {
                 local.translation = translation;
             } else {
                 local.translation = translation - (global.translation - local.translation);
+            }
+
+            // In 2D, preserve the transform `z` component that may have been set by the user and
+            // would be overridden by the simulation value
+            #[cfg(dim2)]
+            {
+                local.translation.z = previous_local_z;
             }
 
             if local.rotation == global.rotation {
@@ -200,7 +210,18 @@ pub(crate) fn update_bevy_transform(
             }
         }
 
+        #[cfg(dim2)]
+        let previous_local_z = global.translation.z;
+
         global.translation = translation;
+
+        // In 2D, preserve the transform `z` component that may have been set by the user and
+        // would be overridden by the simulation value
+        #[cfg(dim2)]
+        {
+            global.translation.z = previous_local_z;
+        }
+
         global.rotation = rotation;
     }
 }
