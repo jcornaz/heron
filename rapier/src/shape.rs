@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, SensorShape};
+use heron_core::{
+    CollisionLayers, CollisionShape, ConvexDecompositionParameters, PhysicMaterial, RigidBody,
+    SensorShape,
+};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
@@ -221,6 +224,12 @@ impl ColliderFactory for CollisionShape {
             CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
             CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
+            CollisionShape::ConvexDecomposition {
+                vertices,
+                indices,
+                border_radius,
+                parameters,
+            } => convex_decomposition_builder(&vertices, &indices, *border_radius, parameters),
         }
         // General all types of collision events
         .active_events(ActiveEvents::all())
@@ -265,6 +274,34 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     ColliderBuilder::heightfield(
         crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
         crate::rapier::na::Vector3::new(size.x, 1.0, size.y),
+    )
+}
+
+#[inline]
+fn convex_decomposition_builder(
+    vertices: &[Vec3],
+    #[cfg(dim2)] indices: &[[u32; 2]],
+    #[cfg(dim3)] indices: &[[u32; 3]],
+    border_radius: Option<f32>,
+    parameters: &Option<ConvexDecompositionParameters>,
+) -> ColliderBuilder {
+    let vertices: Vec<Point<f32>> = vertices.into_rapier();
+    border_radius.map_or_else(
+        || {
+            ColliderBuilder::convex_decomposition_with_params(
+                &vertices,
+                indices,
+                &parameters.clone().unwrap_or_default().into(),
+            )
+        },
+        |border_radius| {
+            ColliderBuilder::round_convex_decomposition_with_params(
+                &vertices,
+                indices,
+                &parameters.clone().unwrap_or_default().into(),
+                border_radius,
+            )
+        },
     )
 }
 
