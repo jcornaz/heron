@@ -179,6 +179,9 @@ pub(crate) fn update_bevy_transform(
             Some(body) => body,
         };
 
+        #[cfg(dim3)]
+        let (translation, rotation) = body.position().into_bevy();
+        #[cfg(dim2)]
         let (mut translation, rotation) = body.position().into_bevy();
 
         #[cfg(dim2)]
