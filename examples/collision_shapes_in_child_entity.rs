@@ -28,6 +28,7 @@ fn spawn(mut commands: Commands) {
             children.spawn_bundle((
                 CollisionShape::Cuboid {
                     half_extends: Vec3::new(15.0, 15.0, 0.0),
+                    border_radius: None,
                 },
                 Transform::default(),
                 GlobalTransform::default(),
@@ -37,6 +38,7 @@ fn spawn(mut commands: Commands) {
             children.spawn_bundle((
                 CollisionShape::Cuboid {
                     half_extends: Vec3::new(50.0, 50.0, 0.0),
+                    border_radius: None,
                 },
                 Transform::from_translation(Vec3::X * 100.0),
                 GlobalTransform::default(),
@@ -70,6 +72,7 @@ fn spawn_ground_and_camera(mut commands: Commands) {
         RigidBody::Static,
         CollisionShape::Cuboid {
             half_extends: Vec2::new(1500.0, 50.0).extend(0.0) / 2.0,
+            border_radius: None,
         },
     ));
 }

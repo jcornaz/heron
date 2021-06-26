@@ -133,7 +133,7 @@ pub mod prelude {
     pub use crate::{
         ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
         Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime,
-        RigidBody, RotationConstraints, Velocity,
+        RigidBody, RotationConstraints, Velocity,CompoundSubShape
     };
 }
 

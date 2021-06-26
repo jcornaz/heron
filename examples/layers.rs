@@ -34,6 +34,7 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         .insert(RigidBody::Static)
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         });
 
     // ANCHOR: layer-component-world
@@ -56,6 +57,7 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         .insert(RigidBody::Dynamic)
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         });
 
     // ANCHOR: layer-component-player

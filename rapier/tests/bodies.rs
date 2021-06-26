@@ -77,7 +77,7 @@ fn creates_body_in_rapier_world() {
     #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(actual_translation.truncate(), translation.truncate());
 
     let (axis, angle) = rotation.to_axis_angle();
@@ -148,10 +148,10 @@ fn update_rapier_position() {
     let rigid_body = colliders.get(*app.world.get(entity).unwrap()).unwrap();
     let (actual_translation, actual_rotation) = rigid_body.position().into_bevy();
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 
-    #[cfg(feature = "2d")]
+    #[cfg(dim2)]
     assert_eq!(actual_translation.truncate(), translation.truncate());
 
     let (axis, angle) = rotation.to_axis_angle();
