@@ -1,6 +1,7 @@
 use bevy::app::Events;
 use bevy::ecs::prelude::*;
 use bevy::math::Vec3;
+use bevy::log::prelude::*;
 use crossbeam::channel::{Receiver, Sender};
 
 use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsSteps, PhysicsTime};
@@ -66,11 +67,15 @@ pub(crate) struct EventManager {
 
 impl EventHandler for EventManager {
     fn handle_intersection_event(&self, event: IntersectionEvent) {
-        self.intersection_send.send(event).ok();
+        if self.intersection_send.send(event).is_err() {
+            error!("Failed to forward intersection event!")
+        }
     }
 
     fn handle_contact_event(&self, event: ContactEvent, _: &rapier::prelude::ContactPair) {
-        self.contact_send.send(event).ok();
+        if self.contact_send.send(event).is_err() {
+            error!("Failed to forward contact event!")
+        }
     }
 }
 
