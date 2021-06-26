@@ -14,7 +14,9 @@ use bevy::prelude::*;
 
 use heron_core::{CollisionEvent, PhysicsSystem};
 
-use crate::rapier::dynamics::{CCDSolver, IntegrationParameters, JointSet, RigidBodySet};
+use crate::rapier::dynamics::{
+    CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
+};
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::PhysicsPipeline;
@@ -47,6 +49,7 @@ impl Plugin for RapierPlugin {
             .insert_resource(BroadPhase::new())
             .insert_resource(NarrowPhase::new())
             .insert_resource(RigidBodySet::new())
+            .insert_resource(IslandManager::new())
             .insert_resource(ColliderSet::new())
             .insert_resource(JointSet::new())
             .insert_resource(CCDSolver::new())

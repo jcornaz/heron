@@ -65,7 +65,7 @@ fn create_static_body() {
 }
 
 #[test]
-fn create_kinematic_body() {
+fn create_kinematic_position_based_body() {
     let mut app = test_app();
 
     let entity = app
@@ -74,7 +74,29 @@ fn create_kinematic_body() {
         .insert_bundle((
             GlobalTransform::default(),
             CollisionShape::Sphere { radius: 10.0 },
-            RigidBody::Kinematic,
+            RigidBody::KinematicPositionBased,
+        ))
+        .id();
+
+    app.update();
+
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+
+    assert!(body.is_kinematic())
+}
+
+#[test]
+fn create_kinematic_velocity_based_body() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            GlobalTransform::default(),
+            CollisionShape::Sphere { radius: 10.0 },
+            RigidBody::KinematicVelocityBased,
         ))
         .id();
 

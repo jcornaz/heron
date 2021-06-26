@@ -32,7 +32,7 @@ pub(crate) fn apply_velocity_to_kinematic_bodies(
     let delta_time = physics_step.duration().as_secs_f32();
     let kinematic_bodies = query
         .iter()
-        .filter(|(_, body_type, _)| matches!(body_type, RigidBody::Kinematic));
+        .filter(|(_, body_type, _)| matches!(body_type, RigidBody::KinematicVelocityBased));
 
     for (handle, _, velocity) in kinematic_bodies {
         if let Some(body) = bodies.get_mut(*handle) {

@@ -4,11 +4,12 @@ use fnv::FnvHashMap;
 use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, SensorShape};
 
 use crate::convert::IntoRapier;
-use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{
     Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
 };
 use crate::rapier::math::Point;
+use crate::rapier::pipeline::ActiveEvents;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
 
@@ -61,7 +62,7 @@ pub(crate) fn create(
         };
 
         if let Some((collider, rigid_body_handle)) = collider {
-            let handle = colliders.insert(collider, *rigid_body_handle, &mut bodies);
+            let handle = colliders.insert_with_parent(collider, *rigid_body_handle, &mut bodies);
             commands.entity(entity).insert(handle);
             handles.insert(entity, handle);
         }
@@ -115,10 +116,12 @@ pub(crate) fn remove_sensor_flag(
         .filter_map(|e| collider_handles.get(e).ok())
         .for_each(|handle| {
             if let Some(collider) = colliders.get_mut(*handle) {
-                let rigid_body = bodies
-                    .get(collider.parent())
-                    .map(|b| Entity::from_bits(b.user_data as u64))
-                    .and_then(|e| rigid_bodies.get(e).ok());
+                let rigid_body = collider.parent().and_then(|parent| {
+                    bodies
+                        .get(parent)
+                        .map(|b| Entity::from_bits(b.user_data as u64))
+                        .and_then(|e| rigid_bodies.get(e).ok())
+                });
 
                 collider.set_sensor(matches!(rigid_body, Some(RigidBody::Sensor)));
             }
@@ -144,12 +147,13 @@ pub(crate) fn remove_invalids_after_components_removed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
+    mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
     shapes_removed: RemovedComponents<'_, CollisionShape>,
 ) {
     for entity in shapes_removed.iter() {
         if let Some(handle) = handles.remove(&entity) {
-            colliders.remove(handle, &mut bodies, true);
+            colliders.remove(handle, &mut islands, &mut bodies, true);
             commands.entity(entity).remove::<ColliderHandle>();
         }
     }
@@ -160,11 +164,12 @@ pub(crate) fn remove_invalids_after_component_changed(
     mut commands: Commands<'_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
+    mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
     changed: Query<'_, (Entity, &ColliderHandle), Changed<CollisionShape>>,
 ) {
     for (entity, handle) in changed.iter() {
-        colliders.remove(*handle, &mut bodies, true);
+        colliders.remove(*handle, &mut islands, &mut bodies, true);
         commands.entity(entity).remove::<ColliderHandle>();
         handles.remove(&entity);
     }
@@ -194,8 +199,7 @@ trait ColliderFactory {
         }
 
         if let Some(transform) = transform {
-            builder = builder
-                .position_wrt_parent((transform.translation, transform.rotation).into_rapier());
+            builder = builder.position((transform.translation, transform.rotation).into_rapier());
         }
 
         if let Some(layers) = layers {
@@ -218,6 +222,8 @@ impl ColliderFactory for CollisionShape {
             CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
         }
+        // General all types of collision events
+        .active_events(ActiveEvents::all())
     }
 }
 
@@ -297,7 +303,7 @@ mod tests {
         assert_eq!(cuboid.half_extents.x, 1.0);
         assert_eq!(cuboid.half_extents.y, 2.0);
 
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         assert_eq!(cuboid.half_extents.z, 3.0);
     }
 
@@ -321,9 +327,9 @@ mod tests {
         assert_eq!(capsule.segment.a.y, -10.0);
         assert_eq!(capsule.segment.b.y, 10.0);
 
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         assert_eq!(capsule.segment.a.z, 0.0);
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         assert_eq!(capsule.segment.b.z, 0.0);
     }
 

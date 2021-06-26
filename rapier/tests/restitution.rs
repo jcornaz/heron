@@ -42,7 +42,7 @@ fn restitution_can_be_defined_when_creating_body() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(restitution, collider.restitution)
+    assert_eq!(restitution, collider.restitution())
 }
 
 #[test]
@@ -72,5 +72,5 @@ fn restitution_can_be_updated() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(restitution, collider.restitution)
+    assert_eq!(restitution, collider.restitution())
 }

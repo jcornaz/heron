@@ -31,13 +31,29 @@ enum MaxLayerCount {
     N,
     O,
     P,
+    Q,
+    R,
+    S,
+    T,
+    U,
+    V,
+    W,
+    X,
+    Y,
+    Z,
+    Aa,
+    Ab,
+    Ac,
+    Ad,
+    Ae,
+    Af,
 }
 
 #[rstest]
 #[case(MyLayer::World, 1)]
 #[case(MyLayer::Player, 2)]
 #[case(MyLayer::Enemies, 4)]
-fn returns_expected_bits(#[case] layer: MyLayer, #[case] expected_bits: u16) {
+fn returns_expected_bits(#[case] layer: MyLayer, #[case] expected_bits: u32) {
     assert_eq!(layer.to_bits(), expected_bits)
 }
 
@@ -48,6 +64,6 @@ fn returns_expected_all_bits_mask() {
 
 #[test]
 fn max_layers_bits() {
-    assert_eq!(MaxLayerCount::all_bits(), u16::MAX);
-    assert_eq!(MaxLayerCount::all_bits(), 0xffff);
+    assert_eq!(MaxLayerCount::all_bits(), u32::MAX);
+    assert_eq!(MaxLayerCount::all_bits(), 0xffffffff);
 }

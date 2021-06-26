@@ -74,7 +74,7 @@ fn creates_body_in_rapier_world() {
 
     let (actual_translation, actual_rotation) = body.position().into_bevy();
 
-    #[cfg(feature = "3d")]
+    #[cfg(dim3)]
     assert_eq!(actual_translation, translation);
 
     #[cfg(feature = "2d")]

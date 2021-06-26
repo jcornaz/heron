@@ -56,9 +56,9 @@ fn can_use_child_entity_for_the_collision_shape() {
     assert_eq!(body.colliders(), &[collider_handle]);
     assert_eq!(body.position().into_bevy(), (Vec3::ZERO, Quat::IDENTITY));
 
-    assert_eq!(collider.parent(), body_handle);
+    assert_eq!(collider.parent(), Some(body_handle));
 
-    let (actual_translation, actual_rotation) = collider.position_wrt_parent().into_bevy();
+    let (actual_translation, actual_rotation) = collider.position().into_bevy();
 
     #[cfg(dim2)]
     assert_eq!(
@@ -104,7 +104,7 @@ fn can_change_the_position_of_a_shape_inserted_in_child_entity() {
 
     let (_, collider) = colliders.iter().next().unwrap();
 
-    let (actual_translation, _) = collider.position_wrt_parent().into_bevy();
+    let (actual_translation, _) = collider.position().into_bevy();
 
     #[cfg(dim2)]
     assert_eq!(
@@ -140,7 +140,7 @@ fn updating_local_transform_of_a_rigid_body_doesnt_affect_the_shape() {
 
     let (_, collider) = colliders.iter().next().unwrap();
 
-    let (actual_translation, _) = collider.position_wrt_parent().into_bevy();
+    let (actual_translation, _) = collider.position_wrt_parent().unwrap().into_bevy();
 
     assert_eq!(actual_translation, Vec3::default());
 }

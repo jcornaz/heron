@@ -38,12 +38,12 @@ fn rotation_is_not_constrained_without_the_component() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    assert!(
+    assert_eq!(
         bodies
             .get(*app.world.get(entity).unwrap())
             .unwrap()
-            .effective_world_inv_inertia_sqrt
-            > 0.0
+            .is_rotation_locked(),
+        false
     );
 }
 
@@ -70,8 +70,8 @@ fn rotation_can_be_locked_at_creation() {
         bodies
             .get(*app.world.get(entity).unwrap())
             .unwrap()
-            .effective_world_inv_inertia_sqrt,
-        0.0
+            .is_rotation_locked(),
+        true
     );
 }
 
@@ -103,8 +103,8 @@ fn rotation_can_be_locked_after_creation() {
         bodies
             .get(*app.world.get(entity).unwrap())
             .unwrap()
-            .effective_world_inv_inertia_sqrt,
-        0.0
+            .is_rotation_locked(),
+        true,
     );
 }
 
@@ -131,11 +131,11 @@ fn rotation_is_unlocked_if_component_is_removed() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    assert!(
+    assert_eq!(
         bodies
             .get(*app.world.get(entity).unwrap())
             .unwrap()
-            .effective_world_inv_inertia_sqrt
-            > 0.0
+            .is_rotation_locked(),
+        false
     );
 }

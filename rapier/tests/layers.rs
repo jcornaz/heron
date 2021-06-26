@@ -14,14 +14,14 @@ enum TestLayer {
 }
 
 impl PhysicsLayer for TestLayer {
-    fn to_bits(&self) -> u16 {
+    fn to_bits(&self) -> u32 {
         match self {
             TestLayer::A => 1,
             TestLayer::B => 2,
         }
     }
 
-    fn all_bits() -> u16 {
+    fn all_bits() -> u32 {
         3
     }
 }
@@ -58,7 +58,8 @@ fn sets_the_collision_groups() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(collider.collision_groups().0, (1 << 16) + 2)
+    assert_eq!(collider.collision_groups().memberships, 1);
+    assert_eq!(collider.collision_groups().filter, 2);
 }
 
 #[test]
@@ -88,7 +89,8 @@ fn updates_the_collision_groups() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(collider.collision_groups().0, (1 << 16) + 2)
+    assert_eq!(collider.collision_groups().memberships, 1);
+    assert_eq!(collider.collision_groups().filter, 2);
 }
 
 #[test]
@@ -117,5 +119,5 @@ fn restore_the_collision_groups_on_removal() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
 
-    assert_eq!(collider.collision_groups().0, u32::MAX)
+    assert_eq!(collider.collision_groups().memberships, u32::MAX)
 }
