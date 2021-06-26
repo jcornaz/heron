@@ -163,6 +163,20 @@ pub enum CollisionShape {
         /// inner `Vec`, any other element will be ignored.
         heights: Vec<Vec<f32>>,
     },
+
+    /// A compound shape made out of a vector of shapes and their relative transforms
+    Compound(Vec<CompoundSubShape>),
+}
+
+/// A sub-shape inside of a a [`CollisionShape::Compound`]
+#[derive(Debug, Clone)]
+pub struct CompoundSubShape {
+    /// The relative translation of this shape relative to the origin of the compound shape
+    pub translation: Vec3,
+    /// Rotation of the this shape relative to the compound shape
+    pub rotation: Quat,
+    /// The shape of the sub-shape in the compound shape
+    pub shape: CollisionShape,
 }
 
 impl Default for CollisionShape {

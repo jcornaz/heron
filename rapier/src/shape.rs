@@ -1,7 +1,9 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, SensorShape};
+use heron_core::{
+    CollisionLayers, CollisionShape, CompoundSubShape, PhysicMaterial, RigidBody, SensorShape,
+};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
@@ -227,10 +229,30 @@ impl ColliderFactory for CollisionShape {
                 border_radius,
             } => convex_hull_builder(points.as_slice(), *border_radius),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
+            CollisionShape::Compound(shapes) => compound_builder(shapes),
         }
         // General all types of collision events
         .active_events(ActiveEvents::all())
     }
+}
+
+fn compound_builder(shapes: &Vec<CompoundSubShape>) -> ColliderBuilder {
+    ColliderBuilder::compound(
+        shapes
+            .iter()
+            .map(|sub_shape| {
+                (
+                    (sub_shape.translation, sub_shape.rotation).into_rapier(),
+                    sub_shape
+                        .shape
+                        .collider_builder()
+                        .build()
+                        .shared_shape()
+                        .clone(),
+                )
+            })
+            .collect(),
+    )
 }
 
 #[inline]

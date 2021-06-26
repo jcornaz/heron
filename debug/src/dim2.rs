@@ -6,7 +6,6 @@ use bevy_prototype_lyon::prelude::*;
 use bevy_prototype_lyon::shapes::RectangleOrigin;
 
 use heron_core::CollisionShape;
-use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier::geometry::{ColliderHandle, ColliderSet, Shape};
 
 use super::*;
@@ -95,7 +94,17 @@ fn create_shape(
     color: Color,
     transform: GlobalTransform,
 ) -> ShapeBundle {
-    base_builder(body, shape).build(
+    let mut builder = GeometryBuilder::new();
+
+    base_builder(
+        &mut builder,
+        body,
+        shape,
+        Default::default(),
+        Default::default(),
+    );
+
+    builder.build(
         ShapeColors::new(color),
         DrawMode::Fill(FillOptions::default()),
         Transform {
@@ -106,14 +115,24 @@ fn create_shape(
     )
 }
 
-fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
-    let mut builder = GeometryBuilder::new();
+fn base_builder(
+    builder: &mut GeometryBuilder,
+    body: &CollisionShape,
+    shape: &dyn Shape,
+    translation: Vec2,
+    rotation: Quat,
+) {
+    if rotation != Quat::default() {
+        bevy::log::warn!("Debug rendering of rotated compound sub-shapes is not implemented yet");
+    }
+    let matrix = Mat3::from_scale_angle_translation(Vec2::new(1., 1.), 0., translation);
+    let get_point = |x: f32, y: f32| -> Vec2 { matrix.transform_point2(Vec2::new(x, y)) };
 
     match body {
         CollisionShape::Sphere { radius } => {
             builder.add(&shapes::Circle {
                 radius: *radius,
-                center: Vec2::ZERO,
+                center: get_point(0., 0.),
             });
         }
         CollisionShape::Capsule {
@@ -123,17 +142,17 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             let half_segment = *half_segment;
             let radius = *radius;
             let mut path = PathBuilder::new();
-            path.move_to(Vec2::new(-radius, half_segment));
+            path.move_to(get_point(-radius, half_segment));
             path.arc(
-                Vec2::new(0.0, half_segment),
-                Vec2::new(radius, radius),
+                get_point(0.0, half_segment),
+                get_point(radius, radius),
                 -PI,
                 0.0,
             );
-            path.line_to(Vec2::new(radius, -half_segment));
+            path.line_to(get_point(radius, -half_segment));
             path.arc(
-                Vec2::new(0.0, -half_segment),
-                Vec2::new(radius, radius),
+                get_point(0.0, -half_segment),
+                get_point(radius, radius),
                 -PI,
                 0.0,
             );
@@ -155,14 +174,16 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 width: f32,
                 height: f32,
                 radius: f32,
+                origin: Vec2,
             }
             impl Geometry for RoundedRectangle {
                 fn add_geometry(&self, b: &mut Builder) {
                     let real_width = self.width + self.radius * 2.0;
                     let real_height = self.height + self.radius * 2.0;
+
                     b.add_rounded_rectangle(
                         &Rect::new(
-                            Point::new(-real_width / 2.0, -real_height / 2.0),
+                            Point::new(self.origin.x, self.origin.y),
                             Size::new(real_width, real_height),
                         ),
                         &BorderRadii {
@@ -181,10 +202,11 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                     width: 2.0 * half_extends.x,
                     height: 2.0 * half_extends.y,
                     radius: *radius,
+                    origin: get_point(0., 0.),
                 });
             } else {
                 builder.add(&shapes::Rectangle {
-                    origin: RectangleOrigin::Center,
+                    origin: RectangleOrigin::CustomCenter(get_point(0., 0.)),
                     width: 2.0 * half_extends.x,
                     height: 2.0 * half_extends.y,
                 });
@@ -193,7 +215,11 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
         CollisionShape::ConvexHull { .. } => {
             if let Some(polygon) = shape.as_convex_polygon() {
                 builder.add(&shapes::Polygon {
-                    points: polygon.points().into_bevy(),
+                    points: polygon
+                        .points()
+                        .iter()
+                        .map(|p| get_point(p.x, p.y))
+                        .collect(),
                     closed: true,
                 });
 
@@ -205,12 +231,17 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 for point in polygon.base_shape.points() {
                     builder.add(&shapes::Circle {
                         radius: polygon.border_radius,
-                        center: point.into_bevy(),
+                        center: get_point(point.x, point.y),
                     });
                 }
 
                 builder.add(&shapes::Polygon {
-                    points: polygon.base_shape.points().into_bevy(),
+                    points: polygon
+                        .base_shape
+                        .points()
+                        .iter()
+                        .map(|p| get_point(p.x, p.y))
+                        .collect(),
                     closed: true,
                 });
             }
@@ -242,7 +273,18 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 });
             }
         }
+        CollisionShape::Compound(shapes) => {
+            for (sub_shape, (_, rapier_shape)) in
+                shapes.iter().zip(shape.as_compound().unwrap().shapes())
+            {
+                base_builder(
+                    builder,
+                    &sub_shape.shape,
+                    rapier_shape.as_ref(),
+                    Vec2::new(sub_shape.translation.x, sub_shape.translation.y),
+                    sub_shape.rotation,
+                );
+            }
+        }
     };
-
-    builder
 }
