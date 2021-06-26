@@ -1,7 +1,7 @@
 use bevy::app::Events;
 use bevy::ecs::prelude::*;
-use bevy::math::Vec3;
 use bevy::log::prelude::*;
+use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
 
 use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsSteps, PhysicsTime};
