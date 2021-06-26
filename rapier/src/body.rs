@@ -179,7 +179,16 @@ pub(crate) fn update_bevy_transform(
             Some(body) => body,
         };
 
+        #[cfg(dim3)]
         let (translation, rotation) = body.position().into_bevy();
+        #[cfg(dim2)]
+        let (mut translation, rotation) = body.position().into_bevy();
+
+        #[cfg(dim2)]
+        {
+            // In 2D, preserve the transform `z` component that may have been set by the user
+            translation.z = global.translation.z;
+        }
 
         if translation == global.translation && rotation == global.rotation {
             continue;
