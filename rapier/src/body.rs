@@ -52,18 +52,7 @@ pub(crate) fn create(
         }
 
         if let Some(v) = velocity {
-            #[cfg(dim2)]
-            {
-                builder = builder.linvel(crate::rapier::na::Vector2::new(v.linear.x, v.linear.y));
-            }
-            #[cfg(dim3)]
-            {
-                builder = builder.linvel(crate::rapier::na::Vector3::new(
-                    v.linear.x, v.linear.y, v.linear.z,
-                ));
-            }
-
-            builder = builder.angvel(v.angular.into_rapier());
+            builder = builder.linvel(v.linear.into_rapier()).angvel(v.angular.into_rapier());
         }
 
         let rigid_body_handle = bodies.insert(builder.build());
