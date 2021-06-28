@@ -4,7 +4,9 @@ use bevy::log::prelude::*;
 use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
 
-use heron_core::{CollisionData, CollisionEvent, Gravity, PhysicsSteps, PhysicsTime};
+use heron_core::{
+    CollisionData, CollisionEvent, Gravity, PhysicsStepDuration, PhysicsSteps, PhysicsTime,
+};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -18,10 +20,20 @@ use crate::rapier::pipeline::{EventHandler, PhysicsPipeline};
 pub(crate) fn update_integration_parameters(
     physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
+    bevy_time: Res<'_, bevy::core::Time>,
     mut integration_parameters: ResMut<'_, IntegrationParameters>,
 ) {
-    if physics_steps.is_changed() || physics_time.is_changed() {
-        integration_parameters.dt = physics_steps.duration().as_secs_f32() * physics_time.scale();
+    if matches!(
+        physics_steps.duration(),
+        PhysicsStepDuration::MaxDeltaTime(_)
+    ) || physics_steps.is_changed()
+        || physics_time.is_changed()
+    {
+        integration_parameters.dt = physics_steps
+            .duration()
+            .exact(bevy_time.delta())
+            .as_secs_f32()
+            * physics_time.scale();
     }
 }
 
