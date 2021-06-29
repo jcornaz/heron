@@ -2,15 +2,12 @@
 
 ### Breaking changes
 
-* The cargo feature `debug` has been replaced by `debug-2d`
-* No cargo feature is enabled by default. One must explictly choose between 2d or 3d.
+* The cargo feature `debug` has been replaced by `debug-2d`. (thanks @zicklag)
+* No cargo feature is enabled by default. One must explictly choose between 2d or 3d. (Thanks @zicklag)
 * The `heron_rapier::rapier` module has been replaced by `heron_rapier::rapier2` in 2d and `heron_rapier::rapier3d` in 3d.
-
-#### deps
-
-* Required version of rapier is now ^0.9.2
-* RigidBody::Static is replaced by `RigidBody::KinematicPositionBased` and `RigidBody::KinematicVelocityBased`
-* The `Layer` trait now ta works with `u32` instead of `u16` (effectively increasing the number of layers up to 32)
+* Required version of rapier is now ^0.9.2. (Thanks @zicklag)
+* RigidBody::Static is replaced by `RigidBody::KinematicPositionBased` and `RigidBody::KinematicVelocityBased`. (Thanks @zicklag)
+* The `Layer` trait now works with `u32` instead of `u16`, increasing the maximum number of layers up to 32. (Thanks @zicklag)
 
 
 ### Features
@@ -22,7 +19,7 @@
 
 ### Bug fixes
 
-* Impossiblity to disable render feature in 2d (#118)
+* Impossiblity to disable render feature in 2d (#118, thanks @zicklag)
 * Compilation errors for 3d users (#125)
 
 
