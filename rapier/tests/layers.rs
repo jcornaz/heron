@@ -1,12 +1,16 @@
 #![cfg(any(dim2, dim3))]
+
+use std::time::Duration;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, PhysicsSteps, RigidBody};
-use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
-use std::time::Duration;
+use utils::*;
+
+mod utils;
 
 enum TestLayer {
     A,

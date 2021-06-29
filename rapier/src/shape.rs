@@ -228,13 +228,13 @@ impl ColliderFactory for CollisionShape {
 }
 
 #[inline]
-#[cfg(feature = "2d")]
+#[cfg(dim2)]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y)
 }
 
 #[inline]
-#[cfg(feature = "3d")]
+#[cfg(dim3)]
 fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
     ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
 }
@@ -246,7 +246,7 @@ fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
 }
 
 #[inline]
-#[cfg(feature = "2d")]
+#[cfg(dim2)]
 #[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let len = heights.get(0).map(Vec::len).unwrap_or_default();
@@ -257,7 +257,7 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
 }
 
 #[inline]
-#[cfg(feature = "3d")]
+#[cfg(dim3)]
 #[allow(clippy::cast_precision_loss)]
 fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let nrows = heights.len();
@@ -334,6 +334,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(dim2, dim3))]
     fn build_heightfield() {
         let collider = CollisionShape::HeightField {
             size: Vec2::new(2.0, 1.0),
@@ -347,13 +348,13 @@ mod tests {
             .as_heightfield()
             .expect("Created shape was not a height field");
 
-        #[cfg(feature = "2d")]
+        #[cfg(dim2)]
         {
             assert_eq!(field.num_cells(), 2); // Three points = 2 segments
             assert_eq!(field.cell_width(), 1.0);
         }
 
-        #[cfg(feature = "3d")]
+        #[cfg(dim3)]
         {
             assert_eq!(field.nrows(), 1);
             assert_eq!(field.ncols(), 2);

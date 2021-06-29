@@ -1,4 +1,5 @@
 #![cfg(any(dim2, dim3))]
+
 use std::time::Duration;
 
 use bevy::core::CorePlugin;
@@ -6,9 +7,10 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody};
-use heron_rapier::rapier::dynamics::RigidBodySet;
-use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
+use utils::*;
+
+mod utils;
 
 fn test_app() -> App {
     let mut builder = App::build();
