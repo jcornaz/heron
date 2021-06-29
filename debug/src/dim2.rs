@@ -13,9 +13,9 @@ use super::*;
 
 pub(crate) fn systems() -> SystemSet {
     SystemSet::new()
-        .with_system(dim2::delete_debug_sprite.system())
-        .with_system(dim2::replace_debug_sprite.system())
-        .with_system(dim2::create_debug_sprites.system())
+        .with_system(delete_debug_sprite.system())
+        .with_system(replace_debug_sprite.system())
+        .with_system(create_debug_sprites.system())
 }
 
 fn create_debug_sprites(
