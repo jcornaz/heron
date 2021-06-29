@@ -7,7 +7,7 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
-#[cfg(feature = "2d")]
+#[cfg(all(feature = "2d", not(feature = "3d")))]
 mod dim2;
 
 /// Plugin that enables rendering of collision shapes
@@ -44,7 +44,7 @@ impl Default for DebugPlugin {
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        #[cfg(feature = "2d")]
+        #[cfg(all(feature = "2d", not(feature = "3d")))]
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim2::systems());
 

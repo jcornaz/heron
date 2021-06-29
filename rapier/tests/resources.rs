@@ -1,4 +1,5 @@
 #![cfg(any(dim2, dim3))]
+
 use bevy::app::prelude::*;
 use bevy::core::CorePlugin;
 use bevy::math::prelude::*;
@@ -6,9 +7,10 @@ use bevy::reflect::TypeRegistryArc;
 
 use heron_core::Gravity;
 use heron_core::PhysicsTime;
-use heron_rapier::rapier::dynamics::{IntegrationParameters, JointSet, RigidBodySet};
-use heron_rapier::rapier::geometry::ColliderSet;
 use heron_rapier::RapierPlugin;
+use utils::*;
+
+mod utils;
 
 #[test]
 fn can_define_gravity_before_plugin() {

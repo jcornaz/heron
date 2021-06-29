@@ -5,9 +5,12 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
-use heron_rapier::rapier::dynamics::IntegrationParameters;
 use heron_rapier::RapierPlugin;
 use std::time::Duration;
+
+use utils::*;
+
+mod utils;
 
 fn test_app() -> App {
     let mut builder = App::build();

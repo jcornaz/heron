@@ -10,8 +10,10 @@ use rstest::rstest;
 
 use heron_core::*;
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier::dynamics::RigidBodySet;
 use heron_rapier::RapierPlugin;
+use utils::*;
+
+mod utils;
 
 fn test_app() -> App {
     let mut builder = App::build();

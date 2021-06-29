@@ -5,12 +5,16 @@
 
 //! Physics behavior for Heron, using [rapier](https://rapier.rs/)
 
-#[cfg(dim2)]
-pub extern crate rapier2d as rapier;
-#[cfg(dim3)]
-pub extern crate rapier3d as rapier;
+#[cfg(feature = "rapier2d")]
+pub extern crate rapier2d;
+#[cfg(feature = "rapier3d")]
+pub extern crate rapier3d;
 
 use bevy::prelude::*;
+#[cfg(dim2)]
+pub(crate) use rapier2d as rapier;
+#[cfg(dim3)]
+pub(crate) use rapier3d as rapier;
 
 use heron_core::{CollisionEvent, PhysicsSystem};
 

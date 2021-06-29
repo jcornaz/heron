@@ -72,7 +72,7 @@ impl EventHandler for EventManager {
         }
     }
 
-    fn handle_contact_event(&self, event: ContactEvent, _: &rapier::prelude::ContactPair) {
+    fn handle_contact_event(&self, event: ContactEvent, _: &crate::rapier::prelude::ContactPair) {
         if self.contact_send.send(event).is_err() {
             error!("Failed to forward contact event!")
         }

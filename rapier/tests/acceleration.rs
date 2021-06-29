@@ -1,4 +1,7 @@
 #![cfg(any(dim2, dim3))]
+
+use std::time::Duration;
+
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::prelude::{GlobalTransform, Transform};
@@ -6,10 +9,10 @@ use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Acceleration, AxisAngle, CollisionShape, PhysicsSteps, RigidBody};
 use heron_rapier::convert::IntoBevy;
-#[cfg(dim3)]
-use heron_rapier::rapier::math::Vector;
-use heron_rapier::{rapier::dynamics::RigidBodySet, RapierPlugin};
-use std::time::Duration;
+use heron_rapier::RapierPlugin;
+use utils::*;
+
+mod utils;
 
 fn test_app() -> App {
     let mut builder = App::build();

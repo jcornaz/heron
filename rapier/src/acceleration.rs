@@ -1,14 +1,13 @@
 use bevy::prelude::*;
-use rapier::{
-    dynamics::RigidBody,
-    math::{Real, Vector},
-};
 
 use heron_core::{utils::NearZero, Acceleration};
 
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
-use crate::rapier::math::AngVector;
+use crate::rapier::{
+    dynamics::RigidBody,
+    math::{AngVector, Vector},
+};
 
 pub(crate) fn update_rapier_force_and_torque(
     mut bodies: ResMut<'_, RigidBodySet>,
@@ -23,7 +22,7 @@ pub(crate) fn update_rapier_force_and_torque(
 
 fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
     let wake_up = !acceleration.is_near_zero();
-    let linear_acceleration: Vector<Real> = acceleration.linear.into_rapier();
+    let linear_acceleration: Vector<f32> = acceleration.linear.into_rapier();
     let angular_acceleration: AngVector<f32> = acceleration.angular.into_rapier();
     let inertia = {
         #[cfg(dim3)]
