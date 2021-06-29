@@ -7,7 +7,7 @@ use bevy_prototype_lyon::shapes::RectangleOrigin;
 
 use heron_core::CollisionShape;
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier::geometry::{ColliderHandle, ColliderSet, Shape};
+use heron_rapier::rapier2d::geometry::{ColliderHandle, ColliderSet, Shape};
 
 use super::*;
 
