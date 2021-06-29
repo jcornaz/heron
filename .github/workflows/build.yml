@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - next-major
 
   pull_request:
     branches:
@@ -12,132 +11,76 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RUSTFLAGS: "-D warnings"
 
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
         rust:
-          - stable
-          - nightly
+          - '1.53.0'
+        crate:
+          - '.'
+          - 'core'
+          - 'rapier'
+          - 'debug'
+          - 'macros'
 
-    runs-on: ${{ matrix.os }}
-    env:
-      RUSTFLAGS: "-D warnings"
+    defaults:
+      run:
+        working-directory: ${{ matrix.crate }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
 
-      - name: Global cache
-        uses: actions/cache@v2.1.6
+      - name: Cache
+        uses: actions/cache@v2
         with:
           path: |
-            ~/.cargo
             ~/.rustup
-          key: cargo-${{ matrix.os }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-${{ matrix.os }}-${{ matrix.rust }}
+            ~/.cargo
+            ./target
+          key: build-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
+          restore-keys: |
+            build-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
+            build-${{ matrix.crate }}-${{ matrix.rust }}-
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-          components: rustfmt, clippy
-
-      - name: Install linux dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
-
-      - name: Format check
-        if: matrix.os == 'ubuntu-latest' && matrix.rust == 'stable'
-        run: cargo fmt --all -- --check
-
-      - name: Static analysis
-        if: matrix.os == 'ubuntu-latest' && matrix.rust == 'stable'
-        run: cargo clippy -- -Dwarnings
-
-      - name: Run tests with default features
-        run: cargo test --workspace
-
-  test-features:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      RUSTFLAGS: "-D warnings"
-
-    strategy:
-      matrix:
-        feature-set:
-          - "2d"
-          - "3d"
-          - "debug-2d"
-          - "2d, debug-2d"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2.3.4
-
-      - name: Global cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1.0.7
-        with:
           profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Install dependencies
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
-
-      - name: Run tests
-        run: cargo test --workspace --features "${{ matrix.feature-set }}"
-
-  ignored-tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      RUSTFLAGS: "-D warnings"
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2.3.4
-
-      - name: Global cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1.0.7
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Install dependencies
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
 
       - name: Run ignored tests
-        run: cargo test --workspace --features "2d,debug-2d" -- --ignored
+        run: cargo test --all-features -- --ignored
 
-  doc:
+      - name: Test with all features
+        run: cargo test --all-features
+
+      - name: Test without any feature
+        run: cargo test --no-default-features
+
+      - name: Test with 2d feature
+        if: matrix.crate == 'rapier' || matrix.crate == 'debug' || matrix.crate == '.'
+        run: cargo test --no-default-features --features 2d
+
+      - name: Test with 3d feature
+        if: matrix.crate == 'rapier' || matrix.crate == 'debug' || matrix.crate == '.'
+        run: cargo test --no-default-features --features 3d
+
+      - name: Test with debug-2d feature
+        if: matrix.crate == '.'
+        run: cargo test --no-default-features --features debug-2d
+
+      - name: Test with default features
+        run: cargo test
+
+  code-style:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     env:
       RUSTFLAGS: "-D warnings"
 
@@ -145,24 +88,55 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
 
-      - name: Global cache
-        uses: actions/cache@v2.1.6
+      - name: Cache
+        uses: actions/cache@v2
         with:
           path: |
-            ~/.cargo
             ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
+            ~/.cargo
+            ./target
+          key: code-style-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
+          restore-keys: code-style-${{ hashFiles('**/Cargo.toml') }}-
 
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
-          profile: minimal
           toolchain: stable
           override: true
+          components: clippy, rustfmt
 
-      - name: Install dependencies
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
+      - name: Format
+        run: cargo fmt -- --check
 
-      - name: Run ignored tests
+      - name: Clippy
+        run: cargo clippy
+
+  documentation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RUSTFLAGS: "-D warnings"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.rustup
+            ~/.cargo
+            ./target
+          key: docs-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
+          restore-keys: docs-${{ hashFiles('**/Cargo.toml') }}-
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          components: clippy, rustfmt
+
+      - name: Build documentation
         run: cargo doc --workspace

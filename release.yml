@@ -1,9 +1,11 @@
 hooks:
   verify:
     - cargo test --workspace
+    - cargo test --workspace --no-default-features
     - cargo test --workspace --no-default-features --features "2d"
-    - cargo test --workspace --no-default-features --features "2d, debug-2d"
     - cargo test --workspace --no-default-features --features "3d"
+    - cargo test --workspace --no-default-features --features "debug-2d"
+    - cargo test --workspace --all-features
 
   prepare:
     - "sed -i 's/\".*\" # auto-version/\"{{version}}\" # auto-version/' core/Cargo.toml"
