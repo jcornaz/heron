@@ -92,14 +92,10 @@ heron = { version = "0.9.0", features = ["2d"] }
 
 One must choose to use either `2d` or `3d` (but not both). If none of theses two features is enabled, the `PhysicsPlugin` won't be available.
 
-### Enabled by Default
 
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
-
-### Optional
-
 * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
-* `debug` Render collision shapes. Works only in 2d, support for 3d will be added later.
+* `debug-2d` Render 2d collision shapes. Works only in 2d, support for 3d may be added later.
 
 
 ## Contribute / Contact
