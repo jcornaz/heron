@@ -2,6 +2,7 @@
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 #![allow(clippy::needless_pass_by_value, clippy::needless_doctest_main)]
 #![cfg(any(dim2, dim3))]
+
 //! An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 //!
 //! [bevy]: https://bevyengine.org
@@ -10,21 +11,27 @@
 //!
 //! # Get started
 //!
-//! ## Add the dependency
+//! ## Add the dependency and choose to work with either 2d or 3d
 //!
-//! Add the library to `Cargo.toml`
+//! Add the library to `Cargo.toml`.
+//!
+//! For a 3d game:
 //! ```toml
-//! heron = "0.9.0"
+//! heron = { version = "0.9.0", features = ["3d"] }
 //! ```
 //!
-//! If you are creating a 2d game, change the default features:
-//!
+//! For as 2d game:
 //! ```toml
-//! heron = { version = "0.9.0", default-features = false, features = ["2d"] }
+//! heron = { version = "0.9.0", features = ["2d"] }
 //! ```
 //!
-//! Note: when debugging, you may consider enabling the `debug-2d` feature to render the collision
-//! shapes (works only for 2d, at the moment).
+//! ### Feature flags
+//!
+//! One must choose to use either `2d` or `3d`. If none of theses two features is enabled, the plugin won't be available.
+//!
+//! * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
+//! * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
+//! * `debug-2d` Render 2d collision shapes. Works only in 2d, support for 3d may be added later.
 //!
 //! ## Install the plugin
 //!

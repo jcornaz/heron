@@ -12,6 +12,9 @@ repository = "https://github.com/jcornaz/heron/"
 keywords = ["game", "gamedev", "physics", "collision", "bevy"]
 categories = ["game-development", "simulation"]
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 default = []
 2d = ["heron_rapier/2d"]

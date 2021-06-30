@@ -7,6 +7,9 @@ license = "MIT"
 description = "Physics behavior for Heron, using rapier"
 repository = "https://github.com/jcornaz/heron/"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 default = []
 2d = ["rapier2d"]

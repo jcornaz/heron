@@ -18,8 +18,6 @@ hooks:
     - "sed -i 's/version = \".*\", path =/version = \"^{{version}}\", path =/' debug/Cargo.toml"
     - "sed -i 's/version = \".*\", path =/version = \"^{{version}}\", path =/' macros/Cargo.toml"
     - "sed -i 's/version = \".*\", path =/version = \"^{{version}}\", path =/' Cargo.toml"
-    - "sed -i 's/heron = \".*\"/heron = \"{{version}}\"/' README.md"
-    - "sed -i 's/heron = \".*\"/heron = \"{{version}}\"/' src/lib.rs"
     - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' README.md"
     - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' src/lib.rs"
     - "sed -i 's/heron = { version = \"[0-9a-z\\.-]*\"/heron = { version = \"{{version}}\"/' guide/src/quickstart.md"

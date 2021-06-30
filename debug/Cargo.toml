@@ -7,6 +7,9 @@ license = "MIT"
 description = "Rendering of Heron's collision shapes for debugging purposes"
 repository = "https://github.com/jcornaz/heron/"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 default = []
 2d = ["heron_rapier/2d", "bevy_prototype_lyon"]
