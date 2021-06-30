@@ -1,3 +1,11 @@
+## 0.9.1 - 2021-06-30
+
+### Bug fixes
+
+* Empty documentation on docs.rs
+
+
+
 ## 0.9.0 - 2021-06-29
 
 ### Breaking changes
