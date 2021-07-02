@@ -121,6 +121,12 @@ impl IntoBevy<Vec2> for Point2<f32> {
     }
 }
 
+impl IntoBevy<Vec3> for Point3<f32> {
+    fn into_bevy(self) -> Vec3 {
+        Vec3::new(self.x, self.y, self.z)
+    }
+}
+
 impl IntoBevy<Vec<Vec2>> for &[Point2<f32>] {
     fn into_bevy(self) -> Vec<Vec2> {
         self.iter().copied().map(IntoBevy::into_bevy).collect()
