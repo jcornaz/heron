@@ -13,7 +13,7 @@ This enum list and give names to the physics layer of your game.
 {{#include ../../examples/layers.rs:layer-enum}}
 ```
 
-There can be a maximum of 16 layers.
+There can be a maximum of 32 layers.
 
 ## 2. Add the CollisionLayers component to the concerned entities.
 
