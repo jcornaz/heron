@@ -37,7 +37,7 @@ fn spawn(mut commands: Commands) {
         // Attach a collision shape
         .insert(CollisionShape::Sphere { radius: 10.0 })
         
-        // Optionally add other useful copmonents...
+        // Optionally add other useful components...
         .insert(Velocity::from_linear(Vec3::X * 2.0))
         .insert(Acceleration::from_linear(Vec3::X * 1.0))
         .insert(PhysicMaterial { friction: 1.0, density: 10.0, ..Default::default() })
