@@ -12,7 +12,7 @@ pub use events::{CollisionData, CollisionEvent};
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
 pub use physics_time::PhysicsTime;
-pub use step::PhysicsSteps;
+pub use step::{PhysicsStepDuration, PhysicsSteps};
 pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;

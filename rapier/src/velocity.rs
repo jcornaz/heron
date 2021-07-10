@@ -27,9 +27,13 @@ pub(crate) fn update_rapier_velocity(
 pub(crate) fn apply_velocity_to_kinematic_bodies(
     mut bodies: ResMut<'_, RigidBodySet>,
     physics_step: Res<'_, PhysicsSteps>,
+    bevy_time: Res<'_, bevy::core::Time>,
     query: Query<'_, (&RigidBodyHandle, &RigidBody, &Velocity)>,
 ) {
-    let delta_time = physics_step.duration().as_secs_f32();
+    let delta_time = physics_step
+        .duration()
+        .exact(bevy_time.delta())
+        .as_secs_f32();
     let kinematic_bodies = query
         .iter()
         .filter(|(_, body_type, _)| matches!(body_type, RigidBody::KinematicVelocityBased));

@@ -13,13 +13,35 @@ use bevy::prelude::*;
 pub struct PhysicsSteps(Mode);
 
 enum Mode {
+    MaxDeltaTime(Duration),
     EveryFrame(Duration),
     Timer(Timer),
 }
 
 impl Default for PhysicsSteps {
     fn default() -> Self {
-        Self::from_steps_per_seconds(58.0)
+        Self::from_max_delta_time(Duration::from_secs_f32(0.2) /* 50 FPS */)
+    }
+}
+
+/// The duration of time that this physics step should advance the simulation time
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PhysicsStepDuration {
+    /// The simulation time should be advanced by the provided exact duration
+    Exact(Duration),
+    /// The simulation time should be advanced by this frame's delta-time or the max delta time if
+    /// the delta time is greater than the max
+    MaxDeltaTime(Duration),
+}
+
+impl PhysicsStepDuration {
+    /// Get the exact duration of this physics step, provided the delta-time
+    #[must_use]
+    pub fn exact(&self, delta_time: Duration) -> Duration {
+        match self {
+            PhysicsStepDuration::Exact(duration) => *duration,
+            PhysicsStepDuration::MaxDeltaTime(max) => delta_time.min(*max),
+        }
     }
 }
 
@@ -63,9 +85,8 @@ impl PhysicsSteps {
         Self(Mode::Timer(Timer::new(duration, true)))
     }
 
-    /// Configure the physics systems to run at each and every frame. Regardless of the current FPS.
-    ///
-    /// It takes a duration which is "haw much" the physics simulation should advance at each frame.
+    /// Configure the physics systems to run at each and every frame, advancing the simulation the
+    /// same amount of time each frame.
     ///
     /// Should NOT be used in production. It is mostly useful for testing purposes.
     ///
@@ -78,21 +99,56 @@ impl PhysicsSteps {
         Self(Mode::EveryFrame(duration))
     }
 
+    /// Step the physics simulation every frame, advancing the simulation according to the frame
+    /// delta time, as long as the delta time is not above a provided maximum.
+    ///
+    /// This is the default setting of [`PhysicsSteps`] with a max duration set to 20 ms ( 50 FPS ).
+    ///
+    /// Because it runs the physics step every frame, this physics step mode is precise, but will
+    /// slow down if the frame delta time is higher than the provided `max` duration.
+    ///
+    /// The purpose of setting the max duration is to prevent objects from going through walls, etc.
+    /// in the case that the frame rate drops significantly.
+    ///
+    /// By setting the max duration to `Duration::MAX`, the simulation speed will not slow down,
+    /// regardless of the frame rate, but if the frame rate gets too low, objects may begin to pass
+    /// through each-other because they may travel completely to the other side of a collision
+    /// object in a single frame, depending on their velocity.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use bevy::prelude::*;
+    /// # use heron_core::PhysicsSteps;
+    /// # use std::time::Duration;
+    /// App::build()
+    ///     // Runs physics step every frame.
+    ///     // If the frame rate drops bellow 30 FPS, then the physics simulation will slow down.
+    ///     .insert_resource(PhysicsSteps::from_max_delta_time(Duration::from_secs_f64(1.0 / 30.0)))
+    ///     // ...
+    ///     .run();
+    /// ```
+    #[must_use]
+    pub fn from_max_delta_time(max: Duration) -> Self {
+        Self(Mode::MaxDeltaTime(max))
+    }
+
     /// Returns true only if the current frame is a frame that execute a physics simulation step
     #[must_use]
     pub fn is_step_frame(&self) -> bool {
         match &self.0 {
-            Mode::EveryFrame(_) => true,
+            Mode::EveryFrame(_) | Mode::MaxDeltaTime(_) => true,
             Mode::Timer(timer) => timer.just_finished(),
         }
     }
 
     /// Time that elapses between each physics step
     #[must_use]
-    pub fn duration(&self) -> Duration {
+    pub fn duration(&self) -> PhysicsStepDuration {
         match &self.0 {
-            Mode::EveryFrame(duration) => *duration,
-            Mode::Timer(timer) => timer.duration(),
+            Mode::EveryFrame(duration) => PhysicsStepDuration::Exact(*duration),
+            Mode::Timer(timer) => PhysicsStepDuration::Exact(timer.duration()),
+            Mode::MaxDeltaTime(max) => PhysicsStepDuration::MaxDeltaTime(*max),
         }
     }
 
