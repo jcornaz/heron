@@ -175,7 +175,7 @@ pub(crate) fn remove_invalids_after_component_changed(
     }
 }
 
-trait ColliderFactory {
+pub(crate) trait ColliderFactory {
     fn collider_builder(&self) -> ColliderBuilder;
 
     fn build(

@@ -23,12 +23,13 @@ use crate::rapier::dynamics::{
 };
 use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
-use crate::rapier::pipeline::PhysicsPipeline;
+use crate::rapier::pipeline::{PhysicsPipeline, QueryPipeline};
 
 mod acceleration;
 mod body;
 pub mod convert;
 mod pipeline;
+pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 mod shape;
 mod velocity;
 
@@ -53,6 +54,7 @@ impl Plugin for RapierPlugin {
             .insert_resource(BroadPhase::new())
             .insert_resource(NarrowPhase::new())
             .insert_resource(RigidBodySet::new())
+            .insert_resource(QueryPipeline::new())
             .insert_resource(IslandManager::new())
             .insert_resource(ColliderSet::new())
             .insert_resource(JointSet::new())
