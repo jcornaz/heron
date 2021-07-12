@@ -1,3 +1,16 @@
+## 0.10.0 - 2021-07-12
+
+### Breaking changes
+
+* `PhysicsSteps::duration` now returns a `PhysicsDuration` instead of `Duration`
+
+
+### Features
+
+* Variable timestep mode for PhysicsSteps (#123)
+
+
+
 ## 0.9.1 - 2021-06-30
 
 ### Bug fixes
