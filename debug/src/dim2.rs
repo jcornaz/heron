@@ -140,17 +140,77 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             path.close();
             builder.add(&path.build());
         }
-        CollisionShape::Cuboid { half_extends } => {
-            builder.add(&shapes::Rectangle {
-                origin: RectangleOrigin::Center,
-                width: 2.0 * half_extends.x,
-                height: 2.0 * half_extends.y,
-            });
+        CollisionShape::Cuboid {
+            half_extends,
+            border_radius,
+        } => {
+            // bevy_prototype_lyon doesn't have rounded rectangles yet so we implement our own
+            use lyon_path::{
+                builder::BorderRadii,
+                math::{Point, Rect, Size},
+                path::Builder,
+                traits::PathBuilder,
+            };
+            struct RoundedRectangle {
+                width: f32,
+                height: f32,
+                radius: f32,
+            }
+            impl Geometry for RoundedRectangle {
+                fn add_geometry(&self, b: &mut Builder) {
+                    let real_width = self.width + self.radius * 2.0;
+                    let real_height = self.height + self.radius * 2.0;
+                    b.add_rounded_rectangle(
+                        &Rect::new(
+                            Point::new(-real_width / 2.0, -real_height / 2.0),
+                            Size::new(real_width, real_height),
+                        ),
+                        &BorderRadii {
+                            top_left: self.radius,
+                            top_right: self.radius,
+                            bottom_left: self.radius,
+                            bottom_right: self.radius,
+                        },
+                        lyon_path::Winding::Positive,
+                    );
+                }
+            }
+
+            if let Some(radius) = border_radius {
+                builder.add(&RoundedRectangle {
+                    width: 2.0 * half_extends.x,
+                    height: 2.0 * half_extends.y,
+                    radius: *radius,
+                });
+            } else {
+                builder.add(&shapes::Rectangle {
+                    origin: RectangleOrigin::Center,
+                    width: 2.0 * half_extends.x,
+                    height: 2.0 * half_extends.y,
+                });
+            }
         }
         CollisionShape::ConvexHull { .. } => {
             if let Some(polygon) = shape.as_convex_polygon() {
                 builder.add(&shapes::Polygon {
                     points: polygon.points().into_bevy(),
+                    closed: true,
+                });
+
+            // TODO: Implement better rounded convex hull renderer. Currently our strategy is to
+            // render a circle at each point on the hull to give an impression of what the
+            // border radius adds to the hull, but we don't currently fill in the empty space
+            // around the edges of the polygon that are also taken up by the border radius.
+            } else if let Some(polygon) = shape.as_round_convex_polygon() {
+                for point in polygon.base_shape.points() {
+                    builder.add(&shapes::Circle {
+                        radius: polygon.border_radius,
+                        center: point.into_bevy(),
+                    });
+                }
+
+                builder.add(&shapes::Polygon {
+                    points: polygon.base_shape.points().into_bevy(),
                     closed: true,
                 });
             }

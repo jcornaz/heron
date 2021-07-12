@@ -130,12 +130,22 @@ pub enum CollisionShape {
         ///
         /// In 2d the `z` axis is ignored
         half_extends: Vec3,
+        /// An optional border radius that will be used to round the corners of the cuboid
+        ///
+        /// This radius refers to how much to _add_ to the existing size of the cuboid, creating an
+        /// extra buffer around the un-rounded extent.
+        border_radius: Option<f32>,
     },
 
     /// A convex polygon/polyhedron shape
     ConvexHull {
         /// A vector of points describing the convex hull
         points: Vec<Vec3>,
+        /// An optional border radius that will be used to round the corners of the convex hull
+        ///
+        /// This radius refers to how much to _add_ to the existing size of the hull, creating an
+        /// extra buffer around the un-rounded mesh.
+        border_radius: Option<f32>,
     },
 
     /// A shape defined by the height of points.

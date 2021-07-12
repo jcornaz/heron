@@ -734,6 +734,7 @@ mod tests {
             commands.spawn_bundle((
                 CollisionShape::Cuboid {
                     half_extends: Vec3::new(10., 10., 10.),
+                    border_radius: None,
                 },
                 RigidBody::Static,
                 Transform::from_xyz(0., 100., 0.),
@@ -834,6 +835,7 @@ mod tests {
             let result = physics_world.shape_cast(
                 &CollisionShape::Cuboid {
                     half_extends: Vec3::new(10., 10., 10.),
+                    border_radius: None,
                 },
                 Vec3::default(),
                 Quat::default(),
@@ -880,6 +882,7 @@ mod tests {
             let result = physics_world.shape_cast(
                 &CollisionShape::Cuboid {
                     half_extends: Vec3::new(10., 10., 10.),
+                    border_radius: None,
                 },
                 Vec3::default(),
                 Quat::default(),

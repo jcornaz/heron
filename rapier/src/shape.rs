@@ -218,8 +218,14 @@ impl ColliderFactory for CollisionShape {
                 half_segment: half_height,
                 radius,
             } => ColliderBuilder::capsule_y(*half_height, *radius),
-            CollisionShape::Cuboid { half_extends } => cuboid_builder(*half_extends),
-            CollisionShape::ConvexHull { points } => convex_hull_builder(points.as_slice()),
+            CollisionShape::Cuboid {
+                half_extends,
+                border_radius,
+            } => cuboid_builder(*half_extends, *border_radius),
+            CollisionShape::ConvexHull {
+                points,
+                border_radius,
+            } => convex_hull_builder(points.as_slice(), *border_radius),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
         }
         // General all types of collision events
@@ -229,20 +235,41 @@ impl ColliderFactory for CollisionShape {
 
 #[inline]
 #[cfg(dim2)]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y)
+fn cuboid_builder(half_extends: Vec3, border_radius: Option<f32>) -> ColliderBuilder {
+    border_radius.map_or_else(
+        || ColliderBuilder::cuboid(half_extends.x, half_extends.y),
+        |border_radius| {
+            ColliderBuilder::round_cuboid(half_extends.x, half_extends.y, border_radius)
+        },
+    )
 }
 
 #[inline]
 #[cfg(dim3)]
-fn cuboid_builder(half_extends: Vec3) -> ColliderBuilder {
-    ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z)
+fn cuboid_builder(half_extends: Vec3, border_radius: Option<f32>) -> ColliderBuilder {
+    border_radius.map_or_else(
+        || ColliderBuilder::cuboid(half_extends.x, half_extends.y, half_extends.z),
+        |border_radius| {
+            ColliderBuilder::round_cuboid(
+                half_extends.x,
+                half_extends.y,
+                half_extends.z,
+                border_radius,
+            )
+        },
+    )
 }
 
 #[inline]
-fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
+fn convex_hull_builder(points: &[Vec3], border_radius: Option<f32>) -> ColliderBuilder {
     let points: Vec<Point<f32>> = points.into_rapier();
-    ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull")
+    border_radius.map_or_else(
+        || ColliderBuilder::convex_hull(points.as_slice()).expect("Failed to create convex-hull"),
+        |border_radius| {
+            ColliderBuilder::round_convex_hull(points.as_slice(), border_radius)
+                .expect("Failed to create convex-hull")
+        },
+    )
 }
 
 #[inline]
@@ -251,7 +278,7 @@ fn convex_hull_builder(points: &[Vec3]) -> ColliderBuilder {
 fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let len = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
-        crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).cloned()),
+        crate::rapier::na::DVector::from_iterator(len, heights.iter().flatten().take(len).copied()),
         crate::rapier::na::Vector2::new(size.x, 1.0),
     )
 }
@@ -291,6 +318,7 @@ mod tests {
     fn build_cuboid() {
         let collider = CollisionShape::Cuboid {
             half_extends: Vec3::new(1.0, 2.0, 3.0),
+            border_radius: None,
         }
         .collider_builder()
         .build();
