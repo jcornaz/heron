@@ -12,5 +12,5 @@ bevy = { version = "^0.5.0", default-features = false }
 duplicate = "^0.3.0"
 
 [dev-dependencies]
-rstest = "0.7"
+rstest = "0.10"
 bevy = { version = "^0.5.0", default-features = false, features = ["render"] }
