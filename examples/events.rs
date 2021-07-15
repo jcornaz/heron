@@ -85,6 +85,7 @@ fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<ColorMateri
         .insert(RigidBody::Dynamic)
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         })
         .insert(Velocity::default())
         .insert(CollisionLayers::new(Layer::Player, Layer::Enemy));
@@ -102,6 +103,7 @@ fn spawn_enemy(mut commands: Commands, mut materials: ResMut<Assets<ColorMateria
         .insert(RigidBody::Static)
         .insert(CollisionShape::Cuboid {
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         })
         .insert(CollisionLayers::new(Layer::Enemy, Layer::Player));
 }

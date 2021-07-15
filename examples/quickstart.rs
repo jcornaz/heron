@@ -32,5 +32,6 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         .insert(CollisionShape::Cuboid {
             // let the size be consistent with our sprite
             half_extends: size.extend(0.0) / 2.0,
+            border_radius: None,
         });
 }
