@@ -17,12 +17,12 @@
 //!
 //! For a 3d game:
 //! ```toml
-//! heron = { version = "0.10.1", features = ["3d"] }
+//! heron = { version = "0.11.0", features = ["3d"] }
 //! ```
 //!
 //! For as 2d game:
 //! ```toml
-//! heron = { version = "0.10.1", features = ["2d"] }
+//! heron = { version = "0.11.0", features = ["2d"] }
 //! ```
 //!
 //! ### Feature flags

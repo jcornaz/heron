@@ -1,6 +1,6 @@
 [package]
 name = "heron_macros"
-version = "0.10.1" # auto-version
+version = "0.11.0" # auto-version
 authors = ["Jonathan Cornaz"]
 edition = "2018"
 license = "MIT"
@@ -11,6 +11,6 @@ repository = "https://github.com/jcornaz/heron/"
 proc-macro = true
 
 [dependencies]
-heron_core = { version = "^0.10.1", path = "../core" }
+heron_core = { version = "^0.11.0", path = "../core" }
 syn = "^1.0"
 quote = "^1.0"

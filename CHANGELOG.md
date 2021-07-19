@@ -1,4 +1,27 @@
-## 0.10.1 - 2021-07-19
+## 0.11.0 - 2021-07-19
+
+### Breaking changes
+
+* `CollisionShape::Cuboid` and `CollisionShape::ConvexHull` now have `rounded` member (that can be `None`)
+
+
+### Features
+
+* `PhysicsWorld` system parameter that can be used for ray and shape casting (#129)
+
+
+## 0.10.1 - 2021-07-19 [YANKED]
+
+### YANKED
+
+This release is yanked because breaking changes have accidentally landed in this minor semver bump.
+
+It has been re-released under the version number `0.11.0` to reflect the presence of breaking changes.
+
+### Breaking changes
+
+* `CollisionShape::Cuboid` and `CollisionShape::ConvexHull` now have `rounded` member (that can be `None`)
+
 
 ### Features
 
