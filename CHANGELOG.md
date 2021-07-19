@@ -1,3 +1,11 @@
+## 0.10.1 - 2021-07-19
+
+### Features
+
+* `PhysicsWorld` system parameter that can be used for ray and shape casting (#129)
+
+
+
 ## 0.10.0 - 2021-07-12
 
 ### Breaking changes
