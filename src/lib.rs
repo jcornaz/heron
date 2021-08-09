@@ -119,7 +119,7 @@
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]
 
-use bevy::app::{AppBuilder, Plugin};
+use bevy::app::{App, Plugin};
 
 pub use heron_core::*;
 pub use heron_macros::*;
@@ -138,9 +138,9 @@ pub mod prelude {
 
     #[allow(deprecated)]
     pub use crate::{
-        ext::*, stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
-        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime,
-        RigidBody, RotationConstraints, Velocity,
+        stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape, Gravity,
+        PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime, RigidBody,
+        RotationConstraints, Velocity,
     };
 }
 
@@ -153,7 +153,7 @@ pub struct PhysicsPlugin {
 }
 
 impl Plugin for PhysicsPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(RapierPlugin);
 
         #[cfg(debug)]

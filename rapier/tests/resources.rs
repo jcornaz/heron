@@ -15,15 +15,14 @@ mod utils;
 #[test]
 fn can_define_gravity_before_plugin() {
     let app = {
-        let mut builder = App::build();
+        let mut app = App::new();
 
-        builder
-            .insert_resource(Gravity::from(Vec3::Y))
+        app.insert_resource(Gravity::from(Vec3::Y))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
             .add_plugin(RapierPlugin::default());
 
-        builder.app
+        app
     };
 
     assert_eq!(
@@ -35,15 +34,14 @@ fn can_define_gravity_before_plugin() {
 #[test]
 fn can_define_time_scale_before_plugin() {
     let app = {
-        let mut builder = App::build();
+        let mut app = App::new();
 
-        builder
-            .insert_resource(PhysicsTime::new(0.5))
+        app.insert_resource(PhysicsTime::new(0.5))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
             .add_plugin(RapierPlugin::default());
 
-        builder.app
+        app
     };
 
     assert_eq!(
@@ -54,13 +52,13 @@ fn can_define_time_scale_before_plugin() {
 
 #[test]
 fn rapier_world_is_registered() {
-    let mut app = App::build();
+    let mut app = App::new();
     app.init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin::default());
 
-    assert!(app.world().contains_resource::<RigidBodySet>());
-    assert!(app.world().contains_resource::<ColliderSet>());
-    assert!(app.world().contains_resource::<JointSet>());
-    assert!(app.world().contains_resource::<IntegrationParameters>());
+    assert!(app.world.contains_resource::<RigidBodySet>());
+    assert!(app.world.contains_resource::<ColliderSet>());
+    assert!(app.world.contains_resource::<JointSet>());
+    assert!(app.world.contains_resource::<IntegrationParameters>());
 }

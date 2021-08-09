@@ -15,13 +15,13 @@ use utils::*;
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
-    builder
+    let mut app = App::new();
+    app
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    app
 }
 
 #[test]

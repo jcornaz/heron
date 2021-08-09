@@ -13,12 +13,11 @@ use utils::*;
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut app = App::new();
     let mut parameters = IntegrationParameters::default();
     parameters.dt = 1.0;
 
-    builder
-        .init_resource::<TypeRegistryArc>()
+    app.init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin)
@@ -26,7 +25,7 @@ fn test_app() -> App {
             bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),
         );
-    builder.app
+    app
 }
 
 #[test]

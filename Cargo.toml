@@ -1,5 +1,10 @@
 [workspace]
-members = ["core", "debug", "rapier", "macros"]
+members = [
+    "core",
+    # "debug",
+    "rapier",
+    "macros"
+]
 
 [package]
 name = "heron"
@@ -11,6 +16,7 @@ description = "An ergonomic physics API for 2d and 3d bevy games. (powered by ra
 repository = "https://github.com/jcornaz/heron/"
 keywords = ["game", "gamedev", "physics", "collision", "bevy"]
 categories = ["game-development", "simulation"]
+resolver = "2"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -19,17 +25,17 @@ all-features = true
 default = []
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d"]
-debug-2d = ["2d", "heron_debug/2d"]
+# debug-2d = ["2d", "heron_debug/2d"]
 
 [dependencies]
 heron_core = { version = "^0.11.0", path = "core" }
 heron_macros = { version = "^0.11.0", path = "macros" }
 heron_rapier = { version = "^0.11.0", path = "rapier" }
-heron_debug = { version = "^0.11.0", path = "debug", optional = true }
-bevy = { version = "^0.5.0", default-features = false }
+# heron_debug = { version = "^0.11.0", path = "debug", optional = true }
+bevy = { git = "https://github.com/katharostech/bevy", branch = "bevy_retrograde_0.3", default-features = false }
 
 [dev-dependencies]
-bevy = "0.5"
+bevy = { git = "https://github.com/katharostech/bevy", branch = "bevy_retrograde_0.3" }
 skeptic = "0.13"
 rstest = "0.7"
 
@@ -40,17 +46,17 @@ cfg_aliases = "0.1.1"
 name = "demo"
 required-features = ["2d"]
 
-[[example]]
-name = "debug"
-required-features = ["debug-2d"]
+# [[example]]
+# name = "debug"
+# required-features = ["debug-2d"]
 
 [[example]]
 name = "quickstart"
 required-features = ["2d"]
 
-[[example]]
-name = "collision_shapes_in_child_entity"
-required-features = ["debug-2d"]
+# [[example]]
+# name = "collision_shapes_in_child_entity"
+# required-features = ["debug-2d"]
 
 [[example]]
 name = "layers"

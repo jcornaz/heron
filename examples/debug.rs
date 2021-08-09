@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use heron::*;
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
         .add_startup_system(spawn.system())

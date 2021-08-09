@@ -14,12 +14,13 @@ use crate::rapier::pipeline::ActiveEvents;
 pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
 
 pub(crate) fn create(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut handles: ResMut<'_, HandleMap>,
-    rigid_bodies: Query<'_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
+    rigid_bodies: Query<'_, '_, (&RigidBody, &RigidBodyHandle, Option<&PhysicMaterial>)>,
     collision_shapes: Query<
+        '_,
         '_,
         (
             Entity,
@@ -71,7 +72,7 @@ pub(crate) fn create(
 
 pub(crate) fn update_position(
     mut colliders: ResMut<'_, ColliderSet>,
-    query: Query<'_, (&Transform, &ColliderHandle), (Changed<Transform>, Without<RigidBody>)>,
+    query: Query<'_, '_, (&Transform, &ColliderHandle), (Changed<Transform>, Without<RigidBody>)>,
 ) {
     for (transform, handle) in query.iter() {
         if let Some(collider) = colliders.get_mut(*handle) {
@@ -83,7 +84,7 @@ pub(crate) fn update_position(
 
 pub(crate) fn update_collision_groups(
     mut colliders: ResMut<'_, ColliderSet>,
-    query: Query<'_, (&CollisionLayers, &ColliderHandle), Changed<CollisionLayers>>,
+    query: Query<'_, '_, (&CollisionLayers, &ColliderHandle), Changed<CollisionLayers>>,
 ) {
     for (layers, handle) in query.iter() {
         if let Some(collider) = colliders.get_mut(*handle) {
@@ -94,7 +95,7 @@ pub(crate) fn update_collision_groups(
 
 pub(crate) fn update_sensor_flag(
     mut colliders: ResMut<'_, ColliderSet>,
-    query: Query<'_, &ColliderHandle, Changed<SensorShape>>,
+    query: Query<'_, '_, &ColliderHandle, Changed<SensorShape>>,
 ) {
     for handle in query.iter() {
         if let Some(collider) = colliders.get_mut(*handle) {
@@ -107,8 +108,8 @@ pub(crate) fn update_sensor_flag(
 pub(crate) fn remove_sensor_flag(
     bodies: Res<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    rigid_bodies: Query<'_, &RigidBody>,
-    collider_handles: Query<'_, &ColliderHandle>,
+    rigid_bodies: Query<'_, '_, &RigidBody>,
+    collider_handles: Query<'_, '_, &ColliderHandle>,
     removed: RemovedComponents<'_, SensorShape>,
 ) {
     removed
@@ -130,7 +131,7 @@ pub(crate) fn remove_sensor_flag(
 
 pub(crate) fn reset_collision_groups(
     mut colliders: ResMut<'_, ColliderSet>,
-    handles: Query<'_, &ColliderHandle>,
+    handles: Query<'_, '_, &ColliderHandle>,
     removed: RemovedComponents<'_, CollisionLayers>,
 ) {
     removed
@@ -144,7 +145,7 @@ pub(crate) fn reset_collision_groups(
 }
 
 pub(crate) fn remove_invalids_after_components_removed(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
@@ -161,12 +162,12 @@ pub(crate) fn remove_invalids_after_components_removed(
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn remove_invalids_after_component_changed(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
-    changed: Query<'_, (Entity, &ColliderHandle), Changed<CollisionShape>>,
+    changed: Query<'_, '_, (Entity, &ColliderHandle), Changed<CollisionShape>>,
 ) {
     for (entity, handle) in changed.iter() {
         colliders.remove(*handle, &mut islands, &mut bodies, true);

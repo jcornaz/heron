@@ -13,7 +13,7 @@ enum Layer {
 struct Player;
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default())
         .add_startup_system(spawn_camera.system())

@@ -39,12 +39,15 @@ mod physics_world {
     /// See the [ray_casting](https://github.com/jcornaz/heron/blob/main/examples/ray_casting.rs)
     /// example for a detailed usage example.
     #[derive(SystemParam)]
-    pub struct PhysicsWorld<'a> {
-        query_pipeline: ResMut<'a, QueryPipeline>,
-        colliders: ResMut<'a, ColliderSet>,
+    pub struct PhysicsWorld<'s, 'w> {
+        query_pipeline: ResMut<'w, QueryPipeline>,
+        colliders: ResMut<'w, ColliderSet>,
+        // This is just to use the 's lifetime parameter which is required because of oddities with
+        // the SystemParam derive.
+        _phantom: Commands<'s, 'w>,
     }
 
-    impl<'a> PhysicsWorld<'a> {
+    impl<'s, 'w> PhysicsWorld<'s, 'w> {
         /// Cast a ray and get the collision shape entity, point, and normal at which it collided,
         /// if any
         ///
@@ -500,7 +503,6 @@ impl EventManager {
 #[cfg(test)]
 mod tests {
     use bevy::prelude::App;
-    use bevy::prelude::AppBuilder;
     use bevy::prelude::GlobalTransform;
     use bevy::prelude::Transform;
     use bevy::MinimalPlugins;
@@ -728,8 +730,8 @@ mod tests {
 
     /// Marker struct for Ray cast test collider shape
     struct RayCastTestCollider;
-    fn setup_ray_cast_test_app() -> AppBuilder {
-        fn setup(mut commands: Commands<'_>) {
+    fn setup_ray_cast_test_app() -> App {
+        fn setup(mut commands: Commands<'_, '_>) {
             // Spawn a block above the world center
             commands.spawn_bundle((
                 CollisionShape::Cuboid {
@@ -743,7 +745,7 @@ mod tests {
             ));
         }
 
-        let mut app = App::build();
+        let mut app = App::new();
         app.add_plugins(MinimalPlugins)
             .add_plugin(RapierPlugin)
             .add_startup_system(setup.system());
@@ -756,8 +758,8 @@ mod tests {
         /// The system to test ray casting
         fn ray_cast(
             mut runs: Local<'_, i32>,
-            physics_world: PhysicsWorld<'_>,
-            test_colliders: Query<'_, (), With<RayCastTestCollider>>,
+            physics_world: PhysicsWorld<'_, '_>,
+            test_colliders: Query<'_, '_, (), With<RayCastTestCollider>>,
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
@@ -786,14 +788,14 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
     fn ray_cast_miss() {
         /// The system to test ray casting
-        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_>) {
+        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
                 *runs = *runs + 1;
@@ -813,8 +815,8 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
@@ -822,8 +824,8 @@ mod tests {
         /// System to test shape casting
         fn ray_cast(
             mut runs: Local<'_, i32>,
-            physics_world: PhysicsWorld<'_>,
-            test_colliders: Query<'_, (), With<RayCastTestCollider>>,
+            physics_world: PhysicsWorld<'_, '_>,
+            test_colliders: Query<'_, '_, (), With<RayCastTestCollider>>,
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
@@ -864,14 +866,14 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
     fn shape_cast_miss() {
         /// System to test shape casting
-        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_>) {
+        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
                 *runs = *runs + 1;
@@ -899,7 +901,7 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 }

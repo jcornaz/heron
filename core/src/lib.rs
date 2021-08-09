@@ -17,7 +17,7 @@ pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 mod events;
-pub mod ext;
+// pub mod ext;
 mod gravity;
 mod layers;
 mod physics_time;
@@ -57,7 +57,7 @@ pub struct CorePlugin;
 
 #[allow(deprecated)]
 impl Plugin for CorePlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
             .init_resource::<PhysicsSteps>()

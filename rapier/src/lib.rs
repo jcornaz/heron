@@ -44,7 +44,7 @@ enum InternalSystem {
 }
 
 impl Plugin for RapierPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin)
             .init_resource::<PhysicsPipeline>()
             .init_resource::<body::HandleMap>()

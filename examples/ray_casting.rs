@@ -5,7 +5,7 @@ use heron::{
 };
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(WindowDescriptor {
             height: 900.0,
             width: 900.0,

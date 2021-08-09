@@ -9,7 +9,7 @@ use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&RigidBodyHandle, Option<&RigidBody>, &Velocity), Changed<Velocity>>,
+    query: Query<'_, '_, (&RigidBodyHandle, Option<&RigidBody>, &Velocity), Changed<Velocity>>,
 ) {
     let dynamic_bodies = query.iter().filter(|(_, body_type, _)| {
         matches!(body_type.copied().unwrap_or_default(), RigidBody::Dynamic)
@@ -28,7 +28,7 @@ pub(crate) fn apply_velocity_to_kinematic_bodies(
     mut bodies: ResMut<'_, RigidBodySet>,
     physics_step: Res<'_, PhysicsSteps>,
     bevy_time: Res<'_, bevy::core::Time>,
-    query: Query<'_, (&RigidBodyHandle, &RigidBody, &Velocity)>,
+    query: Query<'_, '_, (&RigidBodyHandle, &RigidBody, &Velocity)>,
 ) {
     let delta_time = physics_step
         .duration()
@@ -50,7 +50,7 @@ pub(crate) fn apply_velocity_to_kinematic_bodies(
 
 pub(crate) fn update_velocity_component(
     bodies: Res<'_, RigidBodySet>,
-    mut velocities: Query<'_, (&RigidBodyHandle, &mut Velocity)>,
+    mut velocities: Query<'_, '_, (&RigidBodyHandle, &mut Velocity)>,
 ) {
     for (handle, mut velocity) in velocities.iter_mut() {
         if let Some(body) = bodies.get(*handle).filter(|it| it.is_dynamic()) {

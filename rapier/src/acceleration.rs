@@ -11,7 +11,7 @@ use crate::rapier::{
 
 pub(crate) fn update_rapier_force_and_torque(
     mut bodies: ResMut<'_, RigidBodySet>,
-    accelerations: Query<'_, (&RigidBodyHandle, &Acceleration)>,
+    accelerations: Query<'_, '_, (&RigidBodyHandle, &Acceleration)>,
 ) {
     for (handle, acceleration) in accelerations.iter() {
         if let Some(body) = bodies.get_mut(*handle) {
