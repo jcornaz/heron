@@ -78,7 +78,9 @@ fn track_debug_entities(
     }
 }
 
-fn scale_debug_entities(mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform)>) {
+fn scale_debug_entities(
+    mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform), With<IsDebug>>,
+) {
     query
         .iter_mut()
         .filter(|(_, global)| {
