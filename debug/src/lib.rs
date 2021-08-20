@@ -11,11 +11,14 @@ use fnv::FnvHashMap;
 mod dim2;
 
 /// Plugin that enables rendering of collision shapes
-#[derive(Debug, Copy, Clone)]
-pub struct DebugPlugin(Color);
+#[derive(Debug, Copy, Clone, Default)]
+pub struct DebugPlugin(DebugColor);
 
 #[derive(Debug, Copy, Clone)]
-struct DebugColor(Color);
+struct DebugColor {
+    physics: Color,
+    sensor: Color,
+}
 
 type DebugEntityMap = FnvHashMap<Entity, Entity>;
 
@@ -28,19 +31,11 @@ struct IsDebug(Entity);
 #[allow(unused)]
 struct Indexed;
 
-impl From<Color> for DebugPlugin {
+/* impl From<Color> for DebugPlugin {
     fn from(color: Color) -> Self {
         Self(color)
     }
-}
-
-impl Default for DebugPlugin {
-    fn default() -> Self {
-        let mut color = bevy::render::color::Color::BLUE;
-        color.set_a(0.4);
-        Self(color)
-    }
-}
+} */
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -48,14 +43,14 @@ impl Plugin for DebugPlugin {
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim2::systems());
 
-        app.insert_resource(DebugColor(self.0))
+        app.insert_resource(self.0)
             .init_resource::<DebugEntityMap>()
             .add_system_to_stage(CoreStage::Last, track_debug_entities.system())
             .add_system_to_stage(CoreStage::Last, scale_debug_entities.system());
     }
 }
 
-impl From<Color> for DebugColor {
+/* impl From<Color> for DebugColor {
     fn from(color: Color) -> Self {
         Self(color)
     }
@@ -64,6 +59,19 @@ impl From<Color> for DebugColor {
 impl From<DebugColor> for Color {
     fn from(DebugColor(color): DebugColor) -> Self {
         color
+    }
+} */
+
+impl Default for DebugColor {
+    fn default() -> Self {
+        let mut physics_color = bevy::render::color::Color::BLUE;
+        physics_color.set_a(0.4);
+        let mut sensor_color = bevy::render::color::Color::GREEN;
+        sensor_color.set_a(0.4);
+        Self {
+            physics: physics_color,
+            sensor: sensor_color,
+        }
     }
 }
 
