@@ -6,10 +6,9 @@ use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, Sen
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{
-    Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
+    ActiveCollisionTypes, Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
 };
 use crate::rapier::math::Point;
-use crate::rapier::pipeline::ActiveCollisionTypes;
 use crate::rapier::pipeline::ActiveEvents;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
