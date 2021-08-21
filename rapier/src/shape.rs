@@ -206,10 +206,9 @@ pub(crate) trait ColliderFactory {
             builder = builder.collision_groups(layers.into_rapier());
         }
 
-        // Activate all collision types
-        builder.active_collision_types(ActiveCollisionTypes::all());
-
-        builder.build()
+        builder
+            .active_collision_types(ActiveCollisionTypes::all()) // Activate all collision types
+            .build()
     }
 }
 
