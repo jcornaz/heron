@@ -9,6 +9,7 @@ use crate::rapier::geometry::{
     Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
 };
 use crate::rapier::math::Point;
+use crate::rapier::pipeline::ActiveCollisionTypes;
 use crate::rapier::pipeline::ActiveEvents;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, ColliderHandle>;
@@ -205,6 +206,9 @@ pub(crate) trait ColliderFactory {
         if let Some(layers) = layers {
             builder = builder.collision_groups(layers.into_rapier());
         }
+
+        // Activate all collision types
+        builder.active_collision_types(ActiveCollisionTypes::all());
 
         builder.build()
     }
