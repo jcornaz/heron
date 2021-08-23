@@ -13,7 +13,7 @@ with this code. You should also add this to your projects's `Cargo.toml`:
 ```toml
 [dependencies]
 bevy = { version = "0.5"} 
-heron = { version = "0.11.0", features = ["2d"] }
+heron = { version = "0.11.1", features = ["2d"] }
 ```
 
 Heron defaults to 3d. To make sure we run it in 2d mode we have to configure it

@@ -1,3 +1,11 @@
+## 0.11.1 - 2021-08-23
+
+### Bug fixes
+
+* Too broad scaling of all shapes with debug mode (#138)
+
+
+
 ## 0.11.0 - 2021-07-19
 
 ### Breaking changes
