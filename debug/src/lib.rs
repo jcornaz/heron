@@ -49,10 +49,10 @@ impl Plugin for DebugPlugin {
 impl Default for DebugColor {
     fn default() -> Self {
         Self {
-            sensor: Color::rgba(0.0, 0.45882, 0.22745, 0.4),
-            static_body: Color::rgba(0.69804, 0.12157, 0.20784, 0.4),
-            dynamic_body: Color::rgba(0.0, 0.32157, 0.64706, 0.4),
-            kinematic_body: Color::rgba(0.40784, 0.11765, 0.49412, 0.4),
+            sensor: Color::rgba(0.0, 0.63, 0.0, 0.4),
+            static_body: Color::rgba(0.64, 0.0, 0.16, 0.4),
+            dynamic_body: Color::rgba(0.0, 0.18, 0.54, 0.4),
+            kinematic_body: Color::rgba(0.21, 0.07, 0.7, 0.4),
         }
     }
 }
