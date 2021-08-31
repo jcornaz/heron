@@ -59,9 +59,20 @@ fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody
             GlobalTransform::default(),
             type2,
             CollisionShape::Sphere { radius: 10.0 },
-            Velocity::from_linear(Vec3::X * 30.0),
         ))
         .id();
+
+    if type2.can_have_velocity() {
+        app.world
+            .entity_mut(entity2)
+            .insert(Velocity::from_linear(Vec3::X * 30.0));
+    } else {
+        app.world
+            .get_mut::<Transform>(entity2)
+            .unwrap()
+            .translation
+            .x += 30.0;
+    }
 
     let mut event_reader = app
         .world
@@ -73,6 +84,14 @@ fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody
 
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
+
+    if !type2.can_have_velocity() {
+        app.world
+            .get_mut::<Transform>(entity2)
+            .unwrap()
+            .translation
+            .x += 30.0;
+    }
 
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
