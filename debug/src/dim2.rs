@@ -121,6 +121,8 @@ fn create_color(
             }
         }
     }
+
+    debug_color.dynamic_body
 }
 
 fn create_shape(
