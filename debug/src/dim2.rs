@@ -44,7 +44,7 @@ fn create_debug_sprites(
                         .spawn_bundle(create_shape(
                             body,
                             collider.shape(),
-                            create_color(rigid_body_option, sensor_option, *debug_color),
+                            create_color(rigid_body_option, sensor_option, &*debug_color),
                             *transform,
                         ))
                         .insert(IsDebug(entity));
@@ -82,7 +82,7 @@ fn replace_debug_sprite(
                     .spawn_bundle(create_shape(
                         body,
                         collider.shape(),
-                        create_color(rigid_body_option, sensor_option, *debug_color),
+                        create_color(rigid_body_option, sensor_option, &*debug_color),
                         *transform,
                     ))
                     .insert(IsDebug(parent_entity));
