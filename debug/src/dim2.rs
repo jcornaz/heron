@@ -109,7 +109,7 @@ fn create_color(
     debug_color: Res<DebugColor>,
 ) -> Color {
     if sensor_option.is_some() {
-        debug_color.sensor
+        return debug_color.sensor;
     } else {
         if rigid_body_option.is_some() {
             return match rigid_body_option.unwrap() {
