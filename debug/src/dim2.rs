@@ -112,13 +112,13 @@ fn create_color(
         debug_color.sensor
     } else {
         if rigid_body_option.is_some() {
-            match rigid_body_option.unwrap() {
+            return match rigid_body_option.unwrap() {
                 RigidBody::Sensor => debug_color.sensor,
                 RigidBody::Static => debug_color.static_body,
                 RigidBody::Dynamic => debug_color.dynamic_body,
                 RigidBody::KinematicPositionBased => debug_color.kinematic_body,
                 RigidBody::KinematicVelocityBased => debug_color.kinematic_body,
-            }
+            };
         }
     }
 
