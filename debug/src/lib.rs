@@ -16,8 +16,10 @@ pub struct DebugPlugin(DebugColor);
 
 #[derive(Debug, Copy, Clone)]
 struct DebugColor {
-    physics: Color,
     sensor: Color,
+    static_body: Color,
+    dynamic_body: Color,
+    kinematic_body: Color,
 }
 
 type DebugEntityMap = FnvHashMap<Entity, Entity>;
@@ -30,12 +32,6 @@ struct IsDebug(Entity);
 
 #[allow(unused)]
 struct Indexed;
-
-/* impl From<Color> for DebugPlugin {
-    fn from(color: Color) -> Self {
-        Self(color)
-    }
-} */
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
@@ -50,27 +46,13 @@ impl Plugin for DebugPlugin {
     }
 }
 
-/* impl From<Color> for DebugColor {
-    fn from(color: Color) -> Self {
-        Self(color)
-    }
-}
-
-impl From<DebugColor> for Color {
-    fn from(DebugColor(color): DebugColor) -> Self {
-        color
-    }
-} */
-
 impl Default for DebugColor {
     fn default() -> Self {
-        let mut physics_color = bevy::render::color::Color::BLUE;
-        physics_color.set_a(0.4);
-        let mut sensor_color = bevy::render::color::Color::GREEN;
-        sensor_color.set_a(0.4);
         Self {
-            physics: physics_color,
-            sensor: sensor_color,
+            sensor: Color::rgba(0., 117., 58., 0.4),
+            static_body: Color::rgba(178., 31., 53., 0.4),
+            dynamic_body: Color::rgba(0., 82., 165., 0.4),
+            kinematic_body: Color::rgba(10.4, 30., 126., 0.4),
         }
     }
 }

@@ -5,7 +5,7 @@ use bevy_prototype_lyon::entity::ShapeBundle;
 use bevy_prototype_lyon::prelude::*;
 use bevy_prototype_lyon::shapes::RectangleOrigin;
 
-use heron_core::{CollisionShape, SensorShape};
+use heron_core::{CollisionShape, RigidBody, SensorShape};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier2d::geometry::{ColliderHandle, ColliderSet, Shape};
 
@@ -28,13 +28,14 @@ fn create_debug_sprites(
             &CollisionShape,
             &ColliderHandle,
             &GlobalTransform,
+            Option<&RigidBody>,
             Option<&SensorShape>,
         ),
         Without<HasDebug>,
     >,
     debug_color: Res<'_, DebugColor>,
 ) {
-    for (entity, body, handle, transform, sensor_option) in query.iter() {
+    for (entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
         if let Some(collider) = colliders.get(*handle) {
             commands
                 .entity(entity)
@@ -43,11 +44,7 @@ fn create_debug_sprites(
                         .spawn_bundle(create_shape(
                             body,
                             collider.shape(),
-                            if sensor_option.is_some() {
-                                debug_color.sensor
-                            } else {
-                                debug_color.physics
-                            },
+                            create_color(rigid_body_option, sensor_option, debug_color),
                             *transform,
                         ))
                         .insert(IsDebug(entity));
@@ -69,12 +66,13 @@ fn replace_debug_sprite(
             &CollisionShape,
             &ColliderHandle,
             &GlobalTransform,
+            Option<&RigidBody>,
             Option<&SensorShape>,
         ),
         (With<HasDebug>, Changed<CollisionShape>),
     >,
 ) {
-    for (parent_entity, body, handle, transform, sensor_option) in query.iter() {
+    for (parent_entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
         if let (Some(debug_entity), Some(collider)) =
             (map.remove(&parent_entity), colliders.get(*handle))
         {
@@ -84,11 +82,7 @@ fn replace_debug_sprite(
                     .spawn_bundle(create_shape(
                         body,
                         collider.shape(),
-                        if sensor_option.is_some() {
-                            debug_color.sensor
-                        } else {
-                            debug_color.physics
-                        },
+                        create_color(rigid_body_option, sensor_option, debug_color),
                         *transform,
                     ))
                     .insert(IsDebug(parent_entity));
@@ -105,6 +99,26 @@ fn delete_debug_sprite(
     for parent_entity in removed_bodies.iter() {
         if let Some(debug_entity) = map.remove(&parent_entity) {
             commands.entity(debug_entity).despawn();
+        }
+    }
+}
+
+fn create_color(
+    rigid_body_option: Option<&RigidBody>,
+    sensor_option: Option<&SensorShape>,
+    debug_color: Res<DebugColor>,
+) -> Color {
+    if sensor_option.is_some() {
+        debug_color.sensor
+    } else {
+        if rigid_body_option.is_some() {
+            match rigid_body_option.unwrap() {
+                RigidBody::Sensor => debug_color.sensor,
+                RigidBody::Static => debug_color.static_body,
+                RigidBody::Dynamic => debug_color.dynamic_body,
+                RigidBody::KinematicPositionBased => debug_color.kinematic_body,
+                RigidBody::KinematicVelocityBased => debug_color.kinematic_body,
+            }
         }
     }
 }
