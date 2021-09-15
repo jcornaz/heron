@@ -43,7 +43,7 @@ pub(crate) fn apply_velocity_to_kinematic_bodies(
             let (mut translation, mut rotation) = body.position().into_bevy();
             translation += velocity.linear * delta_time;
             rotation *= Quat::from(velocity.angular * delta_time);
-            body.set_next_kinematic_position((translation, rotation).into_rapier())
+            body.set_position((translation, rotation).into_rapier(), false)
         }
     }
 }

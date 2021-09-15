@@ -63,3 +63,7 @@ required-features = ["2d"]
 [[example]]
 name = "ray_casting"
 required-features = ["2d"]
+
+[[example]]
+name = "kinematic_velocity_based"
+required-features = ["2d"]
