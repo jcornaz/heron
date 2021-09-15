@@ -111,11 +111,6 @@ fn step_systems() -> SystemSet {
     SystemSet::new()
         .with_run_criteria(heron_core::should_run.system())
         .with_system(
-            velocity::apply_velocity_to_kinematic_bodies
-                .system()
-                .before(PhysicsSystem::Events),
-        )
-        .with_system(
             pipeline::update_integration_parameters
                 .system()
                 .before(PhysicsSystem::Events),
