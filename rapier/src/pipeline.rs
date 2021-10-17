@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::app::Events;
 use bevy::ecs::prelude::*;
 use bevy::ecs::system::SystemParam;
@@ -38,12 +40,14 @@ mod physics_world {
     /// See the [`ray_casting`](heron::ray_casting)
     /// example for a detailed usage example.
     #[derive(SystemParam)]
-    pub struct PhysicsWorld<'a> {
-        query_pipeline: ResMut<'a, QueryPipeline>,
-        colliders: ResMut<'a, ColliderSet>,
+    pub struct PhysicsWorld<'w, 's> {
+        query_pipeline: ResMut<'w, QueryPipeline>,
+        colliders: ResMut<'w, ColliderSet>,
+        #[system_param(ignore)]
+        marker: PhantomData<&'s usize>,
     }
 
-    impl<'a> PhysicsWorld<'a> {
+    impl<'w, 's> PhysicsWorld<'w, 's> {
         /// Cast a ray and get the collision shape entity, point, and normal at which it collided,
         /// if any
         ///
@@ -498,7 +502,6 @@ impl EventManager {
 #[cfg(test)]
 mod tests {
     use bevy::prelude::App;
-    use bevy::prelude::AppBuilder;
     use bevy::prelude::GlobalTransform;
     use bevy::prelude::Transform;
     use bevy::MinimalPlugins;

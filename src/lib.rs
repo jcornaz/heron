@@ -120,7 +120,7 @@
 //! * How to define [`RotationConstraints`]
 //! * How to define [`CustomCollisionShape`] for [`heron_rapier`]
 
-use bevy::app::{AppBuilder, Plugin};
+use bevy::app::{App, Plugin};
 
 pub use heron_core::*;
 pub use heron_macros::*;
@@ -154,7 +154,7 @@ pub struct PhysicsPlugin {
 }
 
 impl Plugin for PhysicsPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(RapierPlugin);
 
         #[cfg(debug)]

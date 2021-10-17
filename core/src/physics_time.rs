@@ -7,7 +7,7 @@
 /// # use heron_core::*;
 ///
 /// fn main() {
-///     App::build()
+///     App::new()
 ///         // ... Add plugins
 ///         .insert_resource(PhysicsTime::new(0.5))
 ///         // ... Add systems
@@ -86,6 +86,7 @@ impl Default for PhysicsTime {
 }
 
 #[cfg(test)]
+#[allow(clippy::float_cmp)]
 mod tests {
     use rstest::rstest;
 

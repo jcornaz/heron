@@ -1,3 +1,4 @@
+use bevy::ecs::component::Component;
 use bevy::math::{Vec2, Vec3};
 
 /// Resource that defines world's gravity.
@@ -9,14 +10,14 @@ use bevy::math::{Vec2, Vec3};
 /// # use heron_core::*;
 ///
 /// fn main() {
-///     App::build()
+///     App::new()
 ///         // ... Add plugins
 ///         .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0)))
 ///         // ... Add systems
 ///         .run();
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Component, Copy, Clone, PartialEq)]
 pub struct Gravity(Vec3);
 
 impl Gravity {

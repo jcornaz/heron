@@ -1,4 +1,4 @@
-use bevy::reflect::Reflect;
+use bevy::{ecs::component::Component, reflect::Reflect};
 
 /// Component that restrict what rotations can be caused by forces.
 ///
@@ -19,7 +19,7 @@ use bevy::reflect::Reflect;
 ///         .insert(RotationConstraints::lock()); // Prevent rotation caused by forces
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Reflect)]
+#[derive(Debug, Component, Copy, Clone, Reflect)]
 pub struct RotationConstraints {
     /// Set to true to prevent rotations around the x axis
     pub allow_x: bool,

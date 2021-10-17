@@ -8,14 +8,18 @@ use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&RigidBodyHandle, Option<&RigidBody>, &Velocity)>,
+    query: Query<
+        '_,
+        '_,
+        (&super::RigidBodyHandle, Option<&RigidBody>, &Velocity),
+    >,
 ) {
     let dynamic_bodies = query
         .iter()
         .filter(|(_, body_type, _)| body_type.copied().unwrap_or_default().can_have_velocity());
 
     for (handle, _, velocity) in dynamic_bodies {
-        if let Some(body) = bodies.get_mut(*handle) {
+        if let Some(body) = bodies.get_mut(handle.0) {
             let wake_up = !velocity.is_near_zero();
             body.set_linvel(velocity.linear.into_rapier(), wake_up);
             body.set_angvel(velocity.angular.into_rapier(), wake_up);
@@ -25,10 +29,10 @@ pub(crate) fn update_rapier_velocity(
 
 pub(crate) fn update_velocity_component(
     bodies: Res<'_, RigidBodySet>,
-    mut velocities: Query<'_, (&RigidBodyHandle, &mut Velocity)>,
+    mut velocities: Query<'_, '_, (&super::RigidBodyHandle, &mut Velocity)>,
 ) {
     for (handle, mut velocity) in velocities.iter_mut() {
-        if let Some(body) = bodies.get(*handle).filter(|it| it.is_dynamic()) {
+        if let Some(body) = bodies.get(handle.0).filter(|it| it.is_dynamic()) {
             velocity.linear = (*body.linvel()).into_bevy();
 
             #[cfg(dim2)]

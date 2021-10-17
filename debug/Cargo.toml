@@ -17,10 +17,10 @@ default = []
 3d = ["heron_rapier/3d", "bevy_prototype_debug_lines"]
 
 [dependencies]
-heron_core = { version = "0.12.1", path = "../core" }
-heron_rapier = { version = "0.12.1", path = "../rapier" }
-bevy = { version = "0.5.0", default-features = false, features = ["render"] }
-bevy_prototype_lyon = { version = "0.3.0", optional = true }
-bevy_prototype_debug_lines = { version = "0.3.3", optional = true }
+heron_core = { version = "^0.12.0", path = "../core" }
+heron_rapier = { version = "^0.12.0", path = "../rapier" }
+bevy = { git="https://github.com/jrxb/bevy.git", default-features = false, features = ["render"] }
+bevy_prototype_lyon = { git = "https://github.com/jrxb/bevy_prototype_lyon.git", optional = true }
+bevy_prototype_debug_lines = { git="https://github.com/jrxb/bevy_debug_lines.git", optional = true }
 lyon_path = { version = "0.17.4", optional = true }
 fnv = "1.0"

@@ -59,7 +59,7 @@ pub struct CorePlugin;
 
 #[allow(deprecated)]
 impl Plugin for CorePlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
             .init_resource::<PhysicsSteps>()
@@ -141,7 +141,7 @@ impl core::fmt::Debug for CustomCollisionShape {
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
 /// ```
-#[derive(Debug, Clone, Reflect)]
+#[derive(Debug, Clone, Component, Reflect)]
 #[non_exhaustive]
 pub enum CollisionShape {
     /// A sphere (or circle in 2d) shape defined by its radius
@@ -254,7 +254,7 @@ impl Default for CollisionShape {
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
+#[derive(Debug, Component, Copy, Clone, Eq, PartialEq, Reflect)]
 pub enum RigidBody {
     /// A dynamic body is normally affected by physic forces and affect the other bodies normally too.
     ///
@@ -346,7 +346,7 @@ impl RigidBody {
 ///     });
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Default, Reflect)]
+#[derive(Debug, Component, Copy, Clone, Default, Reflect)]
 pub struct SensorShape;
 
 /// Component that defines the physics properties of the rigid body
@@ -368,7 +368,7 @@ pub struct SensorShape;
 ///         });
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Reflect)]
+#[derive(Debug, Component, Copy, Clone, PartialEq, Reflect)]
 pub struct PhysicMaterial {
     /// Coefficient of restitution. Affect how much it "bounces" when colliding with other objects.
     ///

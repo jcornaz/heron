@@ -17,16 +17,16 @@ default = []
 3d = ["rapier3d", "heron_core/3d"]
 
 [dependencies]
-heron_core = { version = "0.12.1", path = "../core" }
-bevy = { version = "0.5.0", default-features = false }
-rapier2d = { version = "0.11.1", optional = true }
-rapier3d = { version = "0.11.1", optional = true }
-fnv = "1.0"
-crossbeam = "0.8.0"
+heron_core = { version = "^0.12.0", path = "../core" }
+bevy = { git="https://github.com/jrxb/bevy.git", default-features = false }
+rapier2d = { version = "^0.11.1", optional = true }
+rapier3d = { version = "^0.11.1", optional = true }
+fnv = "^1.0"
+crossbeam = "^0.8.0"
 
 [dev-dependencies]
-bevy = { version = "0.5.0", default-features = false }
-rstest = "0.7.0"
+bevy = { git="https://github.com/jrxb/bevy.git", default-features = false }
+rstest = "0.7"
 
 [build-dependencies]
 cfg_aliases = "0.1.1"

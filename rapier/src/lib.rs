@@ -17,6 +17,7 @@ pub extern crate rapier2d;
 #[cfg(feature = "rapier3d")]
 pub extern crate rapier3d;
 
+use bevy::ecs::component::Component;
 use bevy::prelude::*;
 #[cfg(dim2)]
 pub(crate) use rapier2d as rapier;
@@ -27,9 +28,9 @@ use heron_core::{CollisionEvent, PhysicsSystem};
 pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 
 use crate::rapier::dynamics::{
-    CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
+    self, CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
 };
-use crate::rapier::geometry::{BroadPhase, ColliderSet, NarrowPhase};
+use crate::rapier::geometry::{self, BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
 use crate::rapier::pipeline::{PhysicsPipeline, QueryPipeline};
 
@@ -45,13 +46,19 @@ mod velocity;
 #[derive(Debug, Copy, Clone, Default)]
 pub struct RapierPlugin;
 
+#[derive(Component)]
+struct RigidBodyHandle(dynamics::RigidBodyHandle);
+
+#[derive(Component)]
+pub struct ColliderHandle(pub geometry::ColliderHandle);
+
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum InternalSystem {
     TransformPropagation,
 }
 
 impl Plugin for RapierPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin)
             .init_resource::<PhysicsPipeline>()
             .init_resource::<body::HandleMap>()

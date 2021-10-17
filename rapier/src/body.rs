@@ -14,10 +14,11 @@ pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn create(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut handles: ResMut<'_, HandleMap>,
     query: Query<
+        '_,
         '_,
         (
             Entity,
@@ -26,7 +27,7 @@ pub(crate) fn create(
             Option<&Velocity>,
             Option<&RotationConstraints>,
         ),
-        Without<RigidBodyHandle>,
+        Without<super::RigidBodyHandle>,
     >,
 ) {
     for (entity, transform, body, velocity, rotation_constraints) in query.iter() {
@@ -60,13 +61,15 @@ pub(crate) fn create(
         let rigid_body_handle = bodies.insert(builder.build());
 
         handles.insert(entity, rigid_body_handle);
-        commands.entity(entity).insert(rigid_body_handle);
+        commands
+            .entity(entity)
+            .insert(super::RigidBodyHandle(rigid_body_handle));
     }
 }
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn remove_invalids_after_components_removed(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
@@ -84,14 +87,14 @@ pub(crate) fn remove_invalids_after_components_removed(
             if let Some(handle) = handles.remove(&entity) {
                 remove_collider_handles(&mut commands, &bodies, &colliders, handle);
                 bodies.remove(handle, &mut islands, &mut colliders, &mut joints);
-                commands.entity(entity).remove::<RigidBodyHandle>();
+                commands.entity(entity).remove::<super::RigidBodyHandle>();
             }
         });
 }
 
 #[allow(clippy::type_complexity)]
 pub(crate) fn remove_invalids_after_component_changed(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut handles: ResMut<'_, HandleMap>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
@@ -99,7 +102,8 @@ pub(crate) fn remove_invalids_after_component_changed(
     mut joints: ResMut<'_, JointSet>,
     changed: Query<
         '_,
-        (Entity, &RigidBodyHandle),
+        '_,
+        (Entity, &super::RigidBodyHandle),
         Or<(
             Changed<RigidBody>,
             Changed<RotationConstraints>,
@@ -108,16 +112,16 @@ pub(crate) fn remove_invalids_after_component_changed(
     >,
 ) {
     for (entity, handle) in changed.iter() {
-        remove_collider_handles(&mut commands, &bodies, &colliders, *handle);
-        bodies.remove(*handle, &mut islands, &mut colliders, &mut joints);
-        commands.entity(entity).remove::<RigidBodyHandle>();
+        remove_collider_handles(&mut commands, &bodies, &colliders, handle.0);
+        bodies.remove(handle.0, &mut islands, &mut colliders, &mut joints);
+        commands.entity(entity).remove::<super::RigidBodyHandle>();
         handles.remove(&entity);
     }
 }
 
 #[allow(clippy::manual_filter_map)]
 fn remove_collider_handles(
-    commands: &mut Commands<'_>,
+    commands: &mut Commands<'_, '_>,
     bodies: &RigidBodySet,
     colliders: &ColliderSet,
     handle: RigidBodyHandle,
@@ -132,16 +136,18 @@ fn remove_collider_handles(
             Entity::from_bits(it.user_data as u64)
         })
         .for_each(|collider_entity| {
-            commands.entity(collider_entity).remove::<ColliderHandle>();
+            commands
+                .entity(collider_entity)
+                .remove::<super::ColliderHandle>();
         });
 }
 
 pub(crate) fn update_rapier_position(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&GlobalTransform, &RigidBodyHandle), Changed<GlobalTransform>>,
+    query: Query<'_, '_, (&GlobalTransform, &super::RigidBodyHandle), Changed<GlobalTransform>>,
 ) {
     for (transform, handle) in query.iter() {
-        if let Some(body) = bodies.get_mut(*handle) {
+        if let Some(body) = bodies.get_mut(handle.0) {
             let isometry = (transform.translation, transform.rotation).into_rapier();
             if body.is_kinematic() {
                 body.set_next_kinematic_position(isometry);
@@ -156,10 +162,11 @@ pub(crate) fn update_bevy_transform(
     bodies: Res<'_, RigidBodySet>,
     mut query: Query<
         '_,
+        '_,
         (
             Option<&mut Transform>,
             &mut GlobalTransform,
-            &RigidBodyHandle,
+            &super::RigidBodyHandle,
             Option<&RigidBody>,
         ),
     >,
@@ -169,7 +176,7 @@ pub(crate) fn update_bevy_transform(
             continue;
         }
 
-        let body = match bodies.get(*handle) {
+        let body = match bodies.get(handle.0) {
             None => continue,
             Some(body) => body,
         };

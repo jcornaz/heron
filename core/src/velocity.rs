@@ -1,5 +1,6 @@
 use std::ops::{Mul, MulAssign};
 
+use bevy::ecs::component::Component;
 use bevy::math::prelude::*;
 use bevy::reflect::prelude::*;
 use duplicate::duplicate;
@@ -29,7 +30,7 @@ use crate::utils::NearZero;
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
+#[derive(Debug, Component, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     pub linear: Vec3,
@@ -61,7 +62,7 @@ pub struct Velocity {
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
+#[derive(Debug, Component, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Acceleration {
     /// Linear acceleration in units-per-second-squared on each axis
     pub linear: Vec3,

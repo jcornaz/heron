@@ -1,11 +1,12 @@
 use std::f32::consts::PI;
 
 use bevy::prelude::*;
+use bevy::render::entity::OrthographicCameraBundle;
 
 use heron::*;
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
         .insert_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity

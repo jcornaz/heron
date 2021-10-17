@@ -11,10 +11,10 @@ use crate::rapier::{
 
 pub(crate) fn update_rapier_force_and_torque(
     mut bodies: ResMut<'_, RigidBodySet>,
-    accelerations: Query<'_, (&RigidBodyHandle, &Acceleration)>,
+    accelerations: Query<'_, '_, (&super::RigidBodyHandle, &Acceleration)>,
 ) {
     for (handle, acceleration) in accelerations.iter() {
-        if let Some(body) = bodies.get_mut(*handle) {
+        if let Some(body) = bodies.get_mut(handle.0) {
             update_acceleration(body, acceleration);
         }
     }

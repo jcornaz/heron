@@ -34,16 +34,19 @@ struct DebugColor {
 type DebugEntityMap = FnvHashMap<Entity, Entity>;
 
 #[allow(unused)]
+#[derive(Component)]
 struct HasDebug;
 
 #[allow(unused)]
+#[derive(Component)]
 struct IsDebug(Entity);
 
 #[allow(unused)]
+#[derive(Component)]
 struct Indexed;
 
 impl Plugin for DebugPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         #[cfg(feature = "3d")]
         app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim3::systems());
@@ -101,9 +104,9 @@ impl Default for DebugColor {
 }
 
 fn track_debug_entities(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut map: ResMut<'_, DebugEntityMap>,
-    query: Query<'_, (Entity, &IsDebug), Without<Indexed>>,
+    query: Query<'_, '_, (Entity, &IsDebug), Without<Indexed>>,
 ) {
     for (debug_entity, IsDebug(parent_entity)) in query.iter() {
         map.insert(*parent_entity, debug_entity);
@@ -112,7 +115,7 @@ fn track_debug_entities(
 }
 
 fn scale_debug_entities(
-    mut query: Query<'_, (Option<&mut Transform>, &mut GlobalTransform), With<IsDebug>>,
+    mut query: Query<'_, '_, (Option<&mut Transform>, &mut GlobalTransform), With<IsDebug>>,
 ) {
     query
         .iter_mut()

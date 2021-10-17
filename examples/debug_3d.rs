@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use heron::prelude::*;
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(Msaa { samples: 4 })
         .insert_resource(Gravity::from(Vec3::new(0., -9.81, 0.)))
         .add_plugins(DefaultPlugins)
@@ -191,7 +191,7 @@ fn setup(
         });
 
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(-4.0, 9.0, -4.0),
         ..Default::default()
     });

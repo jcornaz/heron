@@ -1,4 +1,4 @@
-use bevy::reflect::Reflect;
+use bevy::{ecs::component::Component, reflect::Reflect};
 
 /// Describes a collision layer
 ///
@@ -70,7 +70,7 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///         );
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Reflect)]
+#[derive(Debug, Component, Copy, Clone, Eq, PartialEq, Reflect)]
 pub struct CollisionLayers {
     groups: u32,
     masks: u32,
@@ -223,7 +223,7 @@ mod tests {
     fn all_interacts_with_all() {
         assert!(
             CollisionLayers::all::<TestLayer>().interacts_with(CollisionLayers::all::<TestLayer>())
-        )
+        );
     }
 
     #[rstest]

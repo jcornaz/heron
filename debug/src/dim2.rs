@@ -7,7 +7,8 @@ use bevy_prototype_lyon::shapes::RectangleOrigin;
 
 use heron_core::{CollisionShape, RigidBody, SensorShape};
 use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier2d::geometry::{ColliderHandle, ColliderSet, Shape};
+use heron_rapier::rapier2d::geometry::{ColliderSet, Shape};
+use heron_rapier::rapier2d::ColliderHandle;
 
 use super::*;
 
@@ -19,9 +20,10 @@ pub(crate) fn systems() -> SystemSet {
 }
 
 fn create_debug_sprites(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     colliders: Res<'_, ColliderSet>,
     query: Query<
+        '_,
         '_,
         (
             Entity,
@@ -56,11 +58,12 @@ fn create_debug_sprites(
 }
 
 fn replace_debug_sprite(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut map: ResMut<'_, DebugEntityMap>,
     colliders: Res<'_, ColliderSet>,
     debug_color: Res<'_, DebugColor>,
     query: Query<
+        '_,
         '_,
         (
             Entity,
@@ -93,7 +96,7 @@ fn replace_debug_sprite(
 }
 
 fn delete_debug_sprite(
-    mut commands: Commands<'_>,
+    mut commands: Commands<'_, '_>,
     mut map: ResMut<'_, DebugEntityMap>,
     removed_bodies: RemovedComponents<'_, CollisionShape>,
 ) {
