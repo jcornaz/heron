@@ -95,7 +95,8 @@ One must choose to use either `2d` or `3d`. If none of theses two features is en
 
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
 * `2d` Enable simulation only on the first 2 axes `x` and `y`.
-* `debug-2d` Render 2d collision shapes. Works only in 2d, support for 3d may be added later.
+* `debug-2d` Render 2d collision shapes.
+* `debug-3d` Render 3d collision with wireframes.
 
 
 ## How does this project compare to bevy_rapier?

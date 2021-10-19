@@ -10,6 +10,11 @@ use fnv::FnvHashMap;
 #[cfg(all(feature = "2d", not(feature = "3d")))]
 mod dim2;
 
+#[cfg(all(feature = "3d", not(feature = "2d")))]
+mod dim3;
+#[cfg(all(feature = "3d", not(feature = "2d")))]
+mod shape3d_wireframe;
+
 /// Plugin that enables rendering of collision shapes
 #[derive(Debug, Copy, Clone, Default)]
 pub struct DebugPlugin(DebugColor);
@@ -35,6 +40,10 @@ struct Indexed;
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
+        #[cfg(all(feature = "3d", not(feature = "2d")))]
+        app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin)
+            .add_system_set_to_stage(CoreStage::PostUpdate, dim3::systems());
+
         #[cfg(all(feature = "2d", not(feature = "3d")))]
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim2::systems());
@@ -46,13 +55,52 @@ impl Plugin for DebugPlugin {
     }
 }
 
+#[cfg(any(
+    all(feature = "3d", not(feature = "2d")),
+    all(feature = "2d", not(feature = "3d"))
+))]
+use heron_core::RigidBody;
+
+impl DebugColor {
+    #[cfg(any(
+        all(feature = "3d", not(feature = "2d")),
+        all(feature = "2d", not(feature = "3d"))
+    ))]
+    fn for_collider_type(
+        &self,
+        rigid_body_option: Option<&RigidBody>,
+        is_sensor_shape: bool,
+    ) -> Color {
+        if is_sensor_shape {
+            self.sensor
+        } else {
+            use RigidBody::{
+                KinematicPositionBased as PositionBased, KinematicVelocityBased as VelocityBased,
+            };
+            match rigid_body_option {
+                Some(RigidBody::Sensor) => self.sensor,
+                Some(RigidBody::Static) => self.static_body,
+                Some(RigidBody::Dynamic) | None => self.dynamic_body,
+                Some(PositionBased | VelocityBased) => self.kinematic_body,
+            }
+        }
+    }
+}
+
+// 3d debug uses wireframes, it's easier to read with more opaque colors
+const DEFAULT_DEBUG_ALPHA: f32 = if cfg!(all(feature = "2d", not(feature = "3d"))) {
+    0.4
+} else {
+    0.8
+};
+
 impl Default for DebugColor {
     fn default() -> Self {
         Self {
-            sensor: Color::rgba(0.0, 0.63, 0.0, 0.4),
-            static_body: Color::rgba(0.64, 0.0, 0.16, 0.4),
-            dynamic_body: Color::rgba(0.0, 0.18, 0.54, 0.4),
-            kinematic_body: Color::rgba(0.21, 0.07, 0.7, 0.4),
+            sensor: Color::rgba(0.0, 0.63, 0.0, DEFAULT_DEBUG_ALPHA),
+            static_body: Color::rgba(0.64, 0.0, 0.16, DEFAULT_DEBUG_ALPHA),
+            dynamic_body: Color::rgba(0.0, 0.18, 0.54, DEFAULT_DEBUG_ALPHA),
+            kinematic_body: Color::rgba(0.21, 0.07, 0.7, DEFAULT_DEBUG_ALPHA),
         }
     }
 }
