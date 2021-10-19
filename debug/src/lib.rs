@@ -89,7 +89,7 @@ fn scale_debug_entities(
         })
         .for_each(|(local, mut global)| {
             if let Some(mut local) = local {
-                local.scale *= global.scale.recip()
+                local.scale *= global.scale.recip();
             }
             global.scale.x = 1.0;
             global.scale.y = 1.0;

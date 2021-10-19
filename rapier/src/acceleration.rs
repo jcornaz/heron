@@ -15,7 +15,7 @@ pub(crate) fn update_rapier_force_and_torque(
 ) {
     for (handle, acceleration) in accelerations.iter() {
         if let Some(body) = bodies.get_mut(*handle) {
-            update_acceleration(body, acceleration)
+            update_acceleration(body, acceleration);
         }
     }
 }
@@ -40,5 +40,5 @@ fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
         }
     };
     body.apply_force(linear_acceleration * body.mass(), wake_up);
-    body.apply_torque(inertia * angular_acceleration, wake_up)
+    body.apply_torque(inertia * angular_acceleration, wake_up);
 }

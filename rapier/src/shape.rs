@@ -76,7 +76,7 @@ pub(crate) fn update_position(
     for (transform, handle) in query.iter() {
         if let Some(collider) = colliders.get_mut(*handle) {
             collider
-                .set_position_wrt_parent((transform.translation, transform.rotation).into_rapier())
+                .set_position_wrt_parent((transform.translation, transform.rotation).into_rapier());
         }
     }
 }
@@ -226,7 +226,7 @@ impl ColliderFactory for CollisionShape {
                 points,
                 border_radius,
             } => convex_hull_builder(points.as_slice(), *border_radius),
-            CollisionShape::HeightField { size, heights } => heightfield_builder(*size, &heights),
+            CollisionShape::HeightField { size, heights } => heightfield_builder(*size, heights),
         }
         // General all types of collision events
         .active_events(ActiveEvents::all())
@@ -290,7 +290,7 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
     let nrows = heights.len();
     let ncols = heights.get(0).map(Vec::len).unwrap_or_default();
     ColliderBuilder::heightfield(
-        crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().cloned()),
+        crate::rapier::na::DMatrix::from_iterator(nrows, ncols, heights.iter().flatten().copied()),
         crate::rapier::na::Vector3::new(size.x, 1.0, size.y),
     )
 }
