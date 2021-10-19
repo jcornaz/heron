@@ -11,11 +11,16 @@ use fnv::FnvHashMap;
 mod dim2;
 
 /// Plugin that enables rendering of collision shapes
-#[derive(Debug, Copy, Clone)]
-pub struct DebugPlugin(Color);
+#[derive(Debug, Copy, Clone, Default)]
+pub struct DebugPlugin(DebugColor);
 
 #[derive(Debug, Copy, Clone)]
-struct DebugColor(Color);
+struct DebugColor {
+    sensor: Color,
+    static_body: Color,
+    dynamic_body: Color,
+    kinematic_body: Color,
+}
 
 type DebugEntityMap = FnvHashMap<Entity, Entity>;
 
@@ -28,42 +33,27 @@ struct IsDebug(Entity);
 #[allow(unused)]
 struct Indexed;
 
-impl From<Color> for DebugPlugin {
-    fn from(color: Color) -> Self {
-        Self(color)
-    }
-}
-
-impl Default for DebugPlugin {
-    fn default() -> Self {
-        let mut color = bevy::render::color::Color::BLUE;
-        color.set_a(0.4);
-        Self(color)
-    }
-}
-
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
         #[cfg(all(feature = "2d", not(feature = "3d")))]
         app.add_plugin(bevy_prototype_lyon::plugin::ShapePlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim2::systems());
 
-        app.insert_resource(DebugColor(self.0))
+        app.insert_resource(self.0)
             .init_resource::<DebugEntityMap>()
             .add_system_to_stage(CoreStage::Last, track_debug_entities.system())
             .add_system_to_stage(CoreStage::Last, scale_debug_entities.system());
     }
 }
 
-impl From<Color> for DebugColor {
-    fn from(color: Color) -> Self {
-        Self(color)
-    }
-}
-
-impl From<DebugColor> for Color {
-    fn from(DebugColor(color): DebugColor) -> Self {
-        color
+impl Default for DebugColor {
+    fn default() -> Self {
+        Self {
+            sensor: Color::rgba(0.0, 0.63, 0.0, 0.4),
+            static_body: Color::rgba(0.64, 0.0, 0.16, 0.4),
+            dynamic_body: Color::rgba(0.0, 0.18, 0.54, 0.4),
+            kinematic_body: Color::rgba(0.21, 0.07, 0.7, 0.4),
+        }
     }
 }
 
