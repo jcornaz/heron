@@ -1,3 +1,24 @@
+# Changelog
+
+All notable changes to this project are documented in this file.
+
+The format is inspired from [Keep a Changelog], and this project adheres to [Semantic Versioning].
+
+[Keep a Changelog]: https://keepachangelog.com/en/1.1.0
+
+[Semantic Versioning]: https://semver.org/spec/v2.0.0.html
+
+## [Unreleased]
+
+### Breaking changes
+
+* The `DebugColor` resource no longer implement `From<Color>`. That's because it now defines multiples colors, not one.
+
+### Changed
+
+* The collision shapes now have different colors based on the type of body (static, dynamic, kinematic, sensor).
+
+
 ## 0.11.1 - 2021-08-23
 
 ### Bug fixes

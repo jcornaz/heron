@@ -63,3 +63,42 @@ required-features = ["2d"]
 [[example]]
 name = "ray_casting"
 required-features = ["2d"]
+
+[[package.metadata.release.pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "## \\[Unreleased\\]"
+replace = "## [Unreleased]\n\n\n\n## [{{version}}] - {{date}}"
+exactly = 1
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "\\.\\.\\.HEAD"
+replace = "...v{{version}}"
+exactly = 1
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "CHANGELOG.md"
+search = "\\[Unreleased\\]: "
+replace = "[Unreleased]: ../../compare/v{{version}}...HEAD\n[{{version}}]: "
+exactly = 1
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "src/lib.rs"
+search = "//! heron = \\{ version = \"[0-9a-z\\.-]+\""
+replace = "//! heron = { version = \"{{version}}\""
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "README.md"
+search = "heron = \\{ version = \"[0-9a-z\\.-]+\""
+replace = "heron = { version = \"{{version}}\""
+prerelease = true
+
+[[package.metadata.release.pre-release-replacements]]
+file = "guide/src/quickstart.md"
+search = "heron = \\{ version = \"[0-9a-z\\.-]+\""
+replace = "heron = { version = \"{{version}}\""
+prerelease = true

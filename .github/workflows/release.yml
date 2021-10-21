@@ -1,12 +1,14 @@
 name: Release
 
 on:
-  schedule:
-    - cron: '0 0 * * 1'
-
+  workflow_dispatch:
+    inputs:
+      level:
+        description: Release level
+        required: true
 
 jobs:
-  release:
+  verify:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
@@ -15,44 +17,50 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.3.5
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1.0.7
+
+      - name: Install dependencies
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
+
+      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --features 2d
+      - run: cargo test --workspace --features 3d
+      - run: cargo test --workspace --features debug-2d
+      - run: cargo doc --workspace --all-features
+
+  release:
+    needs: verify
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.5
         with:
           fetch-depth: 0
           token: ${{ secrets.RELEASE_TOKEN }}
 
-      - name: Fetch tags
-        run: git fetch --tags
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1.0.7
+
+      - name: Install dependencies
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
+
+      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --features 2d
+      - run: cargo test --workspace --features 3d
+      - run: cargo test --workspace --features debug-2d
+      - run: cargo doc --workspace --all-features
 
       - name: Configure git user
         run: |
           git config --global user.name "Jonathan Cornaz"
           git config --global user.email "jcornaz@users.noreply.github.com"
 
-      - name: Global cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.cargo
-            ~/.rustup
-          key: cargo-ubuntu-latest-stable-${{ hashFiles('**/Cargo.toml') }}
-          restore-keys: cargo-ubuntu-latest-stable
-
-      - name: Install rust toolchain
-        uses: actions-rs/toolchain@v1.0.7
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Install dependencies
-        run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
-
-      - name: Install autorel
-        run: cargo install --git "https://github.com/jcornaz/autorel.git" --tag v0.1.4
-
-      - name: Login to createss.io
+      - name: Login to crates.io
         run: cargo login ${{ secrets.CRATES_TOKEN }}
 
       - name: Release
-        run: autorel
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: cargo release ${{ github.event.inputs.level }} --no-confirm --workspace
