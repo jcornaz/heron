@@ -1,8 +1,7 @@
 use bevy::ecs::prelude::*;
-use bevy::math::prelude::*;
 
 use heron_core::utils::NearZero;
-use heron_core::{PhysicsSteps, RigidBody, Velocity};
+use heron_core::{RigidBody, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
