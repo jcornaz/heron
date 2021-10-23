@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         rust:
-          - '1.53.0'
+          - '1.56.0'
         crate:
           - '.'
           - 'core'
@@ -55,6 +55,7 @@ jobs:
         with:
           toolchain: ${{ matrix.rust }}
           profile: minimal
+          override: true
 
       - name: Run ignored tests
         run: cargo test --all-features -- --ignored
@@ -106,7 +107,8 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
-          toolchain: '1.53.0'
+          toolchain: '1.56.0'
+          override: true
 
       - name: Format
         run: cargo fmt -- --check
@@ -140,7 +142,8 @@ jobs:
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
-          toolchain: '1.53.0'
+          toolchain: '1.56.0'
+          override: true
 
       - name: Build documentation
         run: cargo doc --workspace

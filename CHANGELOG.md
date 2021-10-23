@@ -12,8 +12,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ### Breaking changes
 
-* The required version of `rapier` is now `^0.11.1`
 * The `DebugColor` resource no longer implement `From<Color>`. That's because it now defines multiples colors, not one.
+* The required version of `rapier` is now `^0.11.1`
+* The minimum supported version of rust is now `1.56.0`
+
 
 ### Added
 

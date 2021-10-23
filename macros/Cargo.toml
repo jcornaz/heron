@@ -2,10 +2,11 @@
 name = "heron_macros"
 version = "0.11.1" # auto-version
 authors = ["Jonathan Cornaz"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 description = "proc-macros for heron"
 repository = "https://github.com/jcornaz/heron/"
+rust-version = "1.56"
 
 [lib]
 proc-macro = true
