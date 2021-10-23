@@ -7,12 +7,16 @@
 use bevy::prelude::*;
 use fnv::FnvHashMap;
 
+#[cfg(any(feature = "2d", feature = "3d"))]
+use heron_core::RigidBody;
+
 #[cfg(all(feature = "2d", not(feature = "3d")))]
 mod dim2;
 
-#[cfg(all(feature = "3d", not(feature = "2d")))]
+#[cfg(feature = "3d")]
 mod dim3;
-#[cfg(all(feature = "3d", not(feature = "2d")))]
+
+#[cfg(feature = "3d")]
 mod shape3d_wireframe;
 
 /// Plugin that enables rendering of collision shapes
@@ -40,7 +44,7 @@ struct Indexed;
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        #[cfg(all(feature = "3d", not(feature = "2d")))]
+        #[cfg(feature = "3d")]
         app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim3::systems());
 
@@ -55,17 +59,8 @@ impl Plugin for DebugPlugin {
     }
 }
 
-#[cfg(any(
-    all(feature = "3d", not(feature = "2d")),
-    all(feature = "2d", not(feature = "3d"))
-))]
-use heron_core::RigidBody;
-
 impl DebugColor {
-    #[cfg(any(
-        all(feature = "3d", not(feature = "2d")),
-        all(feature = "2d", not(feature = "3d"))
-    ))]
+    #[cfg(any(feature = "2d", feature = "3d"))]
     fn for_collider_type(
         &self,
         rigid_body_option: Option<&RigidBody>,
