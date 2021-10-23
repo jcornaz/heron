@@ -14,6 +14,12 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 * The `DebugColor` resource no longer implement `From<Color>`. That's because it now defines multiples colors, not one.
 
+
+### Added
+
+* Debug renderer for 3d, behind the `debug-3d` feature flag (#151).  
+
+
 ### Changed
 
 * The collision shapes now have different colors based on the type of body (static, dynamic, kinematic, sensor).
