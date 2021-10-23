@@ -1,3 +1,5 @@
+#![allow(clippy::cast_precision_loss)]
+
 use std::f32::consts::{FRAC_PI_2, PI};
 
 use bevy::{
@@ -5,6 +7,7 @@ use bevy::{
     render::color::Color,
 };
 use bevy_prototype_debug_lines::DebugLines;
+
 use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::rapier3d::parry::transformation::convex_hull;
 
@@ -109,7 +112,7 @@ pub(crate) fn add_rounded_cuboid(
     for i in 0..verts.len() {
         let corner_origin = origin + orient.mul_vec3(verts[i]);
         add_rounded_corner(corner_origin, orient * dir, radius, color, lines);
-        dir = dir * change_dir[i % change_dir.len()];
+        dir *= change_dir[i % change_dir.len()];
     }
     let bevel_edges_points = |index, p| {
         let (p0, p1) = cuboid_edge_bevel_mods(index);

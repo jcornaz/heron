@@ -1,9 +1,13 @@
 use bevy::prelude::*;
+use bevy_prototype_debug_lines::DebugLines;
+
+use heron_core::{CollisionShape, RigidBody, SensorShape};
+
+use crate::shape3d_wireframe::{
+    add_capsule, add_convex_hull, add_cuboid, add_height_field, add_rounded_cuboid, add_sphere,
+};
 
 use super::DebugColor;
-use crate::shape3d_wireframe::*;
-use bevy_prototype_debug_lines::DebugLines;
-use heron_core::{CollisionShape, RigidBody, SensorShape};
 
 fn add_shape_outlines(
     shapes: Query<
@@ -35,7 +39,7 @@ fn add_shape_outlines(
                 }
             },
             CollisionShape::Sphere { radius } => {
-                add_sphere(origin, orient, *radius, color, &mut lines)
+                add_sphere(origin, orient, *radius, color, &mut lines);
             }
             CollisionShape::Capsule {
                 half_segment,
