@@ -44,7 +44,8 @@ fn create_debug_sprites(
                         .spawn_bundle(create_shape(
                             body,
                             collider.shape(),
-                            create_color(rigid_body_option, sensor_option, &*debug_color),
+                            debug_color
+                                .for_collider_type(rigid_body_option, sensor_option.is_some()),
                             *transform,
                         ))
                         .insert(IsDebug(entity));
@@ -82,7 +83,7 @@ fn replace_debug_sprite(
                     .spawn_bundle(create_shape(
                         body,
                         collider.shape(),
-                        create_color(rigid_body_option, sensor_option, &*debug_color),
+                        debug_color.for_collider_type(rigid_body_option, sensor_option.is_some()),
                         *transform,
                     ))
                     .insert(IsDebug(parent_entity));
@@ -101,28 +102,6 @@ fn delete_debug_sprite(
             commands.entity(debug_entity).despawn();
         }
     }
-}
-
-fn create_color(
-    rigid_body_option: Option<&RigidBody>,
-    sensor_option: Option<&SensorShape>,
-    debug_color: &DebugColor,
-) -> Color {
-    if sensor_option.is_some() {
-        return debug_color.sensor;
-    } else {
-        if rigid_body_option.is_some() {
-            return match rigid_body_option.unwrap() {
-                RigidBody::Sensor => debug_color.sensor,
-                RigidBody::Static => debug_color.static_body,
-                RigidBody::Dynamic => debug_color.dynamic_body,
-                RigidBody::KinematicPositionBased => debug_color.kinematic_body,
-                RigidBody::KinematicVelocityBased => debug_color.kinematic_body,
-            };
-        }
-    }
-
-    debug_color.dynamic_body
 }
 
 fn create_shape(
