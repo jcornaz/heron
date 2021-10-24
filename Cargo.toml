@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier", "macros"]
 
 [package]
 name = "heron"
-version = "0.12.0"
+version = "0.12.1"
 authors = ["Jonathan Cornaz"]
 edition = "2021"
 license = "MIT"
