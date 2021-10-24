@@ -8,7 +8,7 @@ use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<'_, (&RigidBodyHandle, Option<&RigidBody>, &Velocity), Changed<Velocity>>,
+    query: Query<'_, (&RigidBodyHandle, Option<&RigidBody>, &Velocity)>,
 ) {
     let dynamic_bodies = query
         .iter()

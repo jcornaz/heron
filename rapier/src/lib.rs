@@ -17,6 +17,7 @@ pub(crate) use rapier2d as rapier;
 pub(crate) use rapier3d as rapier;
 
 use heron_core::{CollisionEvent, PhysicsSystem};
+pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 
 use crate::rapier::dynamics::{
     CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
@@ -29,7 +30,6 @@ mod acceleration;
 mod body;
 pub mod convert;
 mod pipeline;
-pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 mod shape;
 mod velocity;
 
@@ -127,5 +127,11 @@ fn step_systems() -> SystemSet {
                 .system()
                 .label(PhysicsSystem::VelocityUpdate)
                 .after(PhysicsSystem::Events),
+        )
+        .with_system(
+            velocity::update_rapier_velocity
+                .system()
+                .after(PhysicsSystem::Events)
+                .after(PhysicsSystem::VelocityUpdate),
         )
 }
