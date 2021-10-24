@@ -9,7 +9,6 @@ on:
 
 jobs:
   release:
-    needs: verify
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
