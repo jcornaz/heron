@@ -370,7 +370,7 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 [Unreleased]: ../../compare/v0.12.0...HEAD
-[0.12.0]: ../../compare/v0.5.1...v0.12.0
+[0.12.0]: ../../compare/v0.11.1...v0.12.0
 [0.5.1]: ../../compare/v0.5.0...v0.5.1
 [0.5.0]: ../../compare/v0.4.0...v0.5.0
 [0.4.0]: ../../compare/v0.3.0...v0.4.0

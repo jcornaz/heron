@@ -66,3 +66,5 @@ jobs:
       - name: Release
         run: cargo release ${{ github.event.inputs.level }} --no-confirm --workspace --execute
 
+      - run: git push
+      - run: git push --tags
