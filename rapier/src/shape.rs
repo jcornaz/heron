@@ -6,7 +6,7 @@ use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, Sen
 use crate::convert::IntoRapier;
 use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
 use crate::rapier::geometry::{
-    Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
+    ActiveCollisionTypes, Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
 };
 use crate::rapier::math::Point;
 use crate::rapier::pipeline::ActiveEvents;
@@ -206,7 +206,9 @@ pub(crate) trait ColliderFactory {
             builder = builder.collision_groups(layers.into_rapier());
         }
 
-        builder.build()
+        builder
+            .active_collision_types(ActiveCollisionTypes::all()) // Activate all collision types
+            .build()
     }
 }
 

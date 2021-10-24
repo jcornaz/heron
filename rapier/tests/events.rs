@@ -1,13 +1,15 @@
 #![cfg(any(dim2, dim3))]
+
+use std::time::Duration;
+
 use bevy::app::{Events, ManualEventReader};
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use rstest::*;
 
 use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
 use heron_rapier::RapierPlugin;
-use std::time::Duration;
-
 use utils::*;
 
 mod utils;
@@ -29,8 +31,13 @@ fn test_app() -> App {
     builder.app
 }
 
-#[test]
-fn collision_events_are_fired() {
+#[rstest]
+#[case(RigidBody::Sensor, RigidBody::Dynamic)]
+#[case(RigidBody::Sensor, RigidBody::Sensor)]
+#[case(RigidBody::Sensor, RigidBody::KinematicPositionBased)]
+#[case(RigidBody::Sensor, RigidBody::KinematicVelocityBased)]
+#[case(RigidBody::Dynamic, RigidBody::Dynamic)]
+fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody) {
     let mut app = test_app();
 
     let entity1 = app
@@ -40,7 +47,7 @@ fn collision_events_are_fired() {
             Transform::default(),
             GlobalTransform::default(),
             CollisionShape::Sphere { radius: 10.0 },
-            RigidBody::Sensor,
+            type1,
         ))
         .id();
 
@@ -50,11 +57,22 @@ fn collision_events_are_fired() {
         .insert_bundle((
             Transform::from_translation(Vec3::X * -30.0),
             GlobalTransform::default(),
-            RigidBody::Dynamic,
+            type2,
             CollisionShape::Sphere { radius: 10.0 },
-            Velocity::from_linear(Vec3::X * 30.0),
         ))
         .id();
+
+    if type2.can_have_velocity() {
+        app.world
+            .entity_mut(entity2)
+            .insert(Velocity::from_linear(Vec3::X * 30.0));
+    } else {
+        app.world
+            .get_mut::<Transform>(entity2)
+            .unwrap()
+            .translation
+            .x += 30.0;
+    }
 
     let mut event_reader = app
         .world
@@ -66,6 +84,14 @@ fn collision_events_are_fired() {
 
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
+
+    if !type2.can_have_velocity() {
+        app.world
+            .get_mut::<Transform>(entity2)
+            .unwrap()
+            .translation
+            .x += 30.0;
+    }
 
     app.update();
     events.append(&mut collect_events(&app, &mut event_reader));
