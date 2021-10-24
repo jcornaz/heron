@@ -13,6 +13,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 ## Fixed
 
 * `KinematicVelocityBased` bodies not being moved by velocity (#148).
+* Collision events not being fired for kinematic bodies (#142).
 
 
 ## [0.12.0] - 2021-10-24
