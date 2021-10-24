@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.12.0] - 2021-10-24
+
 ### Breaking changes
 
 * The `DebugColor` resource no longer implement `From<Color>`. That's because it now defines multiples colors, not one.
@@ -365,7 +369,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.5.1...HEAD
+[Unreleased]: ../../compare/v0.12.0...HEAD
+[0.12.0]: ../../compare/v0.5.1...v0.12.0
 [0.5.1]: ../../compare/v0.5.0...v0.5.1
 [0.5.0]: ../../compare/v0.4.0...v0.5.0
 [0.4.0]: ../../compare/v0.3.0...v0.4.0

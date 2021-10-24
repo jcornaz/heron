@@ -1,6 +1,6 @@
 [package]
 name = "heron_core"
-version = "0.11.1" # auto-version
+version = "0.12.0"
 authors = ["Jonathan Cornaz"]
 edition = "2021"
 license = "MIT"
