@@ -64,5 +64,5 @@ jobs:
         run: cargo login ${{ secrets.CRATES_TOKEN }}
 
       - name: Release
-        run: cargo release ${{ github.event.inputs.level }} --no-confirm --workspace
+        run: cargo release ${{ github.event.inputs.level }} --no-confirm --workspace --execute
 
