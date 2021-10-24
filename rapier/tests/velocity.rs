@@ -25,8 +25,10 @@ fn test_app() -> App {
     builder.app
 }
 
-#[test]
-fn body_is_created_with_velocity() {
+#[rstest]
+#[case(RigidBody::Dynamic)]
+#[case(RigidBody::KinematicVelocityBased)]
+fn body_is_created_with_velocity(#[case] body_type: RigidBody) {
     let mut app = test_app();
 
     let linear = Vec3::new(1.0, 2.0, 3.0);
@@ -38,7 +40,7 @@ fn body_is_created_with_velocity() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            RigidBody::Dynamic,
+            body_type,
             CollisionShape::Sphere { radius: 1.0 },
             Velocity { linear, angular },
         ))
@@ -65,8 +67,10 @@ fn body_is_created_with_velocity() {
     assert_eq!(angular.angle(), body.angvel());
 }
 
-#[test]
-fn velocity_may_be_added_after_creating_the_body() {
+#[rstest]
+#[case(RigidBody::Dynamic)]
+#[case(RigidBody::KinematicVelocityBased)]
+fn velocity_may_be_added_after_creating_the_body(#[case] body_type: RigidBody) {
     let mut app = test_app();
 
     let entity = app
@@ -75,7 +79,7 @@ fn velocity_may_be_added_after_creating_the_body() {
         .insert_bundle((
             Transform::default(),
             GlobalTransform::default(),
-            RigidBody::Dynamic,
+            body_type,
             CollisionShape::Sphere { radius: 1.0 },
         ))
         .id();
@@ -148,10 +152,9 @@ fn velocity_is_updated_to_reflect_rapier_world() {
 }
 
 #[rstest]
-#[case(Some(RigidBody::Dynamic))]
-#[case(Some(RigidBody::KinematicVelocityBased))]
-#[case(None)]
-fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
+#[case(RigidBody::Dynamic)]
+#[case(RigidBody::KinematicVelocityBased)]
+fn velocity_can_move_kinematic_bodies(#[case] body_type: RigidBody) {
     let mut app = test_app();
     let translation = Vec3::new(1.0, 2.0, 3.0);
     let rotation = Quat::from_axis_angle(Vec3::Z, PI / 2.0);
@@ -160,17 +163,13 @@ fn velocity_can_move_kinematic_bodies(#[case] body_type: Option<RigidBody>) {
         .world
         .spawn()
         .insert_bundle((
-            RigidBody::Dynamic,
+            body_type,
             CollisionShape::Sphere { radius: 2.0 },
             Transform::default(),
             GlobalTransform::default(),
             Velocity::from(translation).with_angular(rotation.into()),
         ))
         .id();
-
-    if let Some(body_type) = body_type {
-        app.world.entity_mut(entity).insert(body_type);
-    }
 
     app.update();
 
