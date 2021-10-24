@@ -78,6 +78,10 @@ jobs:
         if: matrix.crate == '.'
         run: cargo test --no-default-features --features debug-2d
 
+      - name: Test with debug-3d feature
+        if: matrix.crate == '.'
+        run: cargo test --no-default-features --features debug-3d
+
       - name: Test with default features
         run: cargo test
 
