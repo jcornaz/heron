@@ -1,12 +1,12 @@
 [package]
 name = "heron_rapier"
 version = "0.12.1"
-authors = ["Jonathan Cornaz"]
+rust-version = "1.56"
 edition = "2021"
+authors = ["Jonathan Cornaz"]
 license = "MIT"
 description = "Physics behavior for Heron, using rapier"
 repository = "https://github.com/jcornaz/heron/"
-rust-version = "1.56"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -17,16 +17,16 @@ default = []
 3d = ["rapier3d"]
 
 [dependencies]
-heron_core = { version = "^0.12.0", path = "../core" }
-bevy = { version = "^0.5.0", default-features = false }
-rapier2d = { version = "^0.11.1", optional = true }
-rapier3d = { version = "^0.11.1", optional = true }
-fnv = "^1.0"
-crossbeam = "^0.8.0"
+heron_core = { version = "0.12.1", path = "../core" }
+bevy = { version = "0.5.0", default-features = false }
+rapier2d = { version = "0.11.1", optional = true }
+rapier3d = { version = "0.11.1", optional = true }
+fnv = "1.0"
+crossbeam = "0.8.0"
 
 [dev-dependencies]
-bevy = { version = "0.5", default-features = false }
-rstest = "0.7"
+bevy = { version = "0.5.0", default-features = false }
+rstest = "0.7.0"
 
 [build-dependencies]
 cfg_aliases = "0.1.1"

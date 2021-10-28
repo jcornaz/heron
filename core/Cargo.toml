@@ -1,17 +1,17 @@
 [package]
 name = "heron_core"
 version = "0.12.1"
-authors = ["Jonathan Cornaz"]
+rust-version = "1.56"
 edition = "2021"
+authors = ["Jonathan Cornaz"]
 license = "MIT"
 description = "Core components and resources to use Heron"
 repository = "https://github.com/jcornaz/heron/"
-rust-version = "1.56"
 
 [dependencies]
-bevy = { version = "^0.5.0", default-features = false }
-duplicate = "^0.3.0"
+bevy = { version = "0.5.0", default-features = false }
+duplicate = "0.3.0"
 
 [dev-dependencies]
 rstest = "0.7"
-bevy = { version = "^0.5.0", default-features = false, features = ["render"] }
+bevy = { version = "0.5.0", default-features = false, features = ["render"] }

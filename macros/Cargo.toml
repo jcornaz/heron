@@ -1,17 +1,17 @@
 [package]
 name = "heron_macros"
 version = "0.12.1"
-authors = ["Jonathan Cornaz"]
+rust-version = "1.56"
 edition = "2021"
+authors = ["Jonathan Cornaz"]
 license = "MIT"
 description = "proc-macros for heron"
 repository = "https://github.com/jcornaz/heron/"
-rust-version = "1.56"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-heron_core = { version = "^0.12.0", path = "../core" }
-syn = "^1.0"
-quote = "^1.0"
+heron_core = { version = "0.12.1", path = "../core" }
+syn = "1.0"
+quote = "1.0"

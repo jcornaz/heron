@@ -4,14 +4,14 @@ members = ["core", "debug", "rapier", "macros"]
 [package]
 name = "heron"
 version = "0.12.1"
-authors = ["Jonathan Cornaz"]
+rust-version = "1.56"
 edition = "2021"
+authors = ["Jonathan Cornaz"]
 license = "MIT"
 description = "An ergonomic physics API for 2d and 3d bevy games. (powered by rapier)"
 repository = "https://github.com/jcornaz/heron/"
 keywords = ["game", "gamedev", "physics", "collision", "bevy"]
 categories = ["game-development", "simulation"]
-rust-version = "1.56"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -24,16 +24,16 @@ debug-2d = ["2d", "heron_debug/2d"]
 debug-3d = ["3d", "heron_debug/3d"]
 
 [dependencies]
-heron_core = { version = "^0.12.0", path = "core" }
-heron_macros = { version = "^0.12.0", path = "macros" }
-heron_rapier = { version = "^0.12.0", path = "rapier" }
-heron_debug = { version = "^0.12.0", path = "debug", optional = true }
-bevy = { version = "^0.5.0", default-features = false }
+heron_core = { version = "0.12.1", path = "core" }
+heron_macros = { version = "0.12.1", path = "macros" }
+heron_rapier = { version = "0.12.1", path = "rapier" }
+heron_debug = { version = "0.12.1", path = "debug", optional = true }
+bevy = { version = "0.5.0", default-features = false }
 
 [dev-dependencies]
-bevy = "0.5"
-skeptic = "0.13"
-rstest = "0.7"
+bevy = "0.5.0"
+skeptic = "0.13.6"
+rstest = "0.7.0"
 
 [build-dependencies]
 cfg_aliases = "0.1.1"
