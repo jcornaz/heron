@@ -63,6 +63,12 @@ fn add_shape_outlines(
             } => {
                 add_cone(origin, orient, *half_height, *radius, color, &mut lines);
             }
+            any_other => {
+                warn!(
+                    "Debug render for this shape {:?} is unimplemented",
+                    any_other
+                );
+            }
         }
     }
 }

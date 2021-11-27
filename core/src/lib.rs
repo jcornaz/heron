@@ -109,6 +109,7 @@ pub fn should_run(
 /// }
 /// ```
 #[derive(Debug, Clone, Reflect)]
+#[non_exhaustive]
 pub enum CollisionShape {
     /// A sphere (or circle in 2d) shape defined by its radius
     Sphere {
