@@ -8,6 +8,13 @@ license = "MIT"
 description = "Core components and resources to use Heron"
 repository = "https://github.com/jcornaz/heron/"
 
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = []
+3d = []
+
 [dependencies]
 bevy = { version = "0.5.0", default-features = false }
 duplicate = "0.3.0"
@@ -15,3 +22,6 @@ duplicate = "0.3.0"
 [dev-dependencies]
 rstest = "0.7"
 bevy = { version = "0.5.0", default-features = false, features = ["render"] }
+
+[build-dependencies]
+cfg_aliases = "0.1.1"

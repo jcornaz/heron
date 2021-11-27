@@ -124,6 +124,28 @@ fn setup(
         .insert(RigidBody::Dynamic)
         .insert(CollisionShape::Sphere { radius: 1.0 });
 
+    // Cone
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Capsule {
+                radius: 0.5,
+                depth: 2.0,
+                ..Default::default()
+            })),
+            material: materials.add(Color::RED.into()),
+            ..Default::default()
+        })
+        .insert(Transform {
+            translation: Vec3::new(5., 15., -7.),
+            ..Default::default()
+        })
+        .insert(GlobalTransform::identity())
+        .insert(RigidBody::Dynamic)
+        .insert(CollisionShape::Cone {
+            half_height: 2.0,
+            radius: 1.0,
+        });
+
     // Capsule
     commands
         .spawn_bundle(PbrBundle {

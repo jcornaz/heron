@@ -229,6 +229,10 @@ impl ColliderFactory for CollisionShape {
                 border_radius,
             } => convex_hull_builder(points.as_slice(), *border_radius),
             CollisionShape::HeightField { size, heights } => heightfield_builder(*size, heights),
+            CollisionShape::Cone {
+                half_height,
+                radius,
+            } => ColliderBuilder::cone(*half_height, *radius),
         }
         // General all types of collision events
         .active_events(ActiveEvents::all())

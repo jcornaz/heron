@@ -107,6 +107,7 @@ pub fn should_run(
 ///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
 /// }
+/// ```
 #[derive(Debug, Clone, Reflect)]
 pub enum CollisionShape {
     /// A sphere (or circle in 2d) shape defined by its radius
@@ -162,6 +163,18 @@ pub enum CollisionShape {
         /// In 2D, the outer `Vec` should contain only one
         /// inner `Vec`, any other element will be ignored.
         heights: Vec<Vec<f32>>,
+    },
+
+    /// A Cone shape, like a traffic cone, with a circular base
+    ///
+    /// This shape is exclusive to the 3d API, you must enable the "3d" flag to use it.
+    /// For the 2d equivalent, look at [`Sphere`](CollisionShape::Sphere).
+    #[cfg(dim3)]
+    Cone {
+        /// Half of the height from the base of the cone to the top point
+        half_height: f32,
+        /// The radius of the base circle
+        radius: f32,
     },
 }
 
