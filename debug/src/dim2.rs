@@ -257,6 +257,12 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 });
             }
         }
+        any_other => {
+            warn!(
+                "Debug render for this shape {:?} is unimplemented",
+                any_other
+            );
+        }
     };
 
     builder

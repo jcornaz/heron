@@ -14,7 +14,7 @@ all-features = true
 [features]
 default = []
 2d = ["rapier2d"]
-3d = ["rapier3d"]
+3d = ["rapier3d", "heron_core/3d"]
 
 [dependencies]
 heron_core = { version = "0.12.1", path = "../core" }

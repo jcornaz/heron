@@ -10,6 +10,13 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### Breaking changes
+
+The `CollisionShape` is now marked `#[non_exhaustive]`
+
+### Added
+
+Cone collision shape
 
 
 ## [0.12.1] - 2021-10-24

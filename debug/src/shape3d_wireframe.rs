@@ -168,6 +168,24 @@ fn add_circle(origin: Vec3, orient: Quat, radius: f32, color: Color, lines: &mut
     add_semicircle(origin, orient, radius, color, lines);
     add_semicircle(origin, orient * x_rotate, radius, color, lines);
 }
+pub(crate) fn add_cone(
+    origin: Vec3,
+    orient: Quat,
+    half_height: f32,
+    radius: f32,
+    color: Color,
+    lines: &mut DebugLines,
+) {
+    let cone_base = orient * (Vec3::Y * -half_height) + origin;
+    let cone_top = orient * (Vec3::Y * half_height) + origin;
+    let x_rotate = Quat::from_rotation_x(FRAC_PI_2);
+    let on_base_edge = |axis: Vec3, dir: f32| cone_base + dir * (orient * radius * axis);
+    add_circle(cone_base, orient * x_rotate, radius, color, lines);
+    lines.line_colored(on_base_edge(Vec3::Z, 1.0), cone_top, 0.0, color);
+    lines.line_colored(on_base_edge(Vec3::Z, -1.0), cone_top, 0.0, color);
+    lines.line_colored(on_base_edge(Vec3::X, 1.0), cone_top, 0.0, color);
+    lines.line_colored(on_base_edge(Vec3::X, -1.0), cone_top, 0.0, color);
+}
 pub(crate) fn add_sphere(
     origin: Vec3,
     orient: Quat,
