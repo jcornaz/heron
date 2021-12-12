@@ -4,8 +4,8 @@ use bevy_prototype_debug_lines::DebugLines;
 use heron_core::{CollisionShape, RigidBody, SensorShape};
 
 use crate::shape3d_wireframe::{
-    add_capsule, add_cone, add_convex_hull, add_cuboid, add_height_field, add_rounded_cuboid,
-    add_sphere,
+    add_capsule, add_cone, add_convex_hull, add_cuboid, add_cylinder, add_height_field,
+    add_rounded_cuboid, add_sphere,
 };
 
 use super::DebugColor;
@@ -62,6 +62,12 @@ fn add_shape_outlines(
                 radius,
             } => {
                 add_cone(origin, orient, *half_height, *radius, color, &mut lines);
+            }
+            CollisionShape::Cylinder {
+                half_height,
+                radius,
+            } => {
+                add_cylinder(origin, orient, *half_height, *radius, color, &mut lines);
             }
             any_other => {
                 warn!(

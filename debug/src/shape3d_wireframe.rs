@@ -179,12 +179,36 @@ pub(crate) fn add_cone(
     let cone_base = orient * (Vec3::Y * -half_height) + origin;
     let cone_top = orient * (Vec3::Y * half_height) + origin;
     let x_rotate = Quat::from_rotation_x(FRAC_PI_2);
-    let on_base_edge = |axis: Vec3, dir: f32| cone_base + dir * (orient * radius * axis);
+    let on_base = |rot: Vec3| cone_base + orient * rot * radius;
     add_circle(cone_base, orient * x_rotate, radius, color, lines);
-    lines.line_colored(on_base_edge(Vec3::Z, 1.0), cone_top, 0.0, color);
-    lines.line_colored(on_base_edge(Vec3::Z, -1.0), cone_top, 0.0, color);
-    lines.line_colored(on_base_edge(Vec3::X, 1.0), cone_top, 0.0, color);
-    lines.line_colored(on_base_edge(Vec3::X, -1.0), cone_top, 0.0, color);
+    let frac_pi_8 = PI / 8.0;
+    for factor in 0..8 {
+        let angle = 2.0 * (factor as f32) * frac_pi_8;
+        let rot = Vec3::new(angle.cos(), 0.0, angle.sin());
+        lines.line_colored(on_base(rot), cone_top, 0.0, color);
+    }
+}
+pub(crate) fn add_cylinder(
+    origin: Vec3,
+    orient: Quat,
+    half_height: f32,
+    radius: f32,
+    color: Color,
+    lines: &mut DebugLines,
+) {
+    let base = orient * (Vec3::Y * -half_height) + origin;
+    let top = orient * (Vec3::Y * half_height) + origin;
+    let x_rotate = Quat::from_rotation_x(FRAC_PI_2);
+    let on_base = |rot: Vec3| base + orient * rot * radius;
+    let on_top = |rot: Vec3| top + orient * rot * radius;
+    add_circle(base, orient * x_rotate, radius, color, lines);
+    add_circle(top, orient * x_rotate, radius, color, lines);
+    let frac_pi_8 = PI / 8.0;
+    for factor in 0..8 {
+        let angle = 2.0 * (factor as f32) * frac_pi_8;
+        let rot = Vec3::new(angle.cos(), 0.0, angle.sin());
+        lines.line_colored(on_base(rot), on_top(rot), 0.0, color);
+    }
 }
 pub(crate) fn add_sphere(
     origin: Vec3,
