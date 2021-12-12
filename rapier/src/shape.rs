@@ -234,6 +234,11 @@ impl ColliderFactory for CollisionShape {
                 half_height,
                 radius,
             } => ColliderBuilder::cone(*half_height, *radius),
+            #[cfg(dim3)]
+            CollisionShape::Cylinder {
+                half_height,
+                radius,
+            } => ColliderBuilder::cylinder(*half_height, *radius),
             any_other => {
                 warn!(
                     "Tried to build an nonexistent CollisionShape {:?}, falling back to a Sphere",

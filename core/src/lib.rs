@@ -177,6 +177,18 @@ pub enum CollisionShape {
         /// The radius of the base circle
         radius: f32,
     },
+
+    /// A Cylinder shape, it is a cirlce with a height
+    ///
+    /// This shape is exclusive to the 3d API, you must enable the "3d" flag to use it.
+    /// For the 2d equivalent, look at [`Sphere`](CollisionShape::Sphere).
+    #[cfg(dim3)]
+    Cylinder {
+        /// Half of the height from the base of the cylinder to the top
+        half_height: f32,
+        /// The radius of the base circle
+        radius: f32,
+    },
 }
 
 impl Default for CollisionShape {
