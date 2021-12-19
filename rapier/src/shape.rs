@@ -239,6 +239,13 @@ impl ColliderFactory for CollisionShape {
                 half_height,
                 radius,
             } => ColliderBuilder::cylinder(*half_height, *radius),
+            CollisionShape::Custom { shape } => {
+                if let Some(builder) = shape.downcast_ref::<ColliderBuilder>() {
+                    builder.clone()
+                } else {
+                    panic!("Unsupported custom builder is used: {:?}", shape);
+                }
+            }
             any_other => {
                 warn!(
                     "Tried to build an nonexistent CollisionShape {:?}, falling back to a Sphere",
@@ -317,6 +324,7 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
 #[cfg(test)]
 mod tests {
     use bevy::math::Vec3;
+    use heron_core::CustomCollisionShape;
 
     use super::*;
 
@@ -412,5 +420,29 @@ mod tests {
             assert_eq!(field.cell_height(), 1.0);
             assert_eq!(field.cell_width(), 1.0);
         }
+    }
+
+    #[test]
+    fn build_custom_collider_builder() {
+        let collider = CollisionShape::Custom {
+            shape: CustomCollisionShape::new(ColliderBuilder::ball(4.2)),
+        }
+        .collider_builder()
+        .build();
+
+        let ball = collider
+            .shape()
+            .as_ball()
+            .expect("Created shape was not a ball");
+        assert_eq!(ball.radius, 4.2);
+    }
+
+    #[test]
+    #[should_panic(expected = "Unsupported custom builder is used: CustomCollisionShape(())")]
+    fn build_custom_unsupported() {
+        let _ = CollisionShape::Custom {
+            shape: CustomCollisionShape::new(()),
+        }
+        .collider_builder();
     }
 }

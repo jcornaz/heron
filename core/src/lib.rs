@@ -91,6 +91,33 @@ pub fn should_run(
     }
 }
 
+/// TODO
+#[derive(Clone)]
+pub struct CustomCollisionShape(
+    std::sync::Arc<dyn std::any::Any + Send + Sync>,
+    &'static str,
+);
+
+impl CustomCollisionShape {
+    /// TODO
+    pub fn new<T: std::any::Any + Send + Sync>(shape: T) -> Self {
+        Self(std::sync::Arc::new(shape), std::any::type_name::<T>())
+    }
+
+    /// TODO
+    pub fn downcast_ref<T: std::any::Any>(&self) -> Option<&T> {
+        self.0.downcast_ref()
+    }
+}
+
+impl core::fmt::Debug for CustomCollisionShape {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("CustomCollisionShape")
+            .field(&format_args!("{}", &self.1))
+            .finish()
+    }
+}
+
 /// Components that defines the collision shape of a rigid body
 ///
 /// The collision shape will be attached to the [`RigidBody`] of the same entity.
@@ -188,6 +215,12 @@ pub enum CollisionShape {
         half_height: f32,
         /// The radius of the base circle
         radius: f32,
+    },
+
+    /// TODO
+    Custom {
+        /// TODO
+        shape: CustomCollisionShape,
     },
 }
 
