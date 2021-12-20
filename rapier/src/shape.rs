@@ -243,7 +243,7 @@ impl ColliderFactory for CollisionShape {
                 if let Some(builder) = shape.downcast_ref::<ColliderBuilder>() {
                     builder.clone()
                 } else {
-                    panic!("Unsupported custom builder is used: {:?}", shape);
+                    panic!("Unsupported custom collision shape is used: {:?}", shape);
                 }
             }
             any_other => {
@@ -438,7 +438,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Unsupported custom builder is used: CustomCollisionShape(())")]
+    #[should_panic(
+        expected = "Unsupported custom collision shape is used: CustomCollisionShape(())"
+    )]
     fn build_custom_unsupported() {
         let _ = CollisionShape::Custom {
             shape: CustomCollisionShape::new(()),
