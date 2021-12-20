@@ -111,6 +111,7 @@ impl CustomCollisionShape {
     /// Check if the stored value is of type `T`, and give a reference to it
     /// if the type matches.
     /// Will return [`None`] if the type of the stored value does not match `T`.
+    #[must_use]
     pub fn downcast_ref<T: Any>(&self) -> Option<&T> {
         self.0.downcast_ref()
     }
