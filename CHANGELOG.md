@@ -18,6 +18,7 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 * Cone collision shape (#158)
 * Cylinder collision shape (#159)
+* Custom collision shape
 
 
 ## [0.12.1] - 2021-10-24

@@ -4,6 +4,9 @@
 
 //! Core components and resources to use Heron
 
+use core::any::Any;
+use std::sync::Arc;
+
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
@@ -88,6 +91,37 @@ pub fn should_run(
         ShouldRun::Yes
     } else {
         ShouldRun::No
+    }
+}
+
+/// An opaque type representing a custom collision shape.
+///
+/// It will accept [`Any`] type, but the implementation is abstract, and
+/// what actual values will work depends on the backend, so see
+/// the relevant backend documentation to learn what types are accepted here.
+#[derive(Clone)]
+pub struct CustomCollisionShape(Arc<dyn Any + Send + Sync>, &'static str);
+
+impl CustomCollisionShape {
+    /// Create a new [`CustomCollisionShape`] that wraps some value.
+    pub fn new<T: Any + Send + Sync>(shape: T) -> Self {
+        Self(Arc::new(shape), std::any::type_name::<T>())
+    }
+
+    /// Check if the stored value is of type `T`, and give a reference to it
+    /// if the type matches.
+    /// Will return [`None`] if the type of the stored value does not match `T`.
+    #[must_use]
+    pub fn downcast_ref<T: Any>(&self) -> Option<&T> {
+        self.0.downcast_ref()
+    }
+}
+
+impl core::fmt::Debug for CustomCollisionShape {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("CustomCollisionShape")
+            .field(&format_args!("{}", &self.1))
+            .finish()
     }
 }
 
@@ -188,6 +222,15 @@ pub enum CollisionShape {
         half_height: f32,
         /// The radius of the base circle
         radius: f32,
+    },
+
+    /// A Custom shape, the actual shape is abstracted, and will be determined
+    /// by a corresponding backend depending on the implementation details
+    ///
+    /// See [`CustomCollisionShape`] for more info.
+    Custom {
+        /// The custom collision shape to use
+        shape: CustomCollisionShape,
     },
 }
 

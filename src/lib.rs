@@ -118,6 +118,7 @@
 //! * How to define the [`PhysicMaterial`]
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]
+//! * How to define [`CustomCollisionShape`] for [`heron_rapier`]
 
 use bevy::app::{AppBuilder, Plugin};
 
