@@ -4,6 +4,13 @@
 #![cfg(any(dim2, dim3))]
 
 //! Physics behavior for Heron, using [rapier](https://rapier.rs/)
+//!
+//! # Supported custom collision shapes
+//!
+//! The following types are accepted as [`heron_core::CustomCollisionShape`]
+//! values.
+//!
+//! - [`rapier::geometry::ColliderBuilder`]
 
 #[cfg(feature = "rapier2d")]
 pub extern crate rapier2d;
