@@ -4,6 +4,9 @@
 
 //! Core components and resources to use Heron
 
+use core::any::Any;
+use std::sync::Arc;
+
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
@@ -93,19 +96,16 @@ pub fn should_run(
 
 /// TODO
 #[derive(Clone)]
-pub struct CustomCollisionShape(
-    std::sync::Arc<dyn std::any::Any + Send + Sync>,
-    &'static str,
-);
+pub struct CustomCollisionShape(Arc<dyn Any + Send + Sync>, &'static str);
 
 impl CustomCollisionShape {
     /// TODO
-    pub fn new<T: std::any::Any + Send + Sync>(shape: T) -> Self {
-        Self(std::sync::Arc::new(shape), std::any::type_name::<T>())
+    pub fn new<T: Any + Send + Sync>(shape: T) -> Self {
+        Self(Arc::new(shape), std::any::type_name::<T>())
     }
 
     /// TODO
-    pub fn downcast_ref<T: std::any::Any>(&self) -> Option<&T> {
+    pub fn downcast_ref<T: Any>(&self) -> Option<&T> {
         self.0.downcast_ref()
     }
 }
