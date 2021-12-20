@@ -20,7 +20,6 @@ pub use velocity::{Acceleration, AxisAngle, Velocity};
 
 mod constraints;
 mod events;
-pub mod ext;
 mod gravity;
 mod layers;
 mod physics_time;

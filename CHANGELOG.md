@@ -13,12 +13,14 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 ### Breaking changes
 
 * The `CollisionShape` is now marked `#[non_exhaustive]`
+* The `AppBuilderExt` trait and the `add_physics_system` is removed
+  * This was no longer necessary since #109
 
 ### Added
 
 * Cone collision shape (#158)
 * Cylinder collision shape (#159)
-* Custom collision shape
+* Custom collision shape (#160)
 
 
 ## [0.12.1] - 2021-10-24
