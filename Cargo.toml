@@ -21,17 +21,17 @@ default = []
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d", "heron_core/3d"]
 debug-2d = ["2d", "heron_debug/2d"]
-debug-3d = ["3d", "heron_debug/3d"]
+# debug-3d = ["3d", "heron_debug/3d"]
 
 [dependencies]
 heron_core = { version = "0.12.1", path = "core" }
 heron_macros = { version = "0.12.1", path = "macros" }
 heron_rapier = { version = "0.12.1", path = "rapier" }
 heron_debug = { version = "0.12.1", path = "debug", optional = true }
-bevy = { git="https://github.com/jrxb/bevy.git", default-features = false }
+bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false }
 
 [dev-dependencies]
-bevy = { git="https://github.com/jrxb/bevy.git", default-features = false, features=["render", "bevy_wgpu", "x11"] }
+bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false, features=["render", "x11"] }
 skeptic = "0.13"
 rstest = "0.7"
 
