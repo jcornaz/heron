@@ -15,7 +15,7 @@ use utils::*;
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     let mut parameters = IntegrationParameters::default();
     parameters.dt = 1.0;
 
@@ -28,7 +28,7 @@ fn test_app() -> App {
             bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),
         );
-    builder.app
+    builder
 }
 
 #[rstest]

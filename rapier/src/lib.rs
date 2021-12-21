@@ -23,6 +23,7 @@ use bevy::prelude::*;
 pub(crate) use rapier2d as rapier;
 #[cfg(dim3)]
 pub(crate) use rapier3d as rapier;
+use std::ops::Deref;
 
 use heron_core::{CollisionEvent, PhysicsSystem};
 pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
@@ -47,10 +48,24 @@ mod velocity;
 pub struct RapierPlugin;
 
 #[derive(Component)]
-struct RigidBodyHandle(dynamics::RigidBodyHandle);
+pub struct RigidBodyHandle(dynamics::RigidBodyHandle);
 
 #[derive(Component)]
-pub struct ColliderHandle(pub geometry::ColliderHandle);
+pub struct ColliderHandle(geometry::ColliderHandle);
+
+impl Deref for RigidBodyHandle {
+    type Target = dynamics::RigidBodyHandle;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl Deref for ColliderHandle {
+    type Target = geometry::ColliderHandle;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum InternalSystem {

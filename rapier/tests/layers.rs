@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionLayers, CollisionShape, PhysicsLayer, PhysicsSteps, RigidBody};
-use heron_rapier::RapierPlugin;
+use heron_rapier::{ColliderHandle, RapierPlugin};
 use utils::*;
 
 mod utils;
@@ -31,13 +31,13 @@ impl PhysicsLayer for TestLayer {
 }
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -60,7 +60,9 @@ fn sets_the_collision_groups() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .unwrap();
 
     assert_eq!(collider.collision_groups().memberships, 1);
     assert_eq!(collider.collision_groups().filter, 2);
@@ -91,7 +93,9 @@ fn updates_the_collision_groups() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .unwrap();
 
     assert_eq!(collider.collision_groups().memberships, 1);
     assert_eq!(collider.collision_groups().filter, 2);
@@ -121,7 +125,9 @@ fn restore_the_collision_groups_on_removal() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .unwrap();
 
     assert_eq!(collider.collision_groups().memberships, u32::MAX)
 }

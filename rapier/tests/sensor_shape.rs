@@ -7,13 +7,13 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody, SensorShape};
-use heron_rapier::RapierPlugin;
+use heron_rapier::{ColliderHandle, RapierPlugin};
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     let mut parameters = IntegrationParameters::default();
     parameters.dt = 1.0;
 
@@ -22,7 +22,7 @@ fn test_app() -> App {
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -46,7 +46,7 @@ fn a_non_sensor_body_can_have_a_sensor_shape() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(*app.world.get(entity).unwrap())
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
         .unwrap();
 
     assert!(collider.is_sensor());
@@ -76,7 +76,7 @@ fn sensor_flag_can_be_added_after_creation() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(*app.world.get(entity).unwrap())
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
         .unwrap();
 
     assert!(collider.is_sensor());
@@ -107,7 +107,7 @@ fn sensor_flag_can_removed() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(*app.world.get(entity).unwrap())
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
         .unwrap();
 
     assert!(!collider.is_sensor());
@@ -138,7 +138,7 @@ fn removing_sensor_flag_has_no_effect_if_body_is_sensor() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(*app.world.get(entity).unwrap())
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
         .unwrap();
 
     assert!(collider.is_sensor());

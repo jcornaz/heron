@@ -3,7 +3,7 @@ use heron::prelude::*;
 
 #[bevy_main]
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the Heron plugin
         .insert_resource(Gravity::from(Vec3::new(0.0, -300.0, 0.0))) // Define gravity

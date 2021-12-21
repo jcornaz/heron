@@ -135,7 +135,7 @@ impl core::fmt::Debug for CustomCollisionShape {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
@@ -248,7 +248,7 @@ impl Default for CollisionShape {
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .insert(RigidBody::Dynamic) // Create a dynamic rigid body
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }); // Attach a collision shape
@@ -327,7 +327,7 @@ impl RigidBody {
 /// ```rust
 /// # use heron_core::*;
 /// # use bevy::prelude::*;
-/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands) {
 ///   commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///     .insert(RigidBody::Dynamic) // <-- A non-sensor rigid body
 ///     .with_children(|children| {
@@ -358,7 +358,7 @@ pub struct SensorShape;
 /// ```
 /// # use bevy::prelude::*;
 /// # use heron_core::*;
-/// fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+/// fn spawn(mut commands: Commands) {
 ///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
 ///         .insert(CollisionShape::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
 ///         .insert(PhysicMaterial {

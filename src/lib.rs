@@ -42,7 +42,7 @@
 //! use heron::prelude::*;
 //!
 //! fn main() {
-//!   App::build()
+//!   App::new()
 //!     .add_plugins(DefaultPlugins)
 //!     .add_plugin(PhysicsPlugin::default())
 //!     // ... Add your resources and systems

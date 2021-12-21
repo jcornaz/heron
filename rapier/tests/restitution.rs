@@ -7,19 +7,19 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicMaterial, PhysicsSteps, RigidBody};
-use heron_rapier::RapierPlugin;
+use heron_rapier::{ColliderHandle, RapierPlugin};
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -44,7 +44,9 @@ fn restitution_can_be_defined_when_creating_body() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .unwrap();
 
     assert_eq!(restitution, collider.restitution())
 }
@@ -74,7 +76,9 @@ fn restitution_can_be_updated() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .unwrap();
 
     assert_eq!(restitution, collider.restitution())
 }
