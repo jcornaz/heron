@@ -78,6 +78,8 @@ pub(crate) fn remove_invalids_after_components_removed(
     bodies_removed: RemovedComponents<'_, RigidBody>,
     constraints_removed: RemovedComponents<'_, RotationConstraints>,
     materials_removed: RemovedComponents<'_, PhysicMaterial>,
+    rb_entities: Query<'_, '_, Entity, With<super::RigidBodyHandle>>,
+    collider_entities: Query<'_, '_, Entity, With<super::ColliderHandle>>,
 ) {
     bodies_removed
         .iter()
@@ -85,9 +87,17 @@ pub(crate) fn remove_invalids_after_components_removed(
         .chain(materials_removed.iter())
         .for_each(|entity| {
             if let Some(handle) = handles.remove(&entity) {
-                remove_collider_handles(&mut commands, &bodies, &colliders, handle);
+                remove_collider_handles(
+                    &mut commands,
+                    &collider_entities,
+                    &bodies,
+                    &colliders,
+                    handle,
+                );
                 bodies.remove(handle, &mut islands, &mut colliders, &mut joints);
-                commands.entity(entity).remove::<super::RigidBodyHandle>();
+                if rb_entities.get(entity).is_ok() {
+                    commands.entity(entity).remove::<super::RigidBodyHandle>();
+                }
             }
         });
 }
@@ -100,6 +110,8 @@ pub(crate) fn remove_invalids_after_component_changed(
     mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
     mut joints: ResMut<'_, JointSet>,
+    collider_entities: Query<'_, '_, Entity, With<super::ColliderHandle>>,
+    rigidbody_entities: Query<'_, '_, Entity, With<super::RigidBodyHandle>>,
     changed: Query<
         '_,
         '_,
@@ -112,9 +124,17 @@ pub(crate) fn remove_invalids_after_component_changed(
     >,
 ) {
     for (entity, handle) in changed.iter() {
-        remove_collider_handles(&mut commands, &bodies, &colliders, handle.0);
+        remove_collider_handles(
+            &mut commands,
+            &collider_entities,
+            &bodies,
+            &colliders,
+            handle.0,
+        );
         bodies.remove(handle.0, &mut islands, &mut colliders, &mut joints);
-        commands.entity(entity).remove::<super::RigidBodyHandle>();
+        if rigidbody_entities.get(entity).is_ok() {
+            commands.entity(entity).remove::<super::RigidBodyHandle>();
+        }
         handles.remove(&entity);
     }
 }
@@ -122,6 +142,7 @@ pub(crate) fn remove_invalids_after_component_changed(
 #[allow(clippy::manual_filter_map)]
 fn remove_collider_handles(
     commands: &mut Commands<'_, '_>,
+    entities: &Query<'_, '_, Entity, With<super::ColliderHandle>>,
     bodies: &RigidBodySet,
     colliders: &ColliderSet,
     handle: RigidBodyHandle,
@@ -135,6 +156,7 @@ fn remove_collider_handles(
             #[allow(clippy::cast_possible_truncation)]
             Entity::from_bits(it.user_data as u64)
         })
+        .filter(|e| entities.get(*e).is_ok())
         .for_each(|collider_entity| {
             commands
                 .entity(collider_entity)

@@ -158,11 +158,14 @@ pub(crate) fn remove_invalids_after_components_removed(
     mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
     shapes_removed: RemovedComponents<'_, CollisionShape>,
+    collider_entities: Query<'_, '_, Entity, With<super::ColliderHandle>>,
 ) {
     for entity in shapes_removed.iter() {
         if let Some(handle) = handles.remove(&entity) {
             colliders.remove(handle, &mut islands, &mut bodies, true);
-            commands.entity(entity).remove::<super::ColliderHandle>();
+            if collider_entities.get(entity).is_ok() {
+                commands.entity(entity).remove::<super::ColliderHandle>();
+            }
         }
     }
 }
