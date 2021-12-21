@@ -10,6 +10,7 @@ enum Layer {
     Player,
 }
 
+#[derive(Component)]
 struct Player;
 
 fn main() {
@@ -72,12 +73,15 @@ fn is_enemy(layers: CollisionLayers) -> bool {
 }
 // ANCHOR_END: kill-enemy
 
-fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<Image>>) {
     let size = Vec2::new(30.0, 30.0);
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(size),
-            material: materials.add(Color::GREEN.into()),
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(size),
+                ..Default::default()
+            },
             transform: Transform::from_translation(Vec3::new(-400.0, 200.0, 0.0)),
             ..Default::default()
         })
@@ -91,12 +95,15 @@ fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<ColorMateri
         .insert(CollisionLayers::new(Layer::Player, Layer::Enemy));
 }
 
-fn spawn_enemy(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn_enemy(mut commands: Commands) {
     let size = Vec2::new(30.0, 30.0);
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(size),
-            material: materials.add(Color::RED.into()),
+            sprite: Sprite {
+                color: Color::RED,
+                custom_size: Some(size),
+                ..Default::default()
+            },
             transform: Transform::from_translation(Vec3::new(0.0, 200.0, 0.0)),
             ..Default::default()
         })
