@@ -8,7 +8,7 @@ use bevy_prototype_lyon::shapes::RectangleOrigin;
 use heron_core::{CollisionShape, RigidBody, SensorShape};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::rapier2d::geometry::{ColliderSet, Shape};
-use heron_rapier::rapier2d::ColliderHandle;
+use heron_rapier::ColliderHandle;
 
 use super::*;
 
@@ -38,7 +38,7 @@ fn create_debug_sprites(
     debug_color: Res<'_, DebugColor>,
 ) {
     for (entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
-        if let Some(collider) = colliders.get(*handle) {
+        if let Some(collider) = colliders.get(**handle) {
             commands
                 .entity(entity)
                 .with_children(|builder| {
@@ -78,7 +78,7 @@ fn replace_debug_sprite(
 ) {
     for (parent_entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
         if let (Some(debug_entity), Some(collider)) =
-            (map.remove(&parent_entity), colliders.get(*handle))
+            (map.remove(&parent_entity), colliders.get(**handle))
         {
             commands.entity(debug_entity).despawn();
             commands.entity(parent_entity).with_children(|builder| {
@@ -114,8 +114,10 @@ fn create_shape(
     transform: GlobalTransform,
 ) -> ShapeBundle {
     base_builder(body, shape).build(
-        ShapeColors::new(color),
-        DrawMode::Fill(FillOptions::default()),
+        DrawMode::Fill(FillMode {
+            color,
+            options: FillOptions::default(),
+        }),
         Transform {
             translation: Vec3::Z,
             scale: transform.scale.recip(),
@@ -203,8 +205,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             } else {
                 builder.add(&shapes::Rectangle {
                     origin: RectangleOrigin::Center,
-                    width: 2.0 * half_extends.x,
-                    height: 2.0 * half_extends.y,
+                    extents: half_extends.truncate(),
                 });
             }
         }
