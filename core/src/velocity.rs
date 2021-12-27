@@ -70,6 +70,37 @@ pub struct Acceleration {
     pub angular: AxisAngle,
 }
 
+/// Component that defines the linear and angular damping.
+///
+/// It must be inserted on the same entity of a [`RigidBody`](crate::RigidBody)
+///
+/// The higher the values, the stronger slow-downs.
+/// Default values are 0.0 (no damping at all).
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+///
+/// fn spawn(mut commands: Commands) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(CollisionShape::Sphere { radius: 1.0 })
+///         .insert(
+///             Damping::from_linear(0.5)
+///                 .with_angular(0.2)
+///         );
+/// }
+/// ```
+#[derive(Debug, Copy, Clone, PartialEq, Default, Reflect)]
+pub struct Damping {
+    /// Linear damping coefficient
+    pub linear: f32,
+
+    /// Angular damping coefficient
+    pub angular: f32,
+}
+
 /// An [axis-angle] representation
 ///
 /// [axis-angle]: https://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation
@@ -139,6 +170,40 @@ impl Acceleration {
     /// Returns a new version with the given angular acceleration
     #[must_use]
     pub fn with_angular(mut self, angular: AxisAngle) -> Self {
+        self.angular = angular;
+        self
+    }
+}
+
+impl Damping {
+    /// Returns a linear damping
+    #[must_use]
+    pub fn from_linear(linear: f32) -> Self {
+        Self {
+            linear,
+            angular: 0.0,
+        }
+    }
+
+    /// Returns an angular damping
+    #[must_use]
+    pub fn from_angular(angular: f32) -> Self {
+        Self {
+            angular,
+            linear: 0.0,
+        }
+    }
+
+    /// Returns a new version with the given linear damping
+    #[must_use]
+    pub fn with_linear(mut self, linear: f32) -> Self {
+        self.linear = linear;
+        self
+    }
+
+    /// Returns a new version with the given angular damping
+    #[must_use]
+    pub fn with_angular(mut self, angular: f32) -> Self {
         self.angular = angular;
         self
     }
