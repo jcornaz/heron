@@ -2,7 +2,7 @@ use bevy::ecs::prelude::*;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
-use heron_core::{PhysicMaterial, RigidBody, RotationConstraints, Velocity};
+use heron_core::{Damping, PhysicMaterial, RigidBody, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
@@ -25,12 +25,13 @@ pub(crate) fn create(
             &GlobalTransform,
             &RigidBody,
             Option<&Velocity>,
+            Option<&Damping>,
             Option<&RotationConstraints>,
         ),
         Without<super::RigidBodyHandle>,
     >,
 ) {
-    for (entity, transform, body, velocity, rotation_constraints) in query.iter() {
+    for (entity, transform, body, velocity, damping, rotation_constraints) in query.iter() {
         let mut builder = RigidBodyBuilder::new(body_status(*body))
             .user_data(entity.to_bits().into())
             .position((transform.translation, transform.rotation).into_rapier());
@@ -56,6 +57,10 @@ pub(crate) fn create(
             builder = builder
                 .linvel(v.linear.into_rapier())
                 .angvel(v.angular.into_rapier());
+        }
+
+        if let Some(d) = damping {
+            builder = builder.linear_damping(d.linear).angular_damping(d.angular);
         }
 
         let rigid_body_handle = bodies.insert(builder.build());

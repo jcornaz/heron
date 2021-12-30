@@ -16,7 +16,7 @@ pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
 pub use physics_time::PhysicsTime;
 pub use step::{PhysicsStepDuration, PhysicsSteps};
-pub use velocity::{Acceleration, AxisAngle, Velocity};
+pub use velocity::{Acceleration, AxisAngle, Damping, Velocity};
 
 mod constraints;
 mod events;
@@ -68,6 +68,7 @@ impl Plugin for CorePlugin {
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<Acceleration>()
+            .register_type::<Damping>()
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
