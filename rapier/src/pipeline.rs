@@ -532,10 +532,10 @@ mod tests {
             let mut bodies = RigidBodySet::new();
             let mut colliders = ColliderSet::new();
 
-            let rb_entity_1 = Entity::new(0);
-            let rb_entity_2 = Entity::new(1);
-            let collider_entity_1 = Entity::new(2);
-            let collider_entity_2 = Entity::new(3);
+            let rb_entity_1 = Entity::from_bits(0);
+            let rb_entity_2 = Entity::from_bits(1);
+            let collider_entity_1 = Entity::from_bits(2);
+            let collider_entity_2 = Entity::from_bits(3);
             let layers_1 = CollisionLayers::from_bits(1, 2);
             let layers_2 = CollisionLayers::from_bits(3, 4);
             let body1 = bodies.insert(
