@@ -36,6 +36,7 @@ use crate::rapier::pipeline::{PhysicsPipeline, QueryPipeline};
 mod acceleration;
 mod body;
 pub mod convert;
+mod damping;
 mod pipeline;
 mod shape;
 mod velocity;
@@ -99,6 +100,8 @@ fn update_rapier_world_stage() -> SystemStage {
         )
         .with_system(velocity::update_rapier_velocity.system())
         .with_system(acceleration::update_rapier_force_and_torque.system())
+        .with_system(damping::update_rapier_damping.system())
+        .with_system(damping::reset_rapier_damping.system())
         .with_system(shape::update_position.system())
         .with_system(shape::update_collision_groups.system())
         .with_system(shape::update_sensor_flag.system())
