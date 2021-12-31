@@ -8,7 +8,7 @@ use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
-use heron_core::{CollisionShape, PhysicsSteps, RigidBody};
+use heron_core::{CollisionShape, PhysicsSteps, PhysicsTime, RigidBody};
 use heron_rapier::convert::IntoBevy;
 use heron_rapier::{ColliderHandle, RapierPlugin, RigidBodyHandle};
 use utils::*;
@@ -217,6 +217,37 @@ fn despawn_body_entity() {
 
     assert!(app.world.get::<RigidBodyHandle>(entity).is_none());
     assert!(app.world.get::<ColliderHandle>(entity).is_none());
+
+    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    assert_eq!(bodies.len(), 0);
+
+    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    assert_eq!(colliders.len(), 0);
+}
+
+#[test]
+fn despawn_body_while_paused() {
+    let mut app = test_app();
+
+    let entity = app
+        .world
+        .spawn()
+        .insert_bundle((
+            RigidBody::Dynamic,
+            CollisionShape::Sphere { radius: 2.0 },
+            GlobalTransform::default(),
+        ))
+        .id();
+
+    app.update();
+    app.world.get_resource_mut::<PhysicsTime>().unwrap().pause();
+    app.world.despawn(entity);
+    app.update();
+    app.world
+        .get_resource_mut::<PhysicsTime>()
+        .unwrap()
+        .resume();
+    app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     assert_eq!(bodies.len(), 0);
