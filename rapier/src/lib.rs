@@ -110,11 +110,15 @@ fn update_rapier_world_stage() -> SystemStage {
 }
 
 fn body_update_stage() -> SystemStage {
-    SystemStage::single_threaded().with_system(body::create.system())
+    SystemStage::single_threaded()
+        .with_run_criteria(heron_core::should_run.system())
+        .with_system(body::create.system())
 }
 
 fn create_collider_stage() -> SystemStage {
-    SystemStage::single_threaded().with_system(shape::create.system())
+    SystemStage::single_threaded()
+        .with_run_criteria(heron_core::should_run.system())
+        .with_system(shape::create.system())
 }
 
 fn step_systems() -> SystemSet {
