@@ -74,9 +74,7 @@ impl Plugin for CorePlugin {
             .register_type::<SensorShape>()
             .add_system_to_stage(CoreStage::First, PhysicsSteps::update.system())
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
-                Schedule::default()
-                    .with_run_criteria(should_run.system())
-                    .with_stage(crate::stage::UPDATE, SystemStage::parallel())
+                Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });
     }
 }

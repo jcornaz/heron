@@ -23,6 +23,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 * Custom collision shape (#160)
 * Damping component (#164)
 
+### Fixed
+
+* Despawn not working if simulation is paused
+
 
 ## [0.12.1] - 2021-10-24
 
