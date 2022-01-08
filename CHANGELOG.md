@@ -10,6 +10,9 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### Breaking changes
+
+* Require bevy version 0.6
 
 
 ## [0.13.0] - 2021-12-31
