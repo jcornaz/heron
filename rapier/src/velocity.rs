@@ -4,15 +4,11 @@ use heron_core::utils::NearZero;
 use heron_core::{RigidBody, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::RigidBodySet;
 
 pub(crate) fn update_rapier_velocity(
     mut bodies: ResMut<'_, RigidBodySet>,
-    query: Query<
-        '_,
-        '_,
-        (&super::RigidBodyHandle, Option<&RigidBody>, &Velocity),
-    >,
+    query: Query<'_, '_, (&super::RigidBodyHandle, Option<&RigidBody>, &Velocity)>,
 ) {
     let dynamic_bodies = query
         .iter()

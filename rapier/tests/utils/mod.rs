@@ -11,5 +11,3 @@ pub use heron_rapier::rapier3d::{
     geometry::ColliderSet,
     math::Vector,
 };
-
-use heron_rapier::{ColliderHandle, RigidBodyHandle};

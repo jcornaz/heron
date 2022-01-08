@@ -8,7 +8,7 @@ use crate::convert::{IntoBevy, IntoRapier};
 use crate::rapier::dynamics::{
     IslandManager, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet, RigidBodyType,
 };
-use crate::rapier::geometry::{ColliderHandle, ColliderSet};
+use crate::rapier::geometry::ColliderSet;
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 

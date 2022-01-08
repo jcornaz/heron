@@ -1,7 +1,7 @@
 #![cfg(any(dim2, dim3))]
 
 use std::f32::consts::PI;
-use std::ops::{Deref, DerefMut};
+use std::ops::DerefMut;
 use std::time::Duration;
 
 use bevy::core::CorePlugin;

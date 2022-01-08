@@ -4,7 +4,7 @@ use fnv::FnvHashMap;
 use heron_core::{CollisionLayers, CollisionShape, PhysicMaterial, RigidBody, SensorShape};
 
 use crate::convert::IntoRapier;
-use crate::rapier::dynamics::{IslandManager, RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::{IslandManager, RigidBodySet};
 use crate::rapier::geometry::{
     ActiveCollisionTypes, Collider, ColliderBuilder, ColliderHandle, ColliderSet, InteractionGroups,
 };
@@ -335,6 +335,7 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
 #[cfg(test)]
 mod tests {
     use bevy::math::Vec3;
+
     use heron_core::CustomCollisionShape;
 
     use super::*;

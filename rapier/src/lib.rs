@@ -48,9 +48,15 @@ mod velocity;
 #[derive(Debug, Copy, Clone, Default)]
 pub struct RapierPlugin;
 
+/// Component that holds a reference to the rapier rigid body
+///
+/// It is automatically spawned and despawned. It is only useful for advanced, direct access to the rapier world
 #[derive(Component)]
 pub struct RigidBodyHandle(dynamics::RigidBodyHandle);
 
+/// Component that holds a reference to the rapier collider
+///
+/// It is automatically spawned and despawned. It is only useful for advanced, direct access to the rapier world
 #[derive(Component)]
 pub struct ColliderHandle(geometry::ColliderHandle);
 

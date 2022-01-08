@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use heron_core::{utils::NearZero, Acceleration};
 
 use crate::convert::IntoRapier;
-use crate::rapier::dynamics::{RigidBodyHandle, RigidBodySet};
+use crate::rapier::dynamics::RigidBodySet;
 use crate::rapier::{
     dynamics::RigidBody,
     math::{AngVector, Vector},
