@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier", "macros"]
 
 [package]
 name = "heron"
-version = "0.12.1"
+version = "0.13.0"
 rust-version = "1.56"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -24,14 +24,14 @@ default = []
 # debug-3d = ["3d", "heron_debug/3d"]
 
 [dependencies]
-heron_core = { version = "0.12.1", path = "core" }
-heron_macros = { version = "0.12.1", path = "macros" }
-heron_rapier = { version = "0.12.1", path = "rapier" }
-heron_debug = { version = "0.12.1", path = "debug", optional = true }
-bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false }
+heron_core = { version = "^0.13.0", path = "core" }
+heron_macros = { version = "^0.13.0", path = "macros" }
+heron_rapier = { version = "^0.13.0", path = "rapier" }
+heron_debug = { version = "^0.13.0", path = "debug", optional = true }
+bevy = { version = "0.6.0", default-features = false }
 
 [dev-dependencies]
-bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false, features=["render", "x11"] }
+bevy = { version = "0.6.0", default-features = false, features=["render", "x11"] }
 skeptic = "0.13"
 rstest = "0.7"
 

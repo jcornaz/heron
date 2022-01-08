@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [0.13.0] - 2021-12-31
+
 ### Breaking changes
 
 * The `CollisionShape` is now marked `#[non_exhaustive]`
@@ -393,7 +397,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.12.1...HEAD
+[Unreleased]: ../../compare/v0.13.0...HEAD
+[0.13.0]: ../../compare/v0.12.1...v0.13.0
 [0.12.1]: ../../compare/v0.12.0...v0.12.1
 [0.12.0]: ../../compare/v0.11.1...v0.12.0
 [0.5.1]: ../../compare/v0.5.0...v0.5.1

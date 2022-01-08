@@ -1,0 +1,20 @@
+name: pr-lints
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  semantic-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v3.6.0
+        with:
+          subjectPattern: ^[a-z].+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}" should start with a lowercase.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

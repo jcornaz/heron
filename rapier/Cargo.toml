@@ -1,6 +1,6 @@
 [package]
 name = "heron_rapier"
-version = "0.12.1"
+version = "0.13.0"
 rust-version = "1.56"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -17,15 +17,15 @@ default = []
 3d = ["rapier3d", "heron_core/3d"]
 
 [dependencies]
-heron_core = { version = "^0.12.0", path = "../core" }
-bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false }
-rapier2d = { version = "^0.11.1", optional = true }
-rapier3d = { version = "^0.11.1", optional = true }
-fnv = "^1.0"
-crossbeam = "^0.8.0"
+heron_core = { version = "^0.13.0", path = "../core" }
+bevy = { version = "0.6.0", default-features = false }
+rapier2d = { version = "0.11.1", optional = true }
+rapier3d = { version = "0.11.1", optional = true }
+fnv = "1.0"
+crossbeam = "0.8.0"
 
 [dev-dependencies]
-bevy = { git="https://github.com/bevyengine/bevy.git", default-features = false }
+bevy = { version = "0.6.0", default-features = false }
 rstest = "0.7"
 
 [build-dependencies]
