@@ -72,10 +72,11 @@ heron = { version = "0.13.0", features = ["2d"] }
 
 ## Bevy Version Supported
 
-| bevy | heron      |
-|------|------------|
-| 0.5  | >= 0.4     |
-| 0.4  | < 0.4      |
+| bevy | heron    |
+|------|----------|
+| 0.6  | 1.0      |
+| 0.5  | 0.4 - 0.13 |
+| 0.4  | 0.1 - 0.3 |
 
 ## Design principles
 
