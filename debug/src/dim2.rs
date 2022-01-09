@@ -1,14 +1,18 @@
-use std::f32::consts::PI;
-
 use bevy::prelude::*;
-use bevy_prototype_lyon::entity::ShapeBundle;
-use bevy_prototype_lyon::prelude::*;
-use bevy_prototype_lyon::shapes::RectangleOrigin;
+use bevy_prototype_lyon::{entity::ShapeBundle, prelude::*};
+use lyon_path::{
+    builder::BorderRadii,
+    math::{Point, Rect, Size},
+    path::Builder,
+    traits::PathBuilder,
+};
 
 use heron_core::{CollisionShape, RigidBody, SensorShape};
-use heron_rapier::convert::IntoBevy;
-use heron_rapier::rapier2d::geometry::{ColliderSet, Shape};
-use heron_rapier::ColliderHandle;
+use heron_rapier::{
+    convert::IntoBevy,
+    rapier2d::geometry::{ColliderSet, Shape},
+    ColliderHandle,
+};
 
 use super::*;
 
@@ -131,7 +135,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
 
     match body {
         CollisionShape::Sphere { radius } => {
-            builder.add(&shapes::Circle {
+            builder = builder.add(&shapes::Circle {
                 radius: *radius,
                 center: Vec2::ZERO,
             });
@@ -140,37 +144,15 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             half_segment,
             radius,
         } => {
-            let half_segment = *half_segment;
-            let radius = *radius;
-            let mut path = PathBuilder::new();
-            path.move_to(Vec2::new(-radius, half_segment));
-            path.arc(
-                Vec2::new(0.0, half_segment),
-                Vec2::new(radius, radius),
-                -PI,
-                0.0,
-            );
-            path.line_to(Vec2::new(radius, -half_segment));
-            path.arc(
-                Vec2::new(0.0, -half_segment),
-                Vec2::new(radius, radius),
-                -PI,
-                0.0,
-            );
-            path.close();
-            builder.add(&path.build());
+            builder = builder.add(&Capsule {
+                half_segment: *half_segment,
+                radius: *radius,
+            });
         }
         CollisionShape::Cuboid {
             half_extends,
             border_radius,
         } => {
-            // bevy_prototype_lyon doesn't have rounded rectangles yet so we implement our own
-            use lyon_path::{
-                builder::BorderRadii,
-                math::{Point, Rect, Size},
-                path::Builder,
-                traits::PathBuilder,
-            };
             struct RoundedRectangle {
                 width: f32,
                 height: f32,
@@ -196,22 +178,15 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 }
             }
 
-            if let Some(radius) = border_radius {
-                builder.add(&RoundedRectangle {
-                    width: 2.0 * half_extends.x,
-                    height: 2.0 * half_extends.y,
-                    radius: *radius,
-                });
-            } else {
-                builder.add(&shapes::Rectangle {
-                    origin: RectangleOrigin::Center,
-                    extents: half_extends.truncate(),
-                });
-            }
+            builder = builder.add(&RoundedRectangle {
+                width: 2.0 * half_extends.x,
+                height: 2.0 * half_extends.y,
+                radius: border_radius.unwrap_or(0.0),
+            });
         }
         CollisionShape::ConvexHull { .. } => {
             if let Some(polygon) = shape.as_convex_polygon() {
-                builder.add(&shapes::Polygon {
+                builder = builder.add(&shapes::Polygon {
                     points: polygon.points().into_bevy(),
                     closed: true,
                 });
@@ -222,13 +197,13 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             // around the edges of the polygon that are also taken up by the border radius.
             } else if let Some(polygon) = shape.as_round_convex_polygon() {
                 for point in polygon.base_shape.points() {
-                    builder.add(&shapes::Circle {
+                    builder = builder.add(&shapes::Circle {
                         radius: polygon.border_radius,
                         center: point.into_bevy(),
                     });
                 }
 
-                builder.add(&shapes::Polygon {
+                builder = builder.add(&shapes::Polygon {
                     points: polygon.base_shape.points().into_bevy(),
                     closed: true,
                 });
@@ -255,7 +230,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 points.push(Vec2::new(half_size, min_y));
                 points.push(Vec2::new(-half_size, min_y));
 
-                builder.add(&shapes::Polygon {
+                builder = builder.add(&shapes::Polygon {
                     points,
                     closed: true,
                 });
@@ -270,4 +245,28 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
     };
 
     builder
+}
+
+struct Capsule {
+    half_segment: f32,
+    radius: f32,
+}
+
+impl Geometry for Capsule {
+    fn add_geometry(&self, path: &mut Builder) {
+        let ctrl_height = self.radius * (4. / 3.);
+        path.begin(Point::new(-self.radius, self.half_segment));
+        path.cubic_bezier_to(
+            Point::new(-self.radius, self.half_segment + ctrl_height),
+            Point::new(self.radius, self.half_segment + ctrl_height),
+            Point::new(self.radius, self.half_segment),
+        );
+        path.line_to(Point::new(self.radius, -self.half_segment));
+        path.cubic_bezier_to(
+            Point::new(self.radius, -self.half_segment - ctrl_height),
+            Point::new(-self.radius, -self.half_segment - ctrl_height),
+            Point::new(-self.radius, -self.half_segment),
+        );
+        path.end(true);
+    }
 }
