@@ -28,6 +28,7 @@ mod shape3d_wireframe;
 #[derive(Debug, Copy, Clone, Default)]
 pub struct DebugPlugin(DebugColor);
 
+#[allow(dead_code)]
 #[derive(Debug, Copy, Clone)]
 struct DebugColor {
     sensor: Color,
