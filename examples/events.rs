@@ -73,7 +73,7 @@ fn is_enemy(layers: CollisionLayers) -> bool {
 }
 // ANCHOR_END: kill-enemy
 
-fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<Image>>) {
+fn spawn_player(mut commands: Commands) {
     let size = Vec2::new(30.0, 30.0);
     commands
         .spawn_bundle(SpriteBundle {

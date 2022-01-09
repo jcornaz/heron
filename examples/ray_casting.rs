@@ -109,7 +109,6 @@ fn ray_cast_from_center(
     mut commands: Commands,
     physics_world: PhysicsWorld,
     mut targeter: Query<&Transform, With<Targeter>>,
-    mut textures: ResMut<Assets<Image>>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
     if !keyboard_input.just_pressed(KeyCode::R) {
