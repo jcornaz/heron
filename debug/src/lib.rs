@@ -1,6 +1,11 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::needless_pass_by_value)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::type_complexity,
+    clippy::cast_precision_loss,
+    clippy::default_trait_access
+)]
 
 //! Rendering of Heron's collision shapes for debugging purposes
 

@@ -14,6 +14,7 @@ use heron_rapier::{
     ColliderHandle,
 };
 
+#[allow(clippy::wildcard_imports)]
 use super::*;
 
 pub(crate) fn systems() -> SystemSet {
@@ -131,6 +132,7 @@ fn create_shape(
     )
 }
 
+#[allow(clippy::too_many_lines)]
 fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
     let mut builder = GeometryBuilder::new();
 

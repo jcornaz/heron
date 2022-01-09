@@ -1,6 +1,10 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
-#![allow(clippy::needless_pass_by_value, clippy::type_complexity)]
+#![allow(
+    clippy::needless_pass_by_value,
+    clippy::type_complexity,
+    clippy::too_many_arguments
+)]
 #![cfg(any(dim2, dim3))]
 
 //! Physics behavior for Heron, using [rapier](https://rapier.rs/)

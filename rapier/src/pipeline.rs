@@ -117,7 +117,7 @@ mod physics_world {
                             self.colliders
                                 .get(handle)
                                 .map(|collider| Entity::from_bits(collider.user_data as u64))
-                                .map_or(false, |entity| filter(entity))
+                                .map_or(false, filter)
                         }
                     })
                     .as_ref()
@@ -232,7 +232,7 @@ mod physics_world {
                             self.colliders
                                 .get(handle)
                                 .map(|collider| Entity::from_bits(collider.user_data as u64))
-                                .map_or(false, |entity| filter(entity))
+                                .map_or(false, filter)
                         }
                     })
                     .as_ref()
