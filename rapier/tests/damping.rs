@@ -7,19 +7,19 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Damping, PhysicsSteps, RigidBody};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::RapierPlugin;
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
-    builder
-        .init_resource::<TypeRegistryArc>()
+    let mut app = App::new();
+    app.init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    app
 }
 
 #[test]
@@ -42,7 +42,14 @@ fn body_is_created_with_damping() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.linear_damping(), linear);
     assert_eq!(body.angular_damping(), angular);
@@ -70,7 +77,14 @@ fn damping_can_be_added_after_creation() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.linear_damping(), linear);
     assert_eq!(body.angular_damping(), angular);
@@ -105,7 +119,14 @@ fn damping_can_be_updated_after_creation() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.linear_damping(), linear);
     assert_eq!(body.angular_damping(), angular);
@@ -135,7 +156,14 @@ fn restore_damping_on_removal() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(
         body.linear_damping(),

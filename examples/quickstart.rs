@@ -3,7 +3,7 @@ use heron::prelude::*;
 
 #[bevy_main]
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the Heron plugin
         .insert_resource(Gravity::from(Vec3::new(0.0, -300.0, 0.0))) // Define gravity
@@ -11,7 +11,7 @@ fn main() {
         .run();
 }
 
-fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn(mut commands: Commands) {
     // Ensure we can see things
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
@@ -21,8 +21,11 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
         //  here we add a Sprite. We can add any bundle of our choice; the
         // only required component is a GlobalTransform
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(size),
-            material: materials.add(Color::GREEN.into()),
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(size),
+                ..Default::default()
+            },
             transform: Transform::from_translation(Vec3::new(0.0, 200.0, 0.0)),
             ..Default::default()
         })

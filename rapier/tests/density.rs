@@ -8,20 +8,20 @@ use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
 use heron_core::{CollisionShape, PhysicMaterial, PhysicsSteps, RigidBody};
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::RapierPlugin;
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -41,7 +41,14 @@ fn bodies_are_created_with_a_default_density() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
     assert!(body.mass() > 0.0);
 
     let center: Vec3 = body.mass_properties().local_com.coords.into_bevy();
@@ -69,7 +76,14 @@ fn bodies_are_created_with_defined_density() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }
@@ -98,7 +112,14 @@ fn density_can_be_updated_after_creation() {
     app.update();
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.mass_properties(), &MassProperties::from_ball(2.0, 1.0));
 }

@@ -9,20 +9,20 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, PhysicsTime, RigidBody};
-use heron_rapier::convert::IntoBevy;
-use heron_rapier::RapierPlugin;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
+use heron_rapier::{ColliderHandle, RapierPlugin, RigidBodyHandle};
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -52,11 +52,21 @@ fn creates_body_in_rapier_world() {
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
 
     let body = bodies
-        .get(*app.world.get(entity).unwrap())
+        .get(
+            app.world
+                .get::<RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .expect("No rigid body referenced by the handle");
 
     let collider = colliders
-        .get(*app.world.get(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .expect("No collider referenced by the handle");
 
     assert_eq!(
@@ -115,7 +125,14 @@ fn update_shape() {
     app.update();
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
-    let collider = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let collider = colliders
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(collider.shape().as_ball().unwrap().radius, 42.0)
 }
@@ -147,7 +164,14 @@ fn update_rapier_position() {
     app.update();
 
     let colliders = app.world.get_resource::<RigidBodySet>().unwrap();
-    let rigid_body = colliders.get(*app.world.get(entity).unwrap()).unwrap();
+    let rigid_body = colliders
+        .get(
+            app.world
+                .get::<RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
     let (actual_translation, actual_rotation) = rigid_body.position().into_bevy();
 
     #[cfg(dim3)]

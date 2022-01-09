@@ -187,6 +187,44 @@ impl IntoBevy<CollisionLayers> for InteractionGroups {
     }
 }
 
+#[cfg(feature = "2d")]
+impl IntoRapier<rapier2d::dynamics::RigidBodyHandle> for crate::RigidBodyHandle {
+    #[cfg(not(feature = "3d"))]
+    fn into_rapier(self) -> rapier2d::dynamics::RigidBodyHandle {
+        self.0
+    }
+    #[cfg(feature = "3d")]
+    fn into_rapier(self) -> rapier2d::dynamics::RigidBodyHandle {
+        rapier2d::dynamics::RigidBodyHandle::invalid()
+    }
+}
+
+#[cfg(feature = "3d")]
+impl IntoRapier<rapier3d::dynamics::RigidBodyHandle> for crate::RigidBodyHandle {
+    fn into_rapier(self) -> rapier3d::dynamics::RigidBodyHandle {
+        self.0
+    }
+}
+
+#[cfg(feature = "2d")]
+impl IntoRapier<rapier2d::geometry::ColliderHandle> for crate::ColliderHandle {
+    #[cfg(not(feature = "3d"))]
+    fn into_rapier(self) -> rapier2d::geometry::ColliderHandle {
+        self.0
+    }
+    #[cfg(feature = "3d")]
+    fn into_rapier(self) -> rapier2d::geometry::ColliderHandle {
+        rapier2d::geometry::ColliderHandle::invalid()
+    }
+}
+
+#[cfg(feature = "3d")]
+impl IntoRapier<rapier3d::geometry::ColliderHandle> for crate::ColliderHandle {
+    fn into_rapier(self) -> rapier3d::geometry::ColliderHandle {
+        self.0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #[cfg(dim3)]

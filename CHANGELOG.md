@@ -10,7 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### Breaking changes
 
+* Require bevy version 0.6
+* Remove debug-3d feature (This will hopefully be reintroduced when upstream dependencies will be compatible with bevy 0.6)
 
 ## [0.13.0] - 2021-12-31
 

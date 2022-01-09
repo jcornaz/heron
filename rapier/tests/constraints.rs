@@ -7,19 +7,20 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody, RotationConstraints};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::RapierPlugin;
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -42,7 +43,12 @@ fn rotation_is_not_constrained_without_the_component() {
 
     assert_eq!(
         bodies
-            .get(*app.world.get(entity).unwrap())
+            .get(
+                app.world
+                    .get::<heron_rapier::RigidBodyHandle>(entity)
+                    .unwrap()
+                    .into_rapier()
+            )
             .unwrap()
             .is_rotation_locked(),
         false
@@ -70,7 +76,12 @@ fn rotation_can_be_locked_at_creation() {
 
     assert_eq!(
         bodies
-            .get(*app.world.get(entity).unwrap())
+            .get(
+                app.world
+                    .get::<heron_rapier::RigidBodyHandle>(entity)
+                    .unwrap()
+                    .into_rapier()
+            )
             .unwrap()
             .is_rotation_locked(),
         true
@@ -103,7 +114,12 @@ fn rotation_can_be_locked_after_creation() {
 
     assert_eq!(
         bodies
-            .get(*app.world.get(entity).unwrap())
+            .get(
+                app.world
+                    .get::<heron_rapier::RigidBodyHandle>(entity)
+                    .unwrap()
+                    .into_rapier()
+            )
             .unwrap()
             .is_rotation_locked(),
         true,
@@ -135,7 +151,12 @@ fn rotation_is_unlocked_if_component_is_removed() {
 
     assert_eq!(
         bodies
-            .get(*app.world.get(entity).unwrap())
+            .get(
+                app.world
+                    .get::<heron_rapier::RigidBodyHandle>(entity)
+                    .unwrap()
+                    .into_rapier()
+            )
             .unwrap()
             .is_rotation_locked(),
         false

@@ -121,7 +121,7 @@ impl PhysicsSteps {
     /// # use bevy::prelude::*;
     /// # use heron_core::PhysicsSteps;
     /// # use std::time::Duration;
-    /// App::build()
+    /// App::new()
     ///     // Runs physics step every frame.
     ///     // If the frame rate drops bellow 30 FPS, then the physics simulation will slow down.
     ///     .insert_resource(PhysicsSteps::from_max_delta_time(Duration::from_secs_f64(1.0 / 30.0)))
@@ -179,7 +179,7 @@ mod tests {
         #[case] delta_time: f32,
     ) {
         steps.do_update(Duration::from_secs_f32(delta_time));
-        assert!(!steps.is_step_frame())
+        assert!(!steps.is_step_frame());
     }
 
     #[rstest]
@@ -193,6 +193,6 @@ mod tests {
         #[case] delta_time: f32,
     ) {
         steps.do_update(Duration::from_secs_f32(delta_time));
-        assert!(steps.is_step_frame())
+        assert!(steps.is_step_frame());
     }
 }

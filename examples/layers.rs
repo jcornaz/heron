@@ -11,7 +11,7 @@ enum Layer {
 // ANCHOR_END: layer-enum
 
 fn main() {
-    App::build()
+    App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
         .insert_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
@@ -19,15 +19,18 @@ fn main() {
         .run();
 }
 
-fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     let size = Vec2::new(1000.0, 50.0);
     let mut ground_entity = commands.spawn();
     ground_entity
         .insert_bundle(SpriteBundle {
-            sprite: Sprite::new(size),
-            material: materials.add(Color::WHITE.into()),
+            sprite: Sprite {
+                color: Color::WHITE,
+                custom_size: Some(size),
+                ..Default::default()
+            },
             transform: Transform::from_translation(Vec3::new(0.0, -200.0, 0.0)),
             ..Default::default()
         })
@@ -49,8 +52,11 @@ fn spawn(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     let mut player_entity = commands.spawn();
     player_entity
         .insert_bundle(SpriteBundle {
-            sprite: Sprite::new(size),
-            material: materials.add(Color::GREEN.into()),
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(size),
+                ..Default::default()
+            },
             transform: Transform::from_translation(Vec3::new(0.0, 200.0, 0.0)),
             ..Default::default()
         })

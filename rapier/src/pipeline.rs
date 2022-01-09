@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use bevy::app::Events;
 use bevy::ecs::prelude::*;
 use bevy::ecs::system::SystemParam;
@@ -38,12 +40,14 @@ mod physics_world {
     /// See the [`ray_casting`](heron::ray_casting)
     /// example for a detailed usage example.
     #[derive(SystemParam)]
-    pub struct PhysicsWorld<'a> {
-        query_pipeline: ResMut<'a, QueryPipeline>,
-        colliders: ResMut<'a, ColliderSet>,
+    pub struct PhysicsWorld<'w, 's> {
+        query_pipeline: ResMut<'w, QueryPipeline>,
+        colliders: ResMut<'w, ColliderSet>,
+        #[system_param(ignore)]
+        marker: PhantomData<&'s usize>,
     }
 
-    impl<'a> PhysicsWorld<'a> {
+    impl<'w, 's> PhysicsWorld<'w, 's> {
         /// Cast a ray and get the collision shape entity, point, and normal at which it collided,
         /// if any
         ///
@@ -113,7 +117,7 @@ mod physics_world {
                             self.colliders
                                 .get(handle)
                                 .map(|collider| Entity::from_bits(collider.user_data as u64))
-                                .map_or(false, |entity| filter(entity))
+                                .map_or(false, filter)
                         }
                     })
                     .as_ref()
@@ -228,7 +232,7 @@ mod physics_world {
                             self.colliders
                                 .get(handle)
                                 .map(|collider| Entity::from_bits(collider.user_data as u64))
-                                .map_or(false, |entity| filter(entity))
+                                .map_or(false, filter)
                         }
                     })
                     .as_ref()
@@ -497,10 +501,7 @@ impl EventManager {
 
 #[cfg(test)]
 mod tests {
-    use bevy::prelude::App;
-    use bevy::prelude::AppBuilder;
-    use bevy::prelude::GlobalTransform;
-    use bevy::prelude::Transform;
+    use bevy::prelude::*;
     use bevy::MinimalPlugins;
 
     use heron_core::CollisionLayers;
@@ -531,10 +532,10 @@ mod tests {
             let mut bodies = RigidBodySet::new();
             let mut colliders = ColliderSet::new();
 
-            let rb_entity_1 = Entity::new(0);
-            let rb_entity_2 = Entity::new(1);
-            let collider_entity_1 = Entity::new(2);
-            let collider_entity_2 = Entity::new(3);
+            let rb_entity_1 = Entity::from_bits(0);
+            let rb_entity_2 = Entity::from_bits(1);
+            let collider_entity_1 = Entity::from_bits(2);
+            let collider_entity_2 = Entity::from_bits(3);
             let layers_1 = CollisionLayers::from_bits(1, 2);
             let layers_2 = CollisionLayers::from_bits(3, 4);
             let body1 = bodies.insert(
@@ -726,9 +727,10 @@ mod tests {
     }
 
     /// Marker struct for Ray cast test collider shape
+    #[derive(Component)]
     struct RayCastTestCollider;
-    fn setup_ray_cast_test_app() -> AppBuilder {
-        fn setup(mut commands: Commands<'_>) {
+    fn setup_ray_cast_test_app() -> App {
+        fn setup(mut commands: Commands<'_, '_>) {
             // Spawn a block above the world center
             commands.spawn_bundle((
                 CollisionShape::Cuboid {
@@ -742,7 +744,7 @@ mod tests {
             ));
         }
 
-        let mut app = App::build();
+        let mut app = App::new();
         app.add_plugins(MinimalPlugins)
             .add_plugin(RapierPlugin)
             .add_startup_system(setup.system());
@@ -755,8 +757,8 @@ mod tests {
         /// The system to test ray casting
         fn ray_cast(
             mut runs: Local<'_, i32>,
-            physics_world: PhysicsWorld<'_>,
-            test_colliders: Query<'_, (), With<RayCastTestCollider>>,
+            physics_world: PhysicsWorld<'_, '_>,
+            test_colliders: Query<'_, '_, (), With<RayCastTestCollider>>,
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
@@ -785,14 +787,14 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
     fn ray_cast_miss() {
         /// The system to test ray casting
-        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_>) {
+        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
                 *runs = *runs + 1;
@@ -812,8 +814,8 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
@@ -821,8 +823,8 @@ mod tests {
         /// System to test shape casting
         fn ray_cast(
             mut runs: Local<'_, i32>,
-            physics_world: PhysicsWorld<'_>,
-            test_colliders: Query<'_, (), With<RayCastTestCollider>>,
+            physics_world: PhysicsWorld<'_, '_>,
+            test_colliders: Query<'_, '_, (), With<RayCastTestCollider>>,
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
@@ -863,14 +865,14 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 
     #[test]
     fn shape_cast_miss() {
         /// System to test shape casting
-        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_>) {
+        fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
                 *runs = *runs + 1;
@@ -898,7 +900,7 @@ mod tests {
         app.add_system(ray_cast.system());
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
-        app.app.update();
-        app.app.update();
+        app.update();
+        app.update();
     }
 }

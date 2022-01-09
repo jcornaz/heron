@@ -5,7 +5,7 @@ use heron::{
 };
 
 fn main() {
-    App::build()
+    App::new()
         .insert_resource(WindowDescriptor {
             height: 900.0,
             width: 900.0,
@@ -21,12 +21,14 @@ fn main() {
 }
 
 /// Marker struct for our targeter
+#[derive(Component)]
 struct Targeter;
 
 /// Marker
+#[derive(Component)]
 struct ShapeCastIgnored;
 
-fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn setup(mut commands: Commands) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
     // Spawn some walls to cast rays at
@@ -42,8 +44,11 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     ] {
         commands
             .spawn_bundle(SpriteBundle {
-                sprite: Sprite::new(*size),
-                material: materials.add(Color::WHITE.into()),
+                sprite: Sprite {
+                    color: Color::WHITE,
+                    custom_size: Some(*size),
+                    ..Default::default()
+                },
                 transform: Transform::from_translation(*pos),
                 ..Default::default()
             })
@@ -57,8 +62,11 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     // Spawn the targeter that the player can move
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(Vec2::new(10., 10.)),
-            material: materials.add(Color::RED.into()),
+            sprite: Sprite {
+                color: Color::RED,
+                custom_size: Some(Vec2::new(10., 10.)),
+                ..Default::default()
+            },
             transform: Transform::from_xyz(0., 150., 1.),
             ..Default::default()
         })
@@ -66,8 +74,11 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
 
     // Spawn marker to show the center of the world, where the ray will come from
     commands.spawn_bundle(SpriteBundle {
-        sprite: Sprite::new(Vec2::new(10., 10.)),
-        material: materials.add(Color::BLUE.into()),
+        sprite: Sprite {
+            color: Color::BLUE,
+            custom_size: Some(Vec2::new(10., 10.)),
+            ..Default::default()
+        },
         transform: Transform::default(),
         ..Default::default()
     });
@@ -76,8 +87,11 @@ fn setup(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
     // will use to filter it out from the shape cast below.
     commands
         .spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(Vec2::new(100., 100.)),
-            material: materials.add(Color::ORANGE.into()),
+            sprite: Sprite {
+                color: Color::ORANGE,
+                custom_size: Some(Vec2::new(100., 100.)),
+                ..Default::default()
+            },
             transform: Transform::from_xyz(200., 200., 0.),
             ..Default::default()
         })
@@ -95,14 +109,13 @@ fn ray_cast_from_center(
     mut commands: Commands,
     physics_world: PhysicsWorld,
     mut targeter: Query<&Transform, With<Targeter>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
     if !keyboard_input.just_pressed(KeyCode::R) {
         return;
     }
 
-    let targeter_transform = if let Ok(transform) = targeter.single_mut() {
+    let targeter_transform = if let Ok(transform) = targeter.get_single_mut() {
         transform
     } else {
         return;
@@ -121,8 +134,11 @@ fn ray_cast_from_center(
     if let Some(collision_info) = dbg!(result) {
         // Spawn a green block at the collision point
         commands.spawn_bundle(SpriteBundle {
-            sprite: Sprite::new(Vec2::new(10., 10.)),
-            material: materials.add(Color::GREEN.into()),
+            sprite: Sprite {
+                color: Color::GREEN,
+                custom_size: Some(Vec2::new(10., 10.)),
+                ..Default::default()
+            },
             transform: Transform::from_translation(collision_info.collision_point),
             ..Default::default()
         });
@@ -136,14 +152,13 @@ fn shape_cast_from_center(
     physics_world: PhysicsWorld,
     ignored_entities: Query<(), With<ShapeCastIgnored>>,
     mut targeter: Query<&Transform, With<Targeter>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     keyboard_input: Res<Input<KeyCode>>,
 ) {
     if !keyboard_input.just_pressed(KeyCode::S) {
         return;
     }
 
-    let targeter_transform = if let Ok(transform) = targeter.single_mut() {
+    let targeter_transform = if let Ok(transform) = targeter.get_single_mut() {
         transform
     } else {
         return;
@@ -177,8 +192,11 @@ fn shape_cast_from_center(
         if let ShapeCastCollisionType::Collided(info) = collision.collision_type {
             // Spawn a green block at the collision point
             commands.spawn_bundle(SpriteBundle {
-                sprite: Sprite::new(shape_size),
-                material: materials.add(Color::YELLOW.into()),
+                sprite: Sprite {
+                    color: Color::YELLOW,
+                    custom_size: Some(shape_size),
+                    ..Default::default()
+                },
                 transform: Transform::from_translation(info.self_end_position),
                 ..Default::default()
             });
@@ -193,7 +211,7 @@ fn move_targeter(
 ) {
     const SPEED: f32 = 5.;
 
-    let mut transform = if let Ok(transform) = targeter.single_mut() {
+    let mut transform = if let Ok(transform) = targeter.get_single_mut() {
         transform
     } else {
         return;

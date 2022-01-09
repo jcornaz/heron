@@ -13,6 +13,7 @@ use super::DebugColor;
 fn add_shape_outlines(
     shapes: Query<
         '_,
+        '_,
         (
             &CollisionShape,
             &GlobalTransform,

@@ -8,20 +8,20 @@ use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Acceleration, AxisAngle, CollisionShape, PhysicsSteps, RigidBody};
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::RapierPlugin;
 use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
-    let mut builder = App::build();
+    let mut builder = App::new();
     builder
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
         .add_plugin(RapierPlugin);
-    builder.app
+    builder
 }
 
 #[test]
@@ -52,7 +52,14 @@ fn body_is_created_with_acceleration() {
     {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-        let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+        let body = bodies
+            .get(
+                app.world
+                    .get::<heron_rapier::RigidBodyHandle>(entity)
+                    .unwrap()
+                    .into_rapier(),
+            )
+            .unwrap();
 
         println!("{:?}", body);
         assert_eq!(body.linvel().into_bevy(), Vec3::ZERO);
@@ -63,7 +70,14 @@ fn body_is_created_with_acceleration() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     println!("{:?}", body);
     assert_eq!(body.linvel().into_bevy(), linear);
@@ -102,7 +116,14 @@ fn acceleration_may_be_added_after_creating_the_body() {
 
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
 
-    let body = bodies.get(*app.world.get(entity).unwrap()).unwrap();
+    let body = bodies
+        .get(
+            app.world
+                .get::<heron_rapier::RigidBodyHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
+        .unwrap();
 
     assert_eq!(body.linvel().into_bevy(), linear);
     assert_eq_angular(body.angvel(), angular);
