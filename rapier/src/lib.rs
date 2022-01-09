@@ -23,7 +23,6 @@ use bevy::prelude::*;
 pub(crate) use rapier2d as rapier;
 #[cfg(dim3)]
 pub(crate) use rapier3d as rapier;
-use std::ops::Deref;
 
 use heron_core::{CollisionEvent, PhysicsSystem};
 pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
@@ -50,29 +49,17 @@ pub struct RapierPlugin;
 
 /// Component that holds a reference to the rapier rigid body
 ///
-/// It is automatically spawned and despawned. It is only useful for advanced, direct access to the rapier world
-#[derive(Component)]
+/// It is automatically inserted and removed by heron.
+/// It is only useful for advanced, direct access to the rapier world
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Component)]
 pub struct RigidBodyHandle(dynamics::RigidBodyHandle);
 
 /// Component that holds a reference to the rapier collider
 ///
-/// It is automatically spawned and despawned. It is only useful for advanced, direct access to the rapier world
-#[derive(Component)]
+/// It is automatically inserted and removed by heron.
+/// It is only useful for advanced, direct access to the rapier world
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Component)]
 pub struct ColliderHandle(geometry::ColliderHandle);
-
-impl Deref for RigidBodyHandle {
-    type Target = dynamics::RigidBodyHandle;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Deref for ColliderHandle {
-    type Target = geometry::ColliderHandle;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
 enum InternalSystem {

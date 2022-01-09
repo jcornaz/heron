@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::{ColliderHandle, RapierPlugin};
 use utils::*;
 
@@ -41,10 +42,10 @@ fn create_dynamic_body() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -70,10 +71,10 @@ fn create_static_body() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -99,10 +100,10 @@ fn create_kinematic_position_based_body() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -128,10 +129,10 @@ fn create_kinematic_velocity_based_body() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -156,7 +157,12 @@ fn create_sensor_body() {
 
     let colliders = app.world.get_resource::<ColliderSet>().unwrap();
     let body = colliders
-        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .unwrap();
 
     assert!(body.is_sensor())
@@ -186,10 +192,10 @@ fn can_change_to_static_after_creation() {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
         let body = bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
-                    .unwrap(),
+                    .unwrap()
+                    .into_rapier(),
             )
             .unwrap();
 
@@ -220,7 +226,12 @@ fn can_change_to_sensor_after_creation() {
     {
         let colliders = app.world.get_resource::<ColliderSet>().unwrap();
         let collider = colliders
-            .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+            .get(
+                app.world
+                    .get::<ColliderHandle>(entity)
+                    .unwrap()
+                    .into_rapier(),
+            )
             .unwrap();
 
         assert!(collider.is_sensor());
@@ -251,10 +262,10 @@ fn can_change_to_dynamic_after_creation() {
         let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
         let body = bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
-                    .unwrap(),
+                    .unwrap()
+                    .into_rapier(),
             )
             .unwrap();
 

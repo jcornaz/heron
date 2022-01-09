@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Damping, PhysicsSteps, RigidBody};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::RapierPlugin;
 use utils::*;
 
@@ -43,10 +44,10 @@ fn body_is_created_with_damping() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -78,10 +79,10 @@ fn damping_can_be_added_after_creation() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -120,10 +121,10 @@ fn damping_can_be_updated_after_creation() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -157,10 +158,10 @@ fn restore_damping_on_removal() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 

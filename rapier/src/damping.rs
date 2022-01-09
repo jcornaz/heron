@@ -10,7 +10,7 @@ pub(crate) fn update_rapier_damping(
     dampings: Query<'_, '_, (&RigidBodyHandle, &Damping), Changed<Damping>>,
 ) {
     for (handle, damping) in dampings.iter() {
-        if let Some(body) = bodies.get_mut(**handle) {
+        if let Some(body) = bodies.get_mut(handle.0) {
             body.set_linear_damping(damping.linear);
             body.set_angular_damping(damping.angular);
         }
@@ -26,7 +26,7 @@ pub(crate) fn reset_rapier_damping(
         .iter()
         .filter_map(|entity| handles.get(entity).ok())
         .for_each(|handle| {
-            if let Some(body) = bodies.get_mut(**handle) {
+            if let Some(body) = bodies.get_mut(handle.0) {
                 body.set_linear_damping(RigidBodyDamping::default().linear_damping);
                 body.set_angular_damping(RigidBodyDamping::default().angular_damping);
             }

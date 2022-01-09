@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody, RotationConstraints};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::RapierPlugin;
 use utils::*;
 
@@ -43,10 +44,10 @@ fn rotation_is_not_constrained_without_the_component() {
     assert_eq!(
         bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
                     .unwrap()
+                    .into_rapier()
             )
             .unwrap()
             .is_rotation_locked(),
@@ -76,10 +77,10 @@ fn rotation_can_be_locked_at_creation() {
     assert_eq!(
         bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
                     .unwrap()
+                    .into_rapier()
             )
             .unwrap()
             .is_rotation_locked(),
@@ -114,10 +115,10 @@ fn rotation_can_be_locked_after_creation() {
     assert_eq!(
         bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
                     .unwrap()
+                    .into_rapier()
             )
             .unwrap()
             .is_rotation_locked(),
@@ -151,10 +152,10 @@ fn rotation_is_unlocked_if_component_is_removed() {
     assert_eq!(
         bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
                     .unwrap()
+                    .into_rapier()
             )
             .unwrap()
             .is_rotation_locked(),

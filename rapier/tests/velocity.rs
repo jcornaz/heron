@@ -9,7 +9,7 @@ use bevy::reflect::TypeRegistryArc;
 use rstest::rstest;
 
 use heron_core::*;
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::RapierPlugin;
 use utils::*;
 
@@ -52,10 +52,10 @@ fn body_is_created_with_velocity(#[case] body_type: RigidBody) {
 
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -106,10 +106,10 @@ fn velocity_may_be_added_after_creating_the_body(#[case] body_type: RigidBody) {
 
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 

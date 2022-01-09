@@ -8,7 +8,7 @@ use bevy::prelude::{GlobalTransform, Transform};
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{Acceleration, AxisAngle, CollisionShape, PhysicsSteps, RigidBody};
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::RapierPlugin;
 use utils::*;
 
@@ -54,10 +54,10 @@ fn body_is_created_with_acceleration() {
 
         let body = bodies
             .get(
-                **app
-                    .world
+                app.world
                     .get::<heron_rapier::RigidBodyHandle>(entity)
-                    .unwrap(),
+                    .unwrap()
+                    .into_rapier(),
             )
             .unwrap();
 
@@ -72,10 +72,10 @@ fn body_is_created_with_acceleration() {
 
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -118,10 +118,10 @@ fn acceleration_may_be_added_after_creating_the_body() {
 
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 

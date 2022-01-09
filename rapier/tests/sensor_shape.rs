@@ -7,6 +7,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody, SensorShape};
+use heron_rapier::convert::IntoRapier;
 use heron_rapier::{ColliderHandle, RapierPlugin};
 use utils::*;
 
@@ -46,7 +47,12 @@ fn a_non_sensor_body_can_have_a_sensor_shape() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .unwrap();
 
     assert!(collider.is_sensor());
@@ -76,7 +82,12 @@ fn sensor_flag_can_be_added_after_creation() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .unwrap();
 
     assert!(collider.is_sensor());
@@ -107,7 +118,12 @@ fn sensor_flag_can_removed() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .unwrap();
 
     assert!(!collider.is_sensor());
@@ -138,7 +154,12 @@ fn removing_sensor_flag_has_no_effect_if_body_is_sensor() {
         .world
         .get_resource::<ColliderSet>()
         .unwrap()
-        .get(**app.world.get::<ColliderHandle>(entity).unwrap())
+        .get(
+            app.world
+                .get::<ColliderHandle>(entity)
+                .unwrap()
+                .into_rapier(),
+        )
         .unwrap();
 
     assert!(collider.is_sensor());

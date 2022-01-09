@@ -8,7 +8,7 @@ use bevy::reflect::TypeRegistryArc;
 
 use heron_core::utils::NearZero;
 use heron_core::{CollisionShape, PhysicMaterial, PhysicsSteps, RigidBody};
-use heron_rapier::convert::IntoBevy;
+use heron_rapier::convert::{IntoBevy, IntoRapier};
 use heron_rapier::RapierPlugin;
 use utils::*;
 
@@ -43,10 +43,10 @@ fn bodies_are_created_with_a_default_density() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
     assert!(body.mass() > 0.0);
@@ -78,10 +78,10 @@ fn bodies_are_created_with_defined_density() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 
@@ -114,10 +114,10 @@ fn density_can_be_updated_after_creation() {
     let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
     let body = bodies
         .get(
-            **app
-                .world
+            app.world
                 .get::<heron_rapier::RigidBodyHandle>(entity)
-                .unwrap(),
+                .unwrap()
+                .into_rapier(),
         )
         .unwrap();
 

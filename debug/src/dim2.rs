@@ -9,7 +9,7 @@ use lyon_path::{
 
 use heron_core::{CollisionShape, RigidBody, SensorShape};
 use heron_rapier::{
-    convert::IntoBevy,
+    convert::{IntoBevy, IntoRapier},
     rapier2d::geometry::{ColliderSet, Shape},
     ColliderHandle,
 };
@@ -42,7 +42,7 @@ fn create_debug_sprites(
     debug_color: Res<'_, DebugColor>,
 ) {
     for (entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
-        if let Some(collider) = colliders.get(**handle) {
+        if let Some(collider) = colliders.get(handle.into_rapier()) {
             commands
                 .entity(entity)
                 .with_children(|builder| {
@@ -81,9 +81,10 @@ fn replace_debug_sprite(
     >,
 ) {
     for (parent_entity, body, handle, transform, rigid_body_option, sensor_option) in query.iter() {
-        if let (Some(debug_entity), Some(collider)) =
-            (map.remove(&parent_entity), colliders.get(**handle))
-        {
+        if let (Some(debug_entity), Some(collider)) = (
+            map.remove(&parent_entity),
+            colliders.get(handle.into_rapier()),
+        ) {
             commands.entity(debug_entity).despawn();
             commands.entity(parent_entity).with_children(|builder| {
                 builder
