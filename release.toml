@@ -4,5 +4,5 @@ consolidate-pushes = true
 pre-release-commit-message = "chore: Release"
 dev-version = false
 shared-version = true
-tag-prefix = "v"
+tag-prefix = ""
 tag = false
