@@ -1,6 +1,6 @@
 [package]
 name = "heron_macros"
-version = "0.13.0"
+version = "1.0.1-rc.1"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -12,6 +12,6 @@ repository = "https://github.com/jcornaz/heron/"
 proc-macro = true
 
 [dependencies]
-heron_core = { version = "^0.13.0", path = "../core" }
+heron_core = { version = "^1.0.1-rc.1", path = "../core" }
 syn = "1.0"
 quote = "1.0"

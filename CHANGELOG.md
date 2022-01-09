@@ -10,6 +10,10 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+
+
+## [1.0.1-rc.1] - 2022-01-09
+
 ### Breaking changes
 
 * Require bevy version 0.6
@@ -401,7 +405,8 @@ One can read from `Events<CollisionEvent>` to be notified when collisions start 
 
 
 
-[Unreleased]: ../../compare/v0.13.0...HEAD
+[Unreleased]: ../../compare/v1.0.1-rc.1...HEAD
+[1.0.1-rc.1]: ../../compare/v0.13.0...v1.0.1-rc.1
 [0.13.0]: ../../compare/v0.12.1...v0.13.0
 [0.12.1]: ../../compare/v0.12.0...v0.12.1
 [0.12.0]: ../../compare/v0.11.1...v0.12.0

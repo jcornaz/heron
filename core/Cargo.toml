@@ -1,6 +1,6 @@
 [package]
 name = "heron_core"
-version = "0.13.0"
+version = "1.0.1-rc.1"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
