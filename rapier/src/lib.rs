@@ -48,8 +48,26 @@ mod velocity;
 
 /// Plugin that enables collision detection and physics behavior, powered by rapier.
 #[must_use]
-#[derive(Debug, Copy, Clone, Default)]
-pub struct RapierPlugin;
+#[derive(Debug, Copy, Clone)]
+pub struct RapierPlugin<
+    PreStage: StageLabel + Clone,
+    PhysicsStage: StageLabel + Clone,
+    StepStage: StageLabel + Clone,
+> {
+    physics_stage: PreStage,
+    post_physics_stage: PhysicsStage,
+    step_physics_stage: StepStage,
+}
+
+impl Default for RapierPlugin<&'static str, CoreStage, CoreStage> {
+    fn default() -> Self {
+        Self {
+            physics_stage: "heron-physics",
+            post_physics_stage: CoreStage::PostUpdate,
+            step_physics_stage: CoreStage::First,
+        }
+    }
+}
 
 /// Component that holds a reference to the rapier rigid body
 ///
@@ -70,30 +88,39 @@ enum InternalSystem {
     TransformPropagation,
 }
 
-impl Plugin for RapierPlugin {
+impl<
+        PreStage: StageLabel + Clone,
+        PhysicsStage: StageLabel + Clone,
+        StepStage: StageLabel + Clone,
+    > Plugin for RapierPlugin<PreStage, PhysicsStage, StepStage>
+{
     fn build(&self, app: &mut App) {
-        app.add_plugin(heron_core::CorePlugin)
-            .init_resource::<PhysicsPipeline>()
-            .init_resource::<body::HandleMap>()
-            .init_resource::<shape::HandleMap>()
-            .init_resource::<IntegrationParameters>()
-            .add_event::<CollisionEvent>()
-            .insert_resource(BroadPhase::new())
-            .insert_resource(NarrowPhase::new())
-            .insert_resource(RigidBodySet::new())
-            .insert_resource(QueryPipeline::new())
-            .insert_resource(IslandManager::new())
-            .insert_resource(ColliderSet::new())
-            .insert_resource(JointSet::new())
-            .insert_resource(CCDSolver::new())
-            .stage("heron-physics", |schedule: &mut Schedule| {
-                schedule
-                    .add_stage("heron-remove", removal_stage())
-                    .add_stage("heron-update-rapier-world", update_rapier_world_stage())
-                    .add_stage("heron-create-new-bodies", body_update_stage())
-                    .add_stage("heron-create-new-colliders", create_collider_stage())
-            })
-            .add_system_set_to_stage(CoreStage::PostUpdate, step_systems());
+        app.add_plugin(heron_core::CorePlugin {
+            step_stage: self.step_physics_stage.clone(),
+            physics_stage: self.physics_stage.clone(),
+        })
+        .init_resource::<PhysicsPipeline>()
+        .init_resource::<body::HandleMap>()
+        .init_resource::<shape::HandleMap>()
+        .init_resource::<IntegrationParameters>()
+        .add_event::<CollisionEvent>()
+        .insert_resource(BroadPhase::new())
+        .insert_resource(NarrowPhase::new())
+        .insert_resource(RigidBodySet::new())
+        .insert_resource(QueryPipeline::new())
+        .insert_resource(IslandManager::new())
+        .insert_resource(ColliderSet::new())
+        .insert_resource(JointSet::new())
+        .insert_resource(CCDSolver::new())
+        .stage(self.physics_stage.clone(), |schedule: &mut Schedule| {
+            // TODO: need to make this these sub stages be configurable in physics_stage
+            schedule
+                .add_stage("heron-remove", removal_stage())
+                .add_stage("heron-update-rapier-world", update_rapier_world_stage())
+                .add_stage("heron-create-new-bodies", body_update_stage())
+                .add_stage("heron-create-new-colliders", create_collider_stage())
+        })
+        .add_system_set_to_stage(self.post_physics_stage.clone(), step_systems());
     }
 }
 
