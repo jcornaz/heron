@@ -18,7 +18,7 @@ fn test_app() -> App {
     app.init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin);
+        .add_plugin(RapierPlugin::default());
     app
 }
 

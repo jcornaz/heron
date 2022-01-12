@@ -746,7 +746,7 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins(MinimalPlugins)
-            .add_plugin(RapierPlugin)
+            .add_plugin(RapierPlugin::default())
             .add_startup_system(setup.system());
 
         app

@@ -155,7 +155,7 @@ pub struct PhysicsPlugin {
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugin(RapierPlugin);
+        app.add_plugin(RapierPlugin::default());
 
         #[cfg(debug)]
         app.add_plugin(self.debug);
