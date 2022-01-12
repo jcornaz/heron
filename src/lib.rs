@@ -120,7 +120,10 @@
 //! * How to define [`RotationConstraints`]
 //! * How to define [`CustomCollisionShape`] for [`heron_rapier`]
 
-use bevy::app::{App, Plugin};
+use bevy::{
+    app::{App, Plugin},
+    prelude::StageLabel,
+};
 
 pub use heron_core::*;
 pub use heron_macros::*;
@@ -156,6 +159,65 @@ pub struct PhysicsPlugin {
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(RapierPlugin::default());
+
+        #[cfg(debug)]
+        app.add_plugin(self.debug);
+    }
+}
+
+/// Plugin to install to enable collision detection and physics behavior with custom stage ordering.
+#[must_use]
+#[derive(Debug, Copy, Clone)]
+pub struct StagedPhysicsPlugin<
+    PhysicsStage: StageLabel + Clone,
+    PostPhysicsStage: StageLabel + Clone,
+    StepStage: StageLabel + Clone,
+> {
+    #[cfg(debug)]
+    debug: heron_debug::DebugPlugin,
+
+    /// The stage where heron will run rapier physics logic
+    pub physics_stage: PhysicsStage,
+    /// The stage where heron will update bevy components based on the rapier physics results
+    pub post_physics_stage: PostPhysicsStage,
+    /// The stage to run [`heron_core::step::PhysicsSteps::update`] to tick the physics system timer
+    pub step_physics_stage: StepStage,
+}
+
+impl<
+        PhysicsStage: StageLabel + Clone,
+        PostPhysicsStage: StageLabel + Clone,
+        StepStage: StageLabel + Clone,
+    > StagedPhysicsPlugin<PhysicsStage, PostPhysicsStage, StepStage>
+{
+    /// Construct the StagedPhysicsPlugin with the provided stage labels
+    pub fn new(
+        physics_stage: PhysicsStage,
+        post_physics_stage: PostPhysicsStage,
+        step_physics_stage: StepStage,
+    ) -> Self {
+        Self {
+            physics_stage,
+            post_physics_stage,
+            step_physics_stage,
+            #[cfg(debug)]
+            debug: heron_debug::DebugPlugin::default(),
+        }
+    }
+}
+
+impl<
+        PhysicsStage: StageLabel + Clone,
+        PostPhysicsStage: StageLabel + Clone,
+        StepStage: StageLabel + Clone,
+    > Plugin for StagedPhysicsPlugin<PhysicsStage, PostPhysicsStage, StepStage>
+{
+    fn build(&self, app: &mut App) {
+        app.add_plugin(RapierPlugin {
+            physics_stage: self.physics_stage.clone(),
+            post_physics_stage: self.post_physics_stage.clone(),
+            step_physics_stage: self.step_physics_stage.clone(),
+        });
 
         #[cfg(debug)]
         app.add_plugin(self.debug);

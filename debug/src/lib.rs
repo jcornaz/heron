@@ -53,7 +53,6 @@ struct Indexed;
 
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
-        // TODO: might need stage here
         #[cfg(feature = "3d")]
         app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin)
             .add_system_set_to_stage(CoreStage::PostUpdate, dim3::systems());

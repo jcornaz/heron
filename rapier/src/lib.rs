@@ -50,13 +50,16 @@ mod velocity;
 #[must_use]
 #[derive(Debug, Copy, Clone)]
 pub struct RapierPlugin<
-    PreStage: StageLabel + Clone,
     PhysicsStage: StageLabel + Clone,
+    PostPhysicsStage: StageLabel + Clone,
     StepStage: StageLabel + Clone,
 > {
-    physics_stage: PreStage,
-    post_physics_stage: PhysicsStage,
-    step_physics_stage: StepStage,
+    /// The stage where heron will run rapier physics logic
+    pub physics_stage: PhysicsStage,
+    /// The stage where heron will update bevy components based on the rapier physics results
+    pub post_physics_stage: PostPhysicsStage,
+    /// The stage to run [`heron_core::step::PhysicsSteps::update`] to tick the physics system timer
+    pub step_physics_stage: StepStage,
 }
 
 impl Default for RapierPlugin<&'static str, CoreStage, CoreStage> {
@@ -89,10 +92,10 @@ enum InternalSystem {
 }
 
 impl<
-        PreStage: StageLabel + Clone,
         PhysicsStage: StageLabel + Clone,
+        PostPhysicsStage: StageLabel + Clone,
         StepStage: StageLabel + Clone,
-    > Plugin for RapierPlugin<PreStage, PhysicsStage, StepStage>
+    > Plugin for RapierPlugin<PhysicsStage, PostPhysicsStage, StepStage>
 {
     fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin {
@@ -111,9 +114,11 @@ impl<
         .insert_resource(IslandManager::new())
         .insert_resource(ColliderSet::new())
         .insert_resource(JointSet::new())
-        .insert_resource(CCDSolver::new())
-        .stage(self.physics_stage.clone(), |schedule: &mut Schedule| {
-            // TODO: need to make this these sub stages be configurable in physics_stage
+        .insert_resource(CCDSolver::new());
+        // TODO: before "heron-physics" was its own schedule (a different kind of stage)
+        // will need to play with the types here to see if this is allowed
+        app.stage(self.physics_stage.clone(), |schedule: &mut SystemStage| {
+            // TODO: Should we make all these to one sub schedule/stage with a label we export for better ordering within physics_stage?
             schedule
                 .add_stage("heron-remove", removal_stage())
                 .add_stage("heron-update-rapier-world", update_rapier_world_stage())
