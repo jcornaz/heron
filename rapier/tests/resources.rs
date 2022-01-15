@@ -1,9 +1,9 @@
 #![cfg(any(dim2, dim3))]
 
-use bevy::app::prelude::*;
 use bevy::core::CorePlugin;
 use bevy::math::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::{app::prelude::*, prelude::Schedule};
 
 use heron_core::Gravity;
 use heron_core::PhysicsTime;
@@ -21,6 +21,11 @@ fn can_define_gravity_before_plugin() {
             .insert_resource(Gravity::from(Vec3::Y))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
+            .add_stage_before(
+                bevy::prelude::CoreStage::PostUpdate,
+                "heron-physics",
+                Schedule::default(),
+            )
             .add_plugin(RapierPlugin::default());
 
         builder
@@ -41,6 +46,11 @@ fn can_define_time_scale_before_plugin() {
             .insert_resource(PhysicsTime::new(0.5))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
+            .add_stage_before(
+                bevy::prelude::CoreStage::PostUpdate,
+                "heron-physics",
+                Schedule::default(),
+            )
             .add_plugin(RapierPlugin::default());
 
         builder
@@ -57,6 +67,11 @@ fn rapier_world_is_registered() {
     let mut app = App::new();
     app.init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
+        .add_stage_before(
+            bevy::prelude::CoreStage::PostUpdate,
+            "heron-physics",
+            Schedule::default(),
+        )
         .add_plugin(RapierPlugin::default());
 
     assert!(app.world.contains_resource::<RigidBodySet>());
