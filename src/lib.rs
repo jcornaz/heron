@@ -183,7 +183,7 @@ pub struct StagedPhysicsPlugin<
     debug: heron_debug::DebugPlugin,
 
     /// The [`Schedule`] where heron will run rapier physics logic. This must be a schedule and not just a stage.
-    pub physics_stage: PhysicsSchedule,
+    pub physics_schedule: PhysicsSchedule,
     /// The stage where heron will update bevy components based on the rapier physics results
     pub post_physics_stage: PostPhysicsStage,
     /// The stage to run [`heron_core::step::PhysicsSteps::update`] to tick the physics system timer
@@ -203,7 +203,7 @@ impl<
         step_physics_stage: StepStage,
     ) -> Self {
         Self {
-            physics_stage,
+            physics_schedule: physics_stage,
             post_physics_stage,
             step_physics_stage,
             #[cfg(debug)]
@@ -220,7 +220,7 @@ impl<
 {
     fn build(&self, app: &mut App) {
         app.add_plugin(RapierPlugin {
-            physics_schedule: self.physics_stage.clone(),
+            physics_schedule: self.physics_schedule.clone(),
             post_physics_stage: self.post_physics_stage.clone(),
             step_physics_stage: self.step_physics_stage.clone(),
         });
