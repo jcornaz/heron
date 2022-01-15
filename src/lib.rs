@@ -196,7 +196,7 @@ impl<
         StepStage: StageLabel + Clone,
     > StagedPhysicsPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
-    /// Construct the StagedPhysicsPlugin with the provided stage labels
+    /// Construct the [`StagedPhysicsPlugin`] with the provided stage labels
     pub fn new(
         physics_stage: PhysicsSchedule,
         post_physics_stage: PostPhysicsStage,
