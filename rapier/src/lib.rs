@@ -50,12 +50,12 @@ mod velocity;
 #[must_use]
 #[derive(Debug, Copy, Clone)]
 pub struct RapierPlugin<
-    PhysicsStage: StageLabel + Clone,
+    PhysicsSchedule: StageLabel + Clone,
     PostPhysicsStage: StageLabel + Clone,
     StepStage: StageLabel + Clone,
 > {
     /// The stage where heron will run rapier physics logic
-    pub physics_stage: PhysicsStage,
+    pub physics_schedule: PhysicsSchedule,
     /// The stage where heron will update bevy components based on the rapier physics results
     pub post_physics_stage: PostPhysicsStage,
     /// The stage to run [`heron_core::step::PhysicsSteps::update`] to tick the physics system timer
@@ -65,7 +65,7 @@ pub struct RapierPlugin<
 impl Default for RapierPlugin<&'static str, CoreStage, CoreStage> {
     fn default() -> Self {
         Self {
-            physics_stage: "heron-physics",
+            physics_schedule: "heron-physics",
             post_physics_stage: CoreStage::PostUpdate,
             step_physics_stage: CoreStage::First,
         }
@@ -92,15 +92,14 @@ enum InternalSystem {
 }
 
 impl<
-        PhysicsStage: StageLabel + Clone,
+        PhysicsSchedule: StageLabel + Clone,
         PostPhysicsStage: StageLabel + Clone,
         StepStage: StageLabel + Clone,
-    > Plugin for RapierPlugin<PhysicsStage, PostPhysicsStage, StepStage>
+    > Plugin for RapierPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
     fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin {
             step_stage: self.step_physics_stage.clone(),
-            physics_stage: self.physics_stage.clone(),
         })
         .init_resource::<PhysicsPipeline>()
         .init_resource::<body::HandleMap>()
@@ -114,18 +113,19 @@ impl<
         .insert_resource(IslandManager::new())
         .insert_resource(ColliderSet::new())
         .insert_resource(JointSet::new())
-        .insert_resource(CCDSolver::new());
-        // TODO: before "heron-physics" was its own schedule (a different kind of stage)
-        // will need to play with the types here to see if this is allowed
-        app.stage(self.physics_stage.clone(), |schedule: &mut SystemStage| {
-            // TODO: Should we make all these to one sub schedule/stage with a label we export for better ordering within physics_stage?
-            schedule
-                .add_stage("heron-remove", removal_stage())
-                .add_stage("heron-update-rapier-world", update_rapier_world_stage())
-                .add_stage("heron-create-new-bodies", body_update_stage())
-                .add_stage("heron-create-new-colliders", create_collider_stage())
-        })
+        .insert_resource(CCDSolver::new())
         .add_system_set_to_stage(self.post_physics_stage.clone(), step_systems());
+
+        let physics_schedule = app
+            .schedule
+            .get_stage_mut::<Schedule>(&self.physics_schedule)
+            .expect("The provided physics_schedule was not found.");
+
+        physics_schedule
+            .add_stage("heron-remove", removal_stage())
+            .add_stage("heron-update-rapier-world", update_rapier_world_stage())
+            .add_stage("heron-create-new-bodies", body_update_stage())
+            .add_stage("heron-create-new-colliders", create_collider_stage());
     }
 }
 

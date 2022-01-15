@@ -55,26 +55,21 @@ pub enum PhysicsSystem {
 ///
 /// It does **NOT** enable physics behavior.
 #[derive(Debug, Copy, Clone)]
-pub struct CorePlugin<StepStage: StageLabel + Clone, PhysicsStage: StageLabel + Clone> {
+pub struct CorePlugin<StepStage: StageLabel + Clone> {
     /// The stage to run [`PhysicsSteps::update`] to tick the physics system timer
     pub step_stage: StepStage,
-    /// The stage where heron will run rapier physics logic
-    pub physics_stage: PhysicsStage,
 }
 
-impl Default for CorePlugin<CoreStage, &'static str> {
+impl Default for CorePlugin<CoreStage> {
     fn default() -> Self {
         Self {
             step_stage: CoreStage::First,
-            physics_stage: "heron-physics",
         }
     }
 }
 
 #[allow(deprecated)]
-impl<StepStage: StageLabel + Clone, PhysicsStage: StageLabel + Clone> Plugin
-    for CorePlugin<StepStage, PhysicsStage>
-{
+impl<StepStage: StageLabel + Clone> Plugin for CorePlugin<StepStage> {
     fn build(&self, app: &mut App) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()
@@ -89,15 +84,6 @@ impl<StepStage: StageLabel + Clone, PhysicsStage: StageLabel + Clone> Plugin
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
             .add_system_to_stage(self.step_stage.clone(), PhysicsSteps::update);
-
-        if let None = app.schedule.get_stage::<SystemStage>(&self.physics_stage) {
-            println!("here");
-            // Only add stage if it does not exist
-            app.add_stage_before(CoreStage::PostUpdate, self.physics_stage.clone(), {
-                // TODO: Do we need this with_stage?
-                Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
-            });
-        }
     }
 }
 

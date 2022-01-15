@@ -5,14 +5,14 @@ use bevy::prelude::*;
 use heron::*;
 
 fn main() {
-    let physics_stage = "Physics-stage"; // TODO: this is sad, same with CoreStage::Update
+    let physics_schedule = "Physics-stage";
     let post_physics_stage = CoreStage::PostUpdate;
     let step_physics_stage = CoreStage::First;
     App::new()
-        .add_stage_before(CoreStage::Update, physics_stage, SystemStage::parallel())
+        .add_stage_before(CoreStage::Update, physics_schedule, Schedule::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(StagedPhysicsPlugin::new(
-            physics_stage,
+            physics_schedule,
             post_physics_stage,
             step_physics_stage,
         )) // Add the plugin

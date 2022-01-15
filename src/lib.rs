@@ -122,7 +122,7 @@
 
 use bevy::{
     app::{App, Plugin},
-    prelude::StageLabel,
+    prelude::{Schedule, StageLabel},
 };
 
 pub use heron_core::*;
@@ -158,6 +158,12 @@ pub struct PhysicsPlugin {
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
+        app.add_stage_before(
+            bevy::prelude::CoreStage::PostUpdate,
+            "heron-physics",
+            Schedule::default(),
+        );
+
         app.add_plugin(RapierPlugin::default());
 
         #[cfg(debug)]
@@ -169,15 +175,15 @@ impl Plugin for PhysicsPlugin {
 #[must_use]
 #[derive(Debug, Copy, Clone)]
 pub struct StagedPhysicsPlugin<
-    PhysicsStage: StageLabel + Clone,
+    PhysicsSchedule: StageLabel + Clone,
     PostPhysicsStage: StageLabel + Clone,
     StepStage: StageLabel + Clone,
 > {
     #[cfg(debug)]
     debug: heron_debug::DebugPlugin,
 
-    /// The stage where heron will run rapier physics logic
-    pub physics_stage: PhysicsStage,
+    /// The schedule where heron will run rapier physics logic
+    pub physics_stage: PhysicsSchedule,
     /// The stage where heron will update bevy components based on the rapier physics results
     pub post_physics_stage: PostPhysicsStage,
     /// The stage to run [`heron_core::step::PhysicsSteps::update`] to tick the physics system timer
@@ -185,14 +191,14 @@ pub struct StagedPhysicsPlugin<
 }
 
 impl<
-        PhysicsStage: StageLabel + Clone,
+        PhysicsSchedule: StageLabel + Clone,
         PostPhysicsStage: StageLabel + Clone,
         StepStage: StageLabel + Clone,
-    > StagedPhysicsPlugin<PhysicsStage, PostPhysicsStage, StepStage>
+    > StagedPhysicsPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
     /// Construct the StagedPhysicsPlugin with the provided stage labels
     pub fn new(
-        physics_stage: PhysicsStage,
+        physics_stage: PhysicsSchedule,
         post_physics_stage: PostPhysicsStage,
         step_physics_stage: StepStage,
     ) -> Self {
@@ -207,14 +213,14 @@ impl<
 }
 
 impl<
-        PhysicsStage: StageLabel + Clone,
+        PhysicsSchedule: StageLabel + Clone,
         PostPhysicsStage: StageLabel + Clone,
         StepStage: StageLabel + Clone,
-    > Plugin for StagedPhysicsPlugin<PhysicsStage, PostPhysicsStage, StepStage>
+    > Plugin for StagedPhysicsPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
     fn build(&self, app: &mut App) {
         app.add_plugin(RapierPlugin {
-            physics_stage: self.physics_stage.clone(),
+            physics_schedule: self.physics_stage.clone(),
             post_physics_stage: self.post_physics_stage.clone(),
             step_physics_stage: self.step_physics_stage.clone(),
         });
