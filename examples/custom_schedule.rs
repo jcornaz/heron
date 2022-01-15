@@ -9,6 +9,7 @@ fn main() {
     let post_physics_stage = CoreStage::PostUpdate;
     let step_physics_stage = CoreStage::First;
     App::new()
+        // need to setup the custom physics schedule
         .add_stage_before(CoreStage::Update, physics_schedule, Schedule::default())
         .add_plugins(DefaultPlugins)
         .add_plugin(StagedPhysicsPlugin::new(

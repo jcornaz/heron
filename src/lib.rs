@@ -182,7 +182,7 @@ pub struct StagedPhysicsPlugin<
     #[cfg(debug)]
     debug: heron_debug::DebugPlugin,
 
-    /// The schedule where heron will run rapier physics logic
+    /// The [`Schedule`] where heron will run rapier physics logic. This must be a schedule and not just a stage.
     pub physics_stage: PhysicsSchedule,
     /// The stage where heron will update bevy components based on the rapier physics results
     pub post_physics_stage: PostPhysicsStage,
