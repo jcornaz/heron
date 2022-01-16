@@ -5,7 +5,7 @@ Thanks for your interest. Feedback and pull requests are very welcome!
 
 ## Ask for help, request a feature or report a bug
 
-Feel free to create an [issue](https://github.com/jcornaz/heron/issues).
+Feel free to create an [issue](https://github.com/jcornaz/heron/issues) or open a [discussion](https://github.com/jcornaz/heron/discussions)
 
 You can also discuss with me on Discord (@Jomag)
 
@@ -41,6 +41,12 @@ When designing an API:
 * Think about how it would look like if the physics engine was 100% made with bevy.
 * Consider Ergonomics/Simplicity/Safety *Before* considering too much the performances. (Although performances remains important)
 * Discuss the API in the issues.
+
+### No breaking change
+
+Please *add* new stuff without breaking the existing API. We may eventually deprecate the old API, but not remove it.
+
+The only exception to this rule is the update of a non-optional public dependency (bevy or rapier)
 
 
 ## Open a pull request
