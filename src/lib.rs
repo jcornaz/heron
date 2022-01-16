@@ -122,7 +122,7 @@
 
 use bevy::{
     app::{App, Plugin},
-    prelude::{Schedule, StageLabel},
+    prelude::{CoreStage, Schedule, StageLabel},
 };
 
 pub use heron_core::*;
@@ -164,10 +164,14 @@ impl Plugin for PhysicsPlugin {
             Schedule::default(),
         );
 
-        app.add_plugin(RapierPlugin::default());
+        app.add_plugin(StagedPhysicsPlugin {
+            physics_schedule: "heron-physics",
+            post_physics_stage: CoreStage::PostUpdate,
+            step_physics_stage: CoreStage::First,
 
-        #[cfg(debug)]
-        app.add_plugin(self.debug);
+            #[cfg(debug)]
+            debug: self.debug,
+        });
     }
 }
 
