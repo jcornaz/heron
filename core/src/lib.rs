@@ -54,6 +54,25 @@ pub enum PhysicsSystem {
 /// Plugin that registers stage resources and components.
 ///
 /// It does **NOT** enable physics behavior.
+#[derive(Debug, Copy, Clone, Default)]
+pub struct CorePlugin;
+
+impl Plugin for CorePlugin {
+    fn build(&self, app: &mut App) {
+        // TODO: only add if not exists?
+        app.add_stage_before(
+            bevy::prelude::CoreStage::PostUpdate,
+            "heron-physics",
+            Schedule::default(),
+        );
+
+        app.add_plugin(StagedCorePlugin::default());
+    }
+}
+
+/// Plugin that registers stage resources and components. Allows for custom [`StageLabel`] to run the physics tick.
+///
+/// It does **NOT** enable physics behavior.
 #[derive(Debug, Copy, Clone)]
 pub struct StagedCorePlugin<StepStage: StageLabel + Clone> {
     /// The stage to run [`PhysicsSteps::update`] to tick the physics system timer
