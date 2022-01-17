@@ -37,11 +37,6 @@ fn test_app() -> App {
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_stage_before(
-            bevy::prelude::CoreStage::PostUpdate,
-            "heron-physics",
-            Schedule::default(),
-        )
         .add_plugin(RapierPlugin::default());
     builder
 }

@@ -67,11 +67,6 @@ fn rapier_world_is_registered() {
     let mut app = App::new();
     app.init_resource::<TypeRegistryArc>()
         .add_plugin(CorePlugin)
-        .add_stage_before(
-            bevy::prelude::CoreStage::PostUpdate,
-            "heron-physics",
-            Schedule::default(),
-        )
         .add_plugin(RapierPlugin::default());
 
     assert!(app.world.contains_resource::<RigidBodySet>());
