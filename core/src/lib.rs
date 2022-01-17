@@ -59,12 +59,14 @@ pub struct CorePlugin;
 
 impl Plugin for CorePlugin {
     fn build(&self, app: &mut App) {
-        // TODO: only add if not exists?
-        app.add_stage_before(
-            bevy::prelude::CoreStage::PostUpdate,
-            "heron-physics",
-            Schedule::default(),
-        );
+        let physics_stage = "heron-physics";
+        if let None = app.schedule.get_stage::<Schedule>(&physics_stage) {
+            app.add_stage_before(
+                CoreStage::PostUpdate,
+                physics_stage.clone(),
+                Schedule::default(),
+            );
+        }
 
         app.add_plugin(StagedCorePlugin::default());
     }

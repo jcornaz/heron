@@ -53,6 +53,15 @@ pub struct RapierPlugin;
 
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut App) {
+        let physics_stage = "heron-physics";
+        if let None = app.schedule.get_stage::<Schedule>(&physics_stage) {
+            app.add_stage_before(
+                CoreStage::PostUpdate,
+                physics_stage.clone(),
+                Schedule::default(),
+            );
+        }
+
         app.add_plugin(StagedRapierPlugin::default());
     }
 }

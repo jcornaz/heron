@@ -158,11 +158,14 @@ pub struct PhysicsPlugin {
 
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
-        app.add_stage_before(
-            bevy::prelude::CoreStage::PostUpdate,
-            "heron-physics",
-            Schedule::default(),
-        );
+        let physics_stage = "heron-physics";
+        if let None = app.schedule.get_stage::<Schedule>(&physics_stage) {
+            app.add_stage_before(
+                CoreStage::PostUpdate,
+                physics_stage.clone(),
+                Schedule::default(),
+            );
+        }
 
         app.add_plugin(StagedPhysicsPlugin {
             physics_schedule: "heron-physics",
