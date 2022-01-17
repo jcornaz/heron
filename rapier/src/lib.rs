@@ -48,13 +48,24 @@ mod velocity;
 
 /// Plugin that enables collision detection and physics behavior, powered by rapier.
 #[must_use]
+#[derive(Debug, Copy, Clone, Default)]
+pub struct RapierPlugin;
+
+impl Plugin for RapierPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_plugin(StagedRapierPlugin::default());
+    }
+}
+
+/// Plugin that enables collision detection and physics behavior, powered by rapier. Allows for custom [`Schedule`]s/[`Stage`]s
+#[must_use]
 #[derive(Debug, Copy, Clone)]
-pub struct RapierPlugin<
+pub struct StagedRapierPlugin<
     PhysicsSchedule: StageLabel + Clone,
     PostPhysicsStage: StageLabel + Clone,
     StepStage: StageLabel + Clone,
 > {
-    /// The stage where heron will run rapier physics logic
+    /// The [`Schedule`] where heron will run rapier physics logic
     pub physics_schedule: PhysicsSchedule,
     /// The stage where heron will update bevy components based on the rapier physics results
     pub post_physics_stage: PostPhysicsStage,
@@ -62,7 +73,7 @@ pub struct RapierPlugin<
     pub step_physics_stage: StepStage,
 }
 
-impl Default for RapierPlugin<&'static str, CoreStage, CoreStage> {
+impl Default for StagedRapierPlugin<&'static str, CoreStage, CoreStage> {
     fn default() -> Self {
         Self {
             physics_schedule: "heron-physics",
@@ -95,10 +106,10 @@ impl<
         PhysicsSchedule: StageLabel + Clone,
         PostPhysicsStage: StageLabel + Clone,
         StepStage: StageLabel + Clone,
-    > Plugin for RapierPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
+    > Plugin for StagedRapierPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
     fn build(&self, app: &mut App) {
-        app.add_plugin(heron_core::CorePlugin {
+        app.add_plugin(heron_core::StagedCorePlugin {
             step_stage: self.step_physics_stage.clone(),
         })
         .init_resource::<PhysicsPipeline>()

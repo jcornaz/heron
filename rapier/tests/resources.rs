@@ -7,7 +7,7 @@ use bevy::{core::CorePlugin, prelude::StageLabel};
 
 use heron_core::Gravity;
 use heron_core::PhysicsTime;
-use heron_rapier::RapierPlugin;
+use heron_rapier::{RapierPlugin, StagedRapierPlugin};
 use utils::*;
 
 mod utils;
@@ -93,7 +93,7 @@ fn use_passed_stage_labels() {
             physics_schedule,
             Schedule::default(),
         )
-        .add_plugin(RapierPlugin {
+        .add_plugin(StagedRapierPlugin {
             physics_schedule,
             post_physics_stage,
             step_physics_stage,

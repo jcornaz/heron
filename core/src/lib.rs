@@ -55,12 +55,12 @@ pub enum PhysicsSystem {
 ///
 /// It does **NOT** enable physics behavior.
 #[derive(Debug, Copy, Clone)]
-pub struct CorePlugin<StepStage: StageLabel + Clone> {
+pub struct StagedCorePlugin<StepStage: StageLabel + Clone> {
     /// The stage to run [`PhysicsSteps::update`] to tick the physics system timer
     pub step_stage: StepStage,
 }
 
-impl Default for CorePlugin<CoreStage> {
+impl Default for StagedCorePlugin<CoreStage> {
     fn default() -> Self {
         Self {
             step_stage: CoreStage::First,
@@ -69,7 +69,7 @@ impl Default for CorePlugin<CoreStage> {
 }
 
 #[allow(deprecated)]
-impl<StepStage: StageLabel + Clone> Plugin for CorePlugin<StepStage> {
+impl<StepStage: StageLabel + Clone> Plugin for StagedCorePlugin<StepStage> {
     fn build(&self, app: &mut App) {
         app.init_resource::<Gravity>()
             .init_resource::<PhysicsTime>()

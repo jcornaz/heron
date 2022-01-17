@@ -127,7 +127,7 @@ use bevy::{
 
 pub use heron_core::*;
 pub use heron_macros::*;
-use heron_rapier::RapierPlugin;
+use heron_rapier::StagedRapierPlugin;
 
 /// Physics behavior powered by [rapier](https://rapier.rs)
 ///
@@ -223,7 +223,7 @@ impl<
     > Plugin for StagedPhysicsPlugin<PhysicsSchedule, PostPhysicsStage, StepStage>
 {
     fn build(&self, app: &mut App) {
-        app.add_plugin(RapierPlugin {
+        app.add_plugin(StagedRapierPlugin {
             physics_schedule: self.physics_schedule.clone(),
             post_physics_stage: self.post_physics_stage.clone(),
             step_physics_stage: self.step_physics_stage.clone(),
