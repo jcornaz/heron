@@ -1,9 +1,9 @@
 #![cfg(any(dim2, dim3))]
 
+use bevy::core::CorePlugin;
 use bevy::math::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 use bevy::{app::prelude::*, prelude::Schedule};
-use bevy::{core::CorePlugin, prelude::StageLabel};
 
 use heron_core::Gravity;
 use heron_core::PhysicsTime;
@@ -89,8 +89,5 @@ fn use_passed_stage_labels() {
         .get_stage::<Schedule>(&physics_schedule)
         .expect("Schedule should exist");
 
-    let stage_labels: Vec<&dyn StageLabel> =
-        schedule.iter_stages().map(|(label, _)| label).collect();
-
-    assert_eq!(stage_labels.len(), 4);
+    assert_eq!(schedule.iter_stages().count(), 4);
 }

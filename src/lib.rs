@@ -159,12 +159,8 @@ pub struct PhysicsPlugin {
 impl Plugin for PhysicsPlugin {
     fn build(&self, app: &mut App) {
         let physics_stage = "heron-physics";
-        if let None = app.schedule.get_stage::<Schedule>(&physics_stage) {
-            app.add_stage_before(
-                CoreStage::PostUpdate,
-                physics_stage.clone(),
-                Schedule::default(),
-            );
+        if app.schedule.get_stage::<Schedule>(&physics_stage).is_none() {
+            app.add_stage_before(CoreStage::PostUpdate, physics_stage, Schedule::default());
         }
 
         app.add_plugin(StagedPhysicsPlugin {
