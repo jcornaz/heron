@@ -23,7 +23,7 @@ fn test_app() -> App {
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
-        .add_plugin(RapierPlugin::default())
+        .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
             bevy::transform::transform_propagate_system::transform_propagate_system.system(),

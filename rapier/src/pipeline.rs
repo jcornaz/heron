@@ -746,12 +746,7 @@ mod tests {
 
         let mut app = App::new();
         app.add_plugins(MinimalPlugins)
-            .add_stage_before(
-                bevy::prelude::CoreStage::PostUpdate,
-                "heron-physics",
-                Schedule::default(),
-            )
-            .add_plugin(RapierPlugin::default())
+            .add_plugin(RapierPlugin)
             .add_startup_system(setup.system());
 
         app

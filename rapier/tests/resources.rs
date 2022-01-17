@@ -21,11 +21,6 @@ fn can_define_gravity_before_plugin() {
             .insert_resource(Gravity::from(Vec3::Y))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
-            .add_stage_before(
-                bevy::prelude::CoreStage::PostUpdate,
-                "heron-physics",
-                Schedule::default(),
-            )
             .add_plugin(RapierPlugin::default());
 
         builder
@@ -46,11 +41,6 @@ fn can_define_time_scale_before_plugin() {
             .insert_resource(PhysicsTime::new(0.5))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
-            .add_stage_before(
-                bevy::prelude::CoreStage::PostUpdate,
-                "heron-physics",
-                Schedule::default(),
-            )
             .add_plugin(RapierPlugin::default());
 
         builder
