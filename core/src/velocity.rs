@@ -111,6 +111,7 @@ pub struct AxisAngle(Vec3);
 impl Velocity {
     /// Returns a linear velocity from a vector
     #[must_use]
+    #[inline]
     pub fn from_linear(linear: Vec3) -> Self {
         Self {
             linear,
@@ -120,6 +121,7 @@ impl Velocity {
 
     /// Returns an angular velocity from a vector
     #[must_use]
+    #[inline]
     pub fn from_angular(angular: AxisAngle) -> Self {
         Self {
             angular,
@@ -129,6 +131,7 @@ impl Velocity {
 
     /// Returns a new version with the given linear velocity
     #[must_use]
+    #[inline]
     pub fn with_linear(mut self, linear: Vec3) -> Self {
         self.linear = linear;
         self
@@ -136,6 +139,7 @@ impl Velocity {
 
     /// Returns a new version with the given angular velocity
     #[must_use]
+    #[inline]
     pub fn with_angular(mut self, angular: AxisAngle) -> Self {
         self.angular = angular;
         self
@@ -145,6 +149,7 @@ impl Velocity {
 impl Acceleration {
     /// Returns a linear acceleration from a vector
     #[must_use]
+    #[inline]
     pub fn from_linear(linear: Vec3) -> Self {
         Self {
             linear,
@@ -154,6 +159,7 @@ impl Acceleration {
 
     /// Returns an angular acceleration from a vector
     #[must_use]
+    #[inline]
     pub fn from_angular(angular: AxisAngle) -> Self {
         Self {
             angular,
@@ -163,6 +169,7 @@ impl Acceleration {
 
     /// Returns a new version with the given linear acceleration
     #[must_use]
+    #[inline]
     pub fn with_linear(mut self, linear: Vec3) -> Self {
         self.linear = linear;
         self
@@ -170,6 +177,7 @@ impl Acceleration {
 
     /// Returns a new version with the given angular acceleration
     #[must_use]
+    #[inline]
     pub fn with_angular(mut self, angular: AxisAngle) -> Self {
         self.angular = angular;
         self
@@ -179,7 +187,8 @@ impl Acceleration {
 impl Damping {
     /// Returns a linear damping
     #[must_use]
-    pub fn from_linear(linear: f32) -> Self {
+    #[inline]
+    pub const fn from_linear(linear: f32) -> Self {
         Self {
             linear,
             angular: 0.0,
@@ -188,7 +197,8 @@ impl Damping {
 
     /// Returns an angular damping
     #[must_use]
-    pub fn from_angular(angular: f32) -> Self {
+    #[inline]
+    pub const fn from_angular(angular: f32) -> Self {
         Self {
             angular,
             linear: 0.0,
@@ -197,14 +207,16 @@ impl Damping {
 
     /// Returns a new version with the given linear damping
     #[must_use]
-    pub fn with_linear(mut self, linear: f32) -> Self {
+    #[inline]
+    pub const fn with_linear(mut self, linear: f32) -> Self {
         self.linear = linear;
         self
     }
 
     /// Returns a new version with the given angular damping
     #[must_use]
-    pub fn with_angular(mut self, angular: f32) -> Self {
+    #[inline]
+    pub const fn with_angular(mut self, angular: f32) -> Self {
         self.angular = angular;
         self
     }
@@ -391,10 +403,10 @@ impl From<Quat> for AxisAngle {
 impl From<AxisAngle> for Quat {
     fn from(axis_angle: AxisAngle) -> Self {
         if axis_angle.is_near_zero() {
-            Quat::IDENTITY
+            Self::IDENTITY
         } else {
             let angle = axis_angle.0.length();
-            Quat::from_axis_angle(axis_angle.0 / angle, angle)
+            Self::from_axis_angle(axis_angle.0 / angle, angle)
         }
     }
 }

@@ -1,5 +1,14 @@
 #![deny(future_incompatible, nonstandard_style)]
-#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![warn(
+    missing_docs,
+    rust_2018_idioms,
+    clippy::pedantic,
+    clippy::all,
+    clippy::style,
+    clippy::complexity,
+    clippy::perf,
+    clippy::suspicious
+)]
 #![allow(
     clippy::needless_pass_by_value,
     clippy::type_complexity,

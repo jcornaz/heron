@@ -29,6 +29,7 @@ impl PhysicsTime {
     /// Panic if the scale is negative.
     ///
     #[must_use]
+    #[inline]
     pub fn new(scale: f32) -> Self {
         assert!(scale >= 0.0, "Negative scale: {}", scale);
         Self {
@@ -38,12 +39,14 @@ impl PhysicsTime {
     }
 
     /// Pause the physics emulation, avoiding heron systems to run.
+    #[inline]
     pub fn pause(&mut self) {
         self.previous_scale = Some(self.scale);
         self.scale = 0.0;
     }
 
     /// Resume the physics emulation
+    #[inline]
     pub fn resume(&mut self) {
         if let Some(prev) = self.previous_scale {
             self.scale = prev;
@@ -57,6 +60,7 @@ impl PhysicsTime {
     ///
     /// Panic if the scale is negative
     ///
+    #[inline]
     pub fn set_scale(&mut self, scale: f32) {
         assert!(scale >= 0.0);
         self.scale = scale;
@@ -64,7 +68,8 @@ impl PhysicsTime {
 
     /// Get the physics emulation time scale
     #[must_use]
-    pub fn scale(&self) -> f32 {
+    #[inline]
+    pub const fn scale(&self) -> f32 {
         self.scale
     }
 

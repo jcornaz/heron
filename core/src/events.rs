@@ -48,12 +48,14 @@ impl From<CollisionEvent> for (CollisionData, CollisionData) {
 impl CollisionEvent {
     /// Returns true if the event represent the "start" of a collision
     #[must_use]
+    #[inline]
     pub fn is_started(&self) -> bool {
         matches!(self, CollisionEvent::Started(_, _))
     }
 
     /// Returns true if the event represent the "end" of a collision
     #[must_use]
+    #[inline]
     pub fn is_stopped(&self) -> bool {
         matches!(self, CollisionEvent::Stopped(_, _))
     }

@@ -184,12 +184,14 @@ impl CollisionLayers {
 
     #[must_use]
     #[allow(missing_docs)]
+    #[inline]
     pub fn groups_bits(self) -> u32 {
         self.groups
     }
 
     #[must_use]
     #[allow(missing_docs)]
+    #[inline]
     pub fn masks_bits(self) -> u32 {
         self.masks
     }

@@ -40,7 +40,8 @@ impl Default for RotationConstraints {
 impl RotationConstraints {
     /// Lock rotations around all axes
     #[must_use]
-    pub fn lock() -> Self {
+    #[inline]
+    pub const fn lock() -> Self {
         Self {
             allow_x: false,
             allow_y: false,
@@ -50,7 +51,8 @@ impl RotationConstraints {
 
     /// Allow rotations around all axes
     #[must_use]
-    pub fn allow() -> Self {
+    #[inline]
+    pub const fn allow() -> Self {
         Self {
             allow_x: true,
             allow_y: true,
@@ -60,7 +62,8 @@ impl RotationConstraints {
 
     /// Allow rotation around the x axis only (and prevent rotating around the other axes)
     #[must_use]
-    pub fn restrict_to_x_only() -> Self {
+    #[inline]
+    pub const fn restrict_to_x_only() -> Self {
         Self {
             allow_x: true,
             allow_y: false,
@@ -70,7 +73,8 @@ impl RotationConstraints {
 
     /// Allow rotation around the y axis only (and prevent rotating around the other axes)
     #[must_use]
-    pub fn restrict_to_y_only() -> Self {
+    #[inline]
+    pub const fn restrict_to_y_only() -> Self {
         Self {
             allow_x: false,
             allow_y: true,
@@ -80,7 +84,8 @@ impl RotationConstraints {
 
     /// Allow rotation around the z axis only (and prevent rotating around the other axes)
     #[must_use]
-    pub fn restrict_to_z_only() -> Self {
+    #[inline]
+    pub const fn restrict_to_z_only() -> Self {
         Self {
             allow_x: false,
             allow_y: false,

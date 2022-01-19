@@ -1,5 +1,14 @@
 #![deny(future_incompatible, nonstandard_style)]
-#![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
+#![warn(
+    missing_docs,
+    rust_2018_idioms,
+    clippy::pedantic,
+    clippy::all,
+    clippy::style,
+    clippy::complexity,
+    clippy::perf,
+    clippy::suspicious
+)]
 #![allow(clippy::module_name_repetitions, clippy::needless_pass_by_value)]
 
 //! Core components and resources to use Heron
@@ -307,7 +316,8 @@ impl Default for RigidBody {
 impl RigidBody {
     /// Returns true if this body type can be moved by [`Velocity`]
     #[must_use]
-    pub fn can_have_velocity(self) -> bool {
+    #[inline]
+    pub const fn can_have_velocity(self) -> bool {
         match self {
             RigidBody::Dynamic | RigidBody::KinematicVelocityBased => true,
             RigidBody::Static | RigidBody::Sensor | RigidBody::KinematicPositionBased => false,

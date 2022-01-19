@@ -163,8 +163,8 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             }
             impl Geometry for RoundedRectangle {
                 fn add_geometry(&self, b: &mut Builder) {
-                    let real_width = self.width + self.radius * 2.0;
-                    let real_height = self.height + self.radius * 2.0;
+                    let real_width = self.radius.mul_add(2.0, self.width);
+                    let real_height = self.radius.mul_add(2.0, self.height);
                     b.add_rounded_rectangle(
                         &Rect::new(
                             Point::new(-real_width / 2.0, -real_height / 2.0),

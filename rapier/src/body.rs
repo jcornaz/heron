@@ -243,7 +243,8 @@ pub(crate) fn update_bevy_transform(
     }
 }
 
-fn body_status(body_type: RigidBody) -> RigidBodyType {
+#[inline]
+const fn body_status(body_type: RigidBody) -> RigidBodyType {
     match body_type {
         RigidBody::Dynamic => RigidBodyType::Dynamic,
         RigidBody::Static | RigidBody::Sensor => RigidBodyType::Static,

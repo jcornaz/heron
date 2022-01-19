@@ -152,7 +152,7 @@ impl PhysicsSteps {
         }
     }
 
-    pub(crate) fn update(mut physics_steps: ResMut<'_, PhysicsSteps>, time: Res<'_, Time>) {
+    pub(crate) fn update(mut physics_steps: ResMut<'_, Self>, time: Res<'_, Time>) {
         physics_steps.do_update(time.delta());
     }
 

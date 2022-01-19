@@ -135,7 +135,7 @@ impl IntoBevy<Vec<Vec2>> for &[Point2<f32>] {
 
 impl IntoRapier<Translation<f32>> for Vec3 {
     fn into_rapier(self) -> Translation<f32> {
-        <Vec3 as IntoRapier<Vector<f32>>>::into_rapier(self).into()
+        <Self as IntoRapier<Vector<f32>>>::into_rapier(self).into()
     }
 }
 
