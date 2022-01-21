@@ -37,7 +37,7 @@ mod physics_world {
     /// A Bevy system parameter that can be used to perform queries such as ray casts on the physics
     /// world
     ///
-    /// See the [`ray_casting`](heron::ray_casting)
+    /// See the [`ray_casting`](https://github.com/jcornaz/heron/blob/main/examples/ray_casting.rs)
     /// example for a detailed usage example.
     #[derive(SystemParam)]
     pub struct PhysicsWorld<'w, 's> {

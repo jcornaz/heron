@@ -1,4 +1,4 @@
-name: Build
+name: build
 
 on:
   push:
@@ -9,12 +9,15 @@ on:
     branches:
       - '*'
 
+env:
+  RUST_VERSION: 1.58.0
+  RUSTFLAGS: "-D warnings"
+  RUSTDOCFLAGS: "-D warnings"
+
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      RUSTFLAGS: "-D warnings"
 
     strategy:
       matrix:
@@ -84,8 +87,6 @@ jobs:
   code-style:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      RUSTFLAGS: "-D warnings"
 
     steps:
       - name: Checkout repository
@@ -120,8 +121,6 @@ jobs:
   documentation:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      RUSTFLAGS: "-D warnings"
 
     steps:
       - name: Checkout repository
@@ -147,4 +146,4 @@ jobs:
           override: true
 
       - name: Build documentation
-        run: cargo doc --workspace
+        run: cargo doc --workspace --all-features --no-deps
