@@ -10,6 +10,9 @@ The format is inspired from [Keep a Changelog], and this project adheres to [Sem
 
 ## [Unreleased]
 
+### Bug fixes
+
+* **2d-debug**: crash when despawning recursivly an entity (#178) 
 
 
 ## [1.0.1-rc.1] - 2022-01-09
