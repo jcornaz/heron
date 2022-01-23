@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier", "macros"]
 
 [package]
 name = "heron"
-version = "1.0.1-rc.1"
+version = "1.0.1"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
