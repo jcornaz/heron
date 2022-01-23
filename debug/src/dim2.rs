@@ -105,10 +105,13 @@ fn delete_debug_sprite(
     mut commands: Commands<'_, '_>,
     mut map: ResMut<'_, DebugEntityMap>,
     removed_bodies: RemovedComponents<'_, CollisionShape>,
+    debug_sprites: Query<'_, '_, Entity, With<IsDebug>>,
 ) {
     for parent_entity in removed_bodies.iter() {
         if let Some(debug_entity) = map.remove(&parent_entity) {
-            commands.entity(debug_entity).despawn();
+            if debug_sprites.get(debug_entity).is_ok() {
+                commands.entity(debug_entity).despawn();
+            }
         }
     }
 }
