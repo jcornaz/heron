@@ -72,7 +72,7 @@ jobs:
           toolchain: nightly
           override: true
           profile: minimal
-      - run: cargo doc --all-features --no-deps --workspace --all-features
+      - run: cargo doc --all-features --no-deps --workspace
 
   unwanted-dependencies:
     runs-on: ubuntu-latest
