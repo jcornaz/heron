@@ -10,11 +10,11 @@ that falls down due to gravity:
 If you create a new project using `cargo init` you can replace `main.rs`
 with this code. You should also add this to your projects's `Cargo.toml`:
 
+<!--- x-release-please-start-version --->
 ```toml
-[dependencies]
-bevy = { version = "0.5"} 
 heron = { version = "1.0.1", features = ["2d"] }
 ```
+<!--- x-release-please-end-version --->
 
 Heron defaults to 3d. To make sure we run it in 2d mode we have to configure it
 in `Cargo.toml`; we need to turn off the default features and enable `2d`.

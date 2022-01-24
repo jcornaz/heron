@@ -1,0 +1,31 @@
+name: look-ahead
+
+on:
+  schedule:
+    - cron: '0 0 */10 * *'
+
+  workflow_dispatch:
+
+env:
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  bevy-main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        rust-version: ['stable', 'beta', 'nightly']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.4.0
+
+      - name: Install rust toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ matrix.rust-version }}
+          override: true
+          profile: minimal
+
+      - run: cargo test --all-features

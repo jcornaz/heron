@@ -57,17 +57,20 @@ enum Layer {
 ## Installation
 
 
-**For a 3d game:**
-```toml
-bevy = "^0.5.0"
-heron = { version = "1.0.1", features = ["3d"] }
-```
-
 **For a 2d game:**
+<!--- x-release-please-start-version --->
 ```toml
-bevy = "^0.5.0"
 heron = { version = "1.0.1", features = ["2d"] }
 ```
+<!--- x-release-please-end-version --->
+
+
+**For a 3d game:**
+<!--- x-release-please-start-version --->
+```toml
+heron = { version = "1.0.1", features = ["3d"] }
+```
+<!--- x-release-please-end-version --->
 
 
 ## Bevy Version Supported

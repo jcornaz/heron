@@ -1,8 +1,0 @@
-allow-branch = ["main"]
-consolidate-commits = true
-consolidate-pushes = true
-pre-release-commit-message = "chore: Release"
-dev-version = false
-shared-version = true
-tag-prefix = ""
-tag = false
