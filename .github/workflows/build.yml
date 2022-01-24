@@ -45,10 +45,9 @@ jobs:
             ~/.rustup
             ~/.cargo
             ./target
-          key: build-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
+          key: build-v2-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/*.rs') }}
           restore-keys: |
-            build-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
-            build-${{ matrix.crate }}-${{ matrix.rust }}-
+            build-v2-${{ matrix.crate }}-${{ matrix.rust }}-${{ hashFiles('**/Cargo.toml') }}-
 
       - name: Install dependencies
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libudev-dev libasound2-dev
