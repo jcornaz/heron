@@ -1,0 +1,32 @@
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+yanked = "deny"
+notice = "deny"
+ignore = []
+
+[licenses]
+default = "deny"
+unlicensed = "deny"
+copyleft = "deny"
+allow = [
+    "Unlicense",
+    "MIT",
+    "BSD-3-Clause",
+    "Apache-2.0",
+    "Zlib",
+    "ISC",
+    "CC0-1.0",
+]
+
+[[licenses.clarify]]
+name = "stretch"
+expression = "MIT"
+license-files = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+
+[bans]
+multiple-versions = "allow"
