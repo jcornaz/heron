@@ -1,15 +1,14 @@
 # Changelog
 
-All notable changes to this project are documented in this file.
 
-The format is inspired from [Keep a Changelog], and this project adheres to [Semantic Versioning].
+All notable changes are documented in this file.
 
-[Keep a Changelog]: https://keepachangelog.com/en/1.1.0
+This project adheres to [Semantic Versioning].
+
+Unreleased changes (if any) can be found in the latest [release pull-request]. 
 
 [Semantic Versioning]: https://semver.org/spec/v2.0.0.html
-
-## [Unreleased]
-
+[release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
 ## [1.0.1] - 2022-01-23
