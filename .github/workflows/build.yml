@@ -10,7 +10,7 @@ on:
       - '*'
 
 env:
-  RUST_VERSION: 1.58.0
+  RUST_VERSION: 1.57.0
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: "-D warnings"
 
