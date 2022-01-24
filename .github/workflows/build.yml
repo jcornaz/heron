@@ -84,7 +84,7 @@ jobs:
           override: true
           profile: minimal
       - run: cargo install cargo-deny --locked
-      - run: cargo deny check --workspace --all-features
+      - run: cargo deny check
 
   unused-dependencies:
     runs-on: ubuntu-latest
@@ -96,7 +96,7 @@ jobs:
           override: true
           profile: minimal
       - run: cargo install cargo-udeps --locked
-      - run: cargo udeps
+      - run: cargo udeps --workspace --all-features
 
   release:
     needs: [test, documentation]
