@@ -121,7 +121,7 @@ jobs:
   publish:
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ needs.release.outputs.release_created }}$
+    if: ${{ needs.release.outputs.release_created }}
     env:
       CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
