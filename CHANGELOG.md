@@ -18,6 +18,7 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 
 * `enhanced-determinism` feature flag ([#180](https://github.com/jcornaz/heron/issues/180)) ([06457df](https://github.com/jcornaz/heron/commit/06457df03db97ff5459af94b4136fd57da4d8908))
 
+
 ## [1.0.1] - 2022-01-23
 
 ### Bug fixes
