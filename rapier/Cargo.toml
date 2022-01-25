@@ -15,6 +15,7 @@ all-features = true
 default = []
 2d = ["rapier2d"]
 3d = ["rapier3d", "heron_core/3d"]
+enhanced-determinism = ["rapier2d/enhanced-determinism", "rapier3d/enhanced-determinism"]
 
 [dependencies]
 heron_core = { version = "^1.0.1-rc.1", path = "../core" }
