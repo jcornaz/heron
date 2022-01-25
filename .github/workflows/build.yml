@@ -123,8 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ needs.release.outputs.release_created }}
     steps:
-      - uses: actions/checkout@v2.4
-      - uses: actions-rs/toolchain@v1.0
+      - uses: actions/checkout@v2.4.0
+      - uses: actions-rs/toolchain@v1.0.7
         with:
           toolchain: stable
           override: true
