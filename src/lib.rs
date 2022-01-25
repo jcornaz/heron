@@ -36,6 +36,8 @@
 //! * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
 //! * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
 //! * `debug-2d` Render 2d collision shapes. Works only in 2d, support for 3d may be added later.
+//! * `enhanced-determinism` Enable rapier's [enhanced-determinism](https://rapier.rs/docs/user_guides/rust/determinism)
+//!
 //!
 //! ## Install the plugin
 //!
