@@ -10,7 +10,7 @@
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
-## How it looks like
+## What it looks like
 
 ```rust,no_run
 use bevy::prelude::*;
@@ -73,7 +73,7 @@ heron = { version = "1.1.0", features = ["3d"] }
 <!--- x-release-please-end-version --->
 
 
-## Bevy Version Supported
+## Supported Bevy Versions
 
 | bevy | heron      |
 |------|------------|
@@ -85,16 +85,16 @@ heron = { version = "1.1.0", features = ["3d"] }
 
 * Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
 * Provide a single API that works for both 2d and 3d. (Like bevy does)
-* Data oriented. Using this library should look like it is part of [bevy].
+* Data oriented. Using this library should feel like its a part of [bevy].
 * Avoid asking the user to lookup in resources via *handles*. Data should be accessible and modifiable directly in components.
-* Hide the actual physics engine. This is an implementation detail the user shouldn't have to care about.
-    * But, allow advanced users to access the underlying [rapier] resources, so a user is never blocked by a missing
+* Hide the actual physics engine. This is an implementation detail the user shouldn't have to worry about.
+    * But, allow advanced users to access the underlying [rapier] resources, so the user is never blocked by a missing
       element in the API of heron.
 
 
 ## Feature flags
 
-One must choose to use either `2d` or `3d`. If none of theses two features is enabled, the `PhysicsPlugin` won't be available.
+One must choose to use either `2d` or `3d`. If neither of the two features is enabled, the `PhysicsPlugin` won't be available.
 
 
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
