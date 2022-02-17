@@ -1,4 +1,4 @@
-use bevy::ecs::entity::Entity;
+use bevy::{ecs::entity::Entity, math::Vec2};
 
 use crate::CollisionLayers;
 
@@ -22,7 +22,7 @@ use crate::CollisionLayers;
 ///     }
 /// }
 /// ```
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum CollisionEvent {
     /// The two entities started to collide
     Started(CollisionData, CollisionData),
@@ -32,11 +32,12 @@ pub enum CollisionEvent {
 }
 
 /// Collision data concerning one of the two entity that collided
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CollisionData {
     rigid_body_entity: Entity,
     collision_shape_entity: Entity,
     collision_layers: CollisionLayers,
+    normals: Vec<Vec2>,
 }
 
 impl From<CollisionEvent> for (CollisionData, CollisionData) {
@@ -104,11 +105,13 @@ impl CollisionData {
         rigid_body_entity: Entity,
         collision_shape_entity: Entity,
         collision_layers: CollisionLayers,
+        normals: Vec<Vec2>,
     ) -> Self {
         Self {
             rigid_body_entity,
             collision_shape_entity,
             collision_layers,
+            normals,
         }
     }
 
@@ -128,5 +131,11 @@ impl CollisionData {
     #[must_use]
     pub fn collision_layers(&self) -> CollisionLayers {
         self.collision_layers
+    }
+
+    /// Returns the normal vector pointing toward this entity and away from the other entity
+    #[must_use]
+    pub fn normals(&self) -> &Vec<Vec2> {
+        &self.normals
     }
 }

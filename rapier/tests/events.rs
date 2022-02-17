@@ -97,10 +97,54 @@ fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody
     events.append(&mut collect_events(&app, &mut event_reader));
 
     assert_eq!(events.len(), 2);
-    assert!(matches!(events[0], CollisionEvent::Started(_, _)));
-    assert!(matches!(events[1], CollisionEvent::Stopped(_, _)));
+    assert!(matches!(&events[0], CollisionEvent::Started(_, _)));
+    assert!(matches!(&events[1], CollisionEvent::Stopped(_, _)));
     assert_eq!(events[0].collision_shape_entities(), (entity1, entity2));
     assert_eq!(events[1].collision_shape_entities(), (entity1, entity2));
+
+    match (type1, type2) {
+        (RigidBody::Sensor, RigidBody::Dynamic) => {
+            assert!(
+                matches!(&events[0], CollisionEvent::Started(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+            assert!(
+                matches!(&events[1], CollisionEvent::Stopped(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+        }
+        (RigidBody::Sensor, RigidBody::Sensor) => {
+            assert!(
+                matches!(&events[0], CollisionEvent::Started(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+            assert!(
+                matches!(&events[1], CollisionEvent::Stopped(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+        }
+        (RigidBody::Sensor, RigidBody::KinematicPositionBased) => {
+            assert!(
+                matches!(&events[0], CollisionEvent::Started(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+            assert!(
+                matches!(&events[1], CollisionEvent::Stopped(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+        }
+        (RigidBody::Sensor, RigidBody::KinematicVelocityBased) => {
+            assert!(
+                matches!(&events[0], CollisionEvent::Started(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+            assert!(
+                matches!(&events[1], CollisionEvent::Stopped(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+        }
+        (RigidBody::Dynamic, RigidBody::Dynamic) => {
+            assert!(
+                matches!(&events[0], CollisionEvent::Started(c1, c2) if c1.normals().len() == 1 && c2.normals().len() == 1)
+            );
+            assert!(
+                matches!(&events[1], CollisionEvent::Stopped(c1, c2) if c1.normals().is_empty() && c2.normals().is_empty())
+            );
+        }
+        _ => unimplemented!(),
+    }
 }
 
 fn collect_events(
@@ -108,5 +152,5 @@ fn collect_events(
     reader: &mut ManualEventReader<CollisionEvent>,
 ) -> Vec<CollisionEvent> {
     let events = app.world.get_resource::<Events<CollisionEvent>>().unwrap();
-    reader.iter(&events).copied().collect()
+    reader.iter(events).cloned().collect()
 }
