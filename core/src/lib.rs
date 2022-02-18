@@ -14,6 +14,8 @@ pub use constraints::RotationConstraints;
 pub use events::{CollisionData, CollisionEvent};
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
+#[cfg(feature = "scenes")]
+pub use pending_collision::PendingConvexCollision;
 pub use physics_time::PhysicsTime;
 pub use step::{PhysicsStepDuration, PhysicsSteps};
 pub use velocity::{Acceleration, AxisAngle, Damping, Velocity};
@@ -22,6 +24,8 @@ mod constraints;
 mod events;
 mod gravity;
 mod layers;
+#[cfg(feature = "scenes")]
+mod pending_collision;
 mod physics_time;
 mod step;
 pub mod utils;
@@ -76,6 +80,9 @@ impl Plugin for CorePlugin {
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });
+
+        #[cfg(feature = "scenes")]
+        app.add_system(pending_collision::pending_collision_system);
     }
 }
 
