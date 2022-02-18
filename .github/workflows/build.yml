@@ -100,10 +100,26 @@ jobs:
       - run: cargo install cargo-udeps --locked
       - run: cargo udeps --workspace --all-features
 
-  release:
-    needs: [test, documentation]
-    runs-on: ubuntu-latest
+  release-pr:
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      pr: ${{ steps.release_please.outputs.pr }}
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release_please
+        with:
+          release-type: rust
+          command: release-pr
+          changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"perf","section":"Performance","hidden":false},{"type":"docs","section":"Documentation","hidden":false}]'
+          extra-files: |
+            README.md
+            guide/src/quickstart.md
+
+  release:
+    needs: [test, documentation, release-pr]
+    runs-on: ubuntu-latest
+    if: ${{ !needs.release-pr.outputs.pr }}
 
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
@@ -113,10 +129,7 @@ jobs:
         id: release
         with:
           release-type: rust
-          changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"perf","section":"Performance","hidden":false},{"type":"docs","section":"Documentation","hidden":false}]'
-          extra-files: |
-            README.md
-            guide/src/quickstart.md
+          command: github-release
 
   publish:
     needs: release
