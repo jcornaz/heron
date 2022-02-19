@@ -135,7 +135,7 @@ impl CollisionData {
 
     /// Returns the normal vector pointing toward this entity and away from the other entity
     #[must_use]
-    pub fn normals(&self) -> &Vec<Vec2> {
+    pub fn normals(&self) -> &[Vec2] {
         &self.normals
     }
 }
