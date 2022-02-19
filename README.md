@@ -97,6 +97,7 @@ heron = { version = "1.1.0", features = ["3d"] }
 One must choose to use either `2d` or `3d`. If neither of the two features is enabled, the `PhysicsPlugin` won't be available.
 
 
+* `shape-from-mesh` Add a component to generate convex hull collision for a mesh.
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
 * `2d` Enable simulation only on the first 2 axes `x` and `y`.
 * `debug-2d` Render 2d collision shapes.
