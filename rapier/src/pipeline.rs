@@ -747,7 +747,7 @@ mod tests {
         let mut app = App::new();
         app.add_plugins(MinimalPlugins)
             .add_plugin(RapierPlugin)
-            .add_startup_system(setup.system());
+            .add_startup_system(setup);
 
         app
     }
@@ -784,7 +784,7 @@ mod tests {
         // Get the app
         let mut app = setup_ray_cast_test_app();
         // Add our system
-        app.add_system(ray_cast.system());
+        app.add_system(ray_cast);
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
         app.update();
@@ -811,7 +811,7 @@ mod tests {
         // Get the app
         let mut app = setup_ray_cast_test_app();
         // Add our system
-        app.add_system(ray_cast.system());
+        app.add_system(ray_cast);
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
         app.update();
@@ -862,7 +862,7 @@ mod tests {
         // Get the app
         let mut app = setup_ray_cast_test_app();
         // Add our system
-        app.add_system(ray_cast.system());
+        app.add_system(ray_cast);
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
         app.update();
@@ -897,7 +897,7 @@ mod tests {
         // Get the app
         let mut app = setup_ray_cast_test_app();
         // Add our system
-        app.add_system(ray_cast.system());
+        app.add_system(ray_cast);
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
         app.update();

@@ -13,10 +13,10 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
-        .add_startup_system(setup.system())
-        .add_system(ray_cast_from_center.system())
-        .add_system(shape_cast_from_center.system())
-        .add_system(move_targeter.system())
+        .add_startup_system(setup)
+        .add_system(ray_cast_from_center)
+        .add_system(shape_cast_from_center)
+        .add_system(move_targeter)
         .run();
 }
 

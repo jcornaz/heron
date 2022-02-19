@@ -17,12 +17,12 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default())
-        .add_startup_system(spawn_camera.system())
-        .add_startup_system(spawn_player.system())
-        .add_startup_system(spawn_enemy.system())
-        .add_system(handle_input.system())
-        .add_system(log_collisions.system())
-        .add_system(kill_enemy.system())
+        .add_startup_system(spawn_camera)
+        .add_startup_system(spawn_player)
+        .add_startup_system(spawn_enemy)
+        .add_system(handle_input)
+        .add_system(log_collisions)
+        .add_system(kill_enemy)
         .run();
 }
 

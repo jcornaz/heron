@@ -9,8 +9,8 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default()) // Add the plugin
         .insert_resource(Gravity::from(Vec2::new(0.0, -600.0))) // Define the gravity
-        .add_startup_system(spawn.system())
-        .add_system(log_collisions.system())
+        .add_startup_system(spawn)
+        .add_system(log_collisions)
         .run();
 }
 

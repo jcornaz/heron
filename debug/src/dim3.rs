@@ -81,5 +81,5 @@ fn add_shape_outlines(
 }
 
 pub(crate) fn systems() -> SystemSet {
-    SystemSet::new().with_system(add_shape_outlines.system())
+    SystemSet::new().with_system(add_shape_outlines)
 }

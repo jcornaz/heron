@@ -99,71 +99,59 @@ impl Plugin for RapierPlugin {
 
 fn removal_stage() -> SystemStage {
     SystemStage::single_threaded()
-        .with_system(body::remove_invalids_after_components_removed.system())
-        .with_system(shape::remove_invalids_after_components_removed.system())
-        .with_system(body::remove_invalids_after_component_changed.system())
-        .with_system(shape::remove_invalids_after_component_changed.system())
+        .with_system(body::remove_invalids_after_components_removed)
+        .with_system(shape::remove_invalids_after_components_removed)
+        .with_system(body::remove_invalids_after_component_changed)
+        .with_system(shape::remove_invalids_after_component_changed)
 }
 
 fn update_rapier_world_stage() -> SystemStage {
     SystemStage::parallel()
         .with_system(
             bevy::transform::transform_propagate_system::transform_propagate_system
-                .system()
                 .label(InternalSystem::TransformPropagation),
         )
-        .with_system(
-            body::update_rapier_position
-                .system()
-                .after(InternalSystem::TransformPropagation),
-        )
-        .with_system(velocity::update_rapier_velocity.system())
-        .with_system(acceleration::update_rapier_force_and_torque.system())
-        .with_system(damping::update_rapier_damping.system())
-        .with_system(damping::reset_rapier_damping.system())
-        .with_system(shape::update_position.system())
-        .with_system(shape::update_collision_groups.system())
-        .with_system(shape::update_sensor_flag.system())
-        .with_system(shape::remove_sensor_flag.system())
-        .with_system(shape::reset_collision_groups.system())
+        .with_system(body::update_rapier_position.after(InternalSystem::TransformPropagation))
+        .with_system(velocity::update_rapier_velocity)
+        .with_system(acceleration::update_rapier_force_and_torque)
+        .with_system(damping::update_rapier_damping)
+        .with_system(damping::reset_rapier_damping)
+        .with_system(shape::update_position)
+        .with_system(shape::update_collision_groups)
+        .with_system(shape::update_sensor_flag)
+        .with_system(shape::remove_sensor_flag)
+        .with_system(shape::reset_collision_groups)
 }
 
 fn body_update_stage() -> SystemStage {
     SystemStage::single_threaded()
-        .with_run_criteria(heron_core::should_run.system())
-        .with_system(body::create.system())
+        .with_run_criteria(heron_core::should_run)
+        .with_system(body::create)
 }
 
 fn create_collider_stage() -> SystemStage {
     SystemStage::single_threaded()
-        .with_run_criteria(heron_core::should_run.system())
-        .with_system(shape::create.system())
+        .with_run_criteria(heron_core::should_run)
+        .with_system(shape::create)
 }
 
 fn step_systems() -> SystemSet {
     SystemSet::new()
-        .with_run_criteria(heron_core::should_run.system())
-        .with_system(
-            pipeline::update_integration_parameters
-                .system()
-                .before(PhysicsSystem::Events),
-        )
-        .with_system(pipeline::step.system().label(PhysicsSystem::Events))
+        .with_run_criteria(heron_core::should_run)
+        .with_system(pipeline::update_integration_parameters.before(PhysicsSystem::Events))
+        .with_system(pipeline::step.label(PhysicsSystem::Events))
         .with_system(
             body::update_bevy_transform
-                .system()
                 .label(PhysicsSystem::TransformUpdate)
                 .after(PhysicsSystem::Events),
         )
         .with_system(
             velocity::update_velocity_component
-                .system()
                 .label(PhysicsSystem::VelocityUpdate)
                 .after(PhysicsSystem::Events),
         )
         .with_system(
             velocity::update_rapier_velocity
-                .system()
                 .after(PhysicsSystem::Events)
                 .after(PhysicsSystem::VelocityUpdate),
         )
