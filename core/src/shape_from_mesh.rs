@@ -111,11 +111,8 @@ mod tests {
     use bevy::{
         asset::AssetPlugin,
         core::CorePlugin,
-        gltf::GltfPlugin,
-        pbr::PbrPlugin,
-        prelude::*,
+        prelude::shape::{Cube, Capsule},
         render::{options::WgpuOptions, RenderPlugin},
-        scene::ScenePlugin,
         window::WindowPlugin,
     };
 
@@ -131,13 +128,9 @@ mod tests {
                 ..Default::default()
             })
             .add_plugin(CorePlugin::default())
-            .add_plugin(TransformPlugin::default())
             .add_plugin(WindowPlugin::default())
             .add_plugin(AssetPlugin::default())
-            .add_plugin(ScenePlugin::default())
-            .add_plugin(RenderPlugin::default())
-            .add_plugin(PbrPlugin::default())
-            .add_plugin(GltfPlugin::default());
+            .add_plugin(RenderPlugin::default());
         }
     }
 
@@ -147,6 +140,10 @@ mod tests {
         app.add_plugin(HeadlessRenderPlugin)
             .add_system(pending_collision_system);
 
+        let mut meshes = app.world.get_resource_mut::<Assets<Mesh>>().unwrap();
+        let cube = meshes.add(Cube::default().into());
+        let capsule = meshes.add(Capsule::default().into());
+
         const REQUESTED_COLLISION: PendingConvexCollision = PendingConvexCollision {
             body_type: RigidBody::Static,
             border_radius: None,
@@ -155,19 +152,12 @@ mod tests {
         let parent = app
             .world
             .spawn()
-            .insert(Transform::default())
-            .insert(GlobalTransform::default())
             .insert(REQUESTED_COLLISION)
+            .with_children(|parent| {
+                parent.spawn().insert(cube);
+                parent.spawn().insert(capsule);
+            })
             .id();
-
-        app.world
-            .resource_scope(|world, mut scene_spawner: Mut<'_, SceneSpawner>| {
-                let asset_server = world.get_resource::<AssetServer>().unwrap();
-                scene_spawner.spawn_as_child(asset_server.load("cubes.glb#Scene0"), parent);
-                scene_spawner
-                    .spawn_queued_scenes(world)
-                    .expect("Unable to spawn scene");
-            });
 
         let mut query = app
             .world
@@ -178,7 +168,6 @@ mod tests {
             "Mesh handles, rigid bodies and collision shapes shouldn't exist before update"
         );
 
-        app.update();
         app.update();
 
         assert_eq!(
