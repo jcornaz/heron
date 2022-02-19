@@ -2,9 +2,9 @@ use bevy::{prelude::*, render::mesh::VertexAttributeValues};
 
 use crate::{CollisionShape, RigidBody};
 
-/// Component which indicates that this enityty contains scene(s) which waiting for collision generation.
+/// Component which indicates that this entity or its children contains meshes which waiting for collision generation.
 ///
-/// Once the scene is instantiated (Bevy loads the scenes asynchronously), then all elements of the scene will be added [`RigidBody`] and [`CollisionShape::ConvexHull`] (based on the geometry) components.
+/// Once a mesh is added (for example, Bevy loads the GTLF scenes asynchronously), then the entity or its children will be added [`RigidBody`] and [`CollisionShape::ConvexHull`] (based on the geometry) components.
 ///
 /// # Example
 ///
@@ -14,7 +14,7 @@ use crate::{CollisionShape, RigidBody};
 /// fn spawn(mut commands: Commands, asset_server: ResMut<AssetServer>) {
 ///     commands
 ///         .spawn()
-///         .insert(Transform::default())
+///         .insert(Transform::default()) // Required to apply GLTF transforms in Bevy
 ///         .insert(GlobalTransform::default())
 ///         .insert(PendingConvexCollision {
 ///             body_type: RigidBody::Static,
