@@ -476,7 +476,7 @@ impl EventManager {
                 collider1.parent().and_then(|parent| bodies.get(parent)),
                 collider2.parent().and_then(|parent| bodies.get(parent)),
             ) {
-                let normals1: Vec<_> = narrow_phase
+                let normals1 = narrow_phase
                     .contact_pair(h1, h2)
                     .map(|contact_pair| {
                         contact_pair
@@ -485,10 +485,10 @@ impl EventManager {
                             .map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect::<Vec<_>>()
+                            .collect()
                     })
                     .unwrap_or_default();
-                let normals2: Vec<_> = narrow_phase
+                let normals2 = narrow_phase
                     .contact_pair(h2, h1)
                     .map(|contact_pair| {
                         contact_pair
@@ -497,7 +497,7 @@ impl EventManager {
                             .map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect::<Vec<_>>()
+                            .collect()
                     })
                     .unwrap_or_default();
 

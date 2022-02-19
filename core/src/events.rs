@@ -1,4 +1,5 @@
 use bevy::{ecs::entity::Entity, math::Vec2};
+use smallvec::SmallVec;
 
 use crate::CollisionLayers;
 
@@ -37,7 +38,7 @@ pub struct CollisionData {
     rigid_body_entity: Entity,
     collision_shape_entity: Entity,
     collision_layers: CollisionLayers,
-    normals: Vec<Vec2>,
+    normals: SmallVec<[Vec2; 1]>,
 }
 
 impl From<CollisionEvent> for (CollisionData, CollisionData) {
@@ -105,7 +106,7 @@ impl CollisionData {
         rigid_body_entity: Entity,
         collision_shape_entity: Entity,
         collision_layers: CollisionLayers,
-        normals: Vec<Vec2>,
+        normals: SmallVec<[Vec2; 1]>,
     ) -> Self {
         Self {
             rigid_body_entity,

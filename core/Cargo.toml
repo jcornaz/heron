@@ -18,6 +18,7 @@ default = []
 [dependencies]
 bevy = { version = "0.6.0", default-features = false }
 duplicate = "0.3.0"
+smallvec = "1.8"
 
 [dev-dependencies]
 rstest = "0.12"
