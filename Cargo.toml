@@ -17,8 +17,8 @@ categories = ["game-development", "simulation"]
 all-features = true
 
 [features]
-default = ["scenes"]
-scenes = ["heron_core/scenes"]
+default = ["shape-from-mesh"]
+shape-from-mesh = ["heron_core/shape-from-mesh"]
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d", "heron_core/3d"]
 debug-2d = ["2d", "heron_debug/2d"]

@@ -14,8 +14,8 @@ pub use constraints::RotationConstraints;
 pub use events::{CollisionData, CollisionEvent};
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
-#[cfg(feature = "scenes")]
-pub use pending_collision::PendingConvexCollision;
+#[cfg(feature = "shape-from-mesh")]
+pub use shape_from_mesh::PendingConvexCollision;
 pub use physics_time::PhysicsTime;
 pub use step::{PhysicsStepDuration, PhysicsSteps};
 pub use velocity::{Acceleration, AxisAngle, Damping, Velocity};
@@ -24,8 +24,8 @@ mod constraints;
 mod events;
 mod gravity;
 mod layers;
-#[cfg(feature = "scenes")]
-mod pending_collision;
+#[cfg(feature = "shape-from-mesh")]
+mod shape_from_mesh;
 mod physics_time;
 mod step;
 pub mod utils;
@@ -81,8 +81,8 @@ impl Plugin for CorePlugin {
                 Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });
 
-        #[cfg(feature = "scenes")]
-        app.add_system(pending_collision::pending_collision_system);
+        #[cfg(feature = "shape-from-mesh")]
+        app.add_system(shape_from_mesh::pending_collision_system);
     }
 }
 
