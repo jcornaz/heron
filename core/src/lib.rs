@@ -10,22 +10,22 @@ use std::sync::Arc;
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
+#[cfg(feature = "collision-from-mesh")]
+pub use collision_from_mesh::PendingConvexCollision;
 pub use constraints::RotationConstraints;
 pub use events::{CollisionData, CollisionEvent};
 pub use gravity::Gravity;
 pub use layers::{CollisionLayers, PhysicsLayer};
-#[cfg(feature = "collision-from-mesh")]
-pub use collision_from_mesh::PendingConvexCollision;
 pub use physics_time::PhysicsTime;
 pub use step::{PhysicsStepDuration, PhysicsSteps};
 pub use velocity::{Acceleration, AxisAngle, Damping, Velocity};
 
+#[cfg(feature = "collision-from-mesh")]
+mod collision_from_mesh;
 mod constraints;
 mod events;
 mod gravity;
 mod layers;
-#[cfg(feature = "collision-from-mesh")]
-mod collision_from_mesh;
 mod physics_time;
 mod step;
 pub mod utils;

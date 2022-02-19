@@ -111,7 +111,7 @@ mod tests {
     use bevy::{
         asset::AssetPlugin,
         core::CorePlugin,
-        prelude::shape::{Cube, Capsule},
+        prelude::shape::{Capsule, Cube},
         render::{options::WgpuOptions, RenderPlugin},
         window::WindowPlugin,
     };
