@@ -17,11 +17,11 @@ use bevy::prelude::*;
 use heron::prelude::*;
 
 fn main() {
-  App::build()
+  App::new()
     .add_plugins(DefaultPlugins)
     .add_plugin(PhysicsPlugin::default()) // Add the plugin
     .insert_resource(Gravity::from(Vec3::new(0.0, -9.81, 0.0))) // Optionally define gravity
-    .add_startup_system(spawn.system())
+    .add_startup_system(spawn)
     .run();
 }
 
