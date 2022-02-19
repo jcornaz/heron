@@ -16,10 +16,6 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 * generate collision shapes from mesh via the `PendingConvexCollision` component (behind the `collision-from-mesh` feature flag)  ([#190](https://github.com/jcornaz/heron/issues/190)) ([086a6a6](https://github.com/jcornaz/heron/commit/086a6a6cffaa7d16bd1612555949446c0a07d6a8))
 
 
-### Documentation
-
-* **changelog:** remove reference to semver ([5cebcf3](https://github.com/jcornaz/heron/commit/5cebcf3eb0392bf8d45499e0d92903fc426d2cd3))
-* **readme:** improve some wording ([#186](https://github.com/jcornaz/heron/issues/186)) ([bc23307](https://github.com/jcornaz/heron/commit/bc233073315d85ac5b622bf6528adad1017083b1))
 
 ## [1.1.0](https://github.com/jcornaz/heron/compare/v1.0.1...v1.1.0) (2022-01-25)
 
