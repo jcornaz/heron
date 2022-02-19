@@ -76,7 +76,7 @@ impl Plugin for CorePlugin {
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
-            .add_system_to_stage(CoreStage::First, PhysicsSteps::update.system())
+            .add_system_to_stage(CoreStage::First, PhysicsSteps::update)
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
             });

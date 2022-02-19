@@ -63,8 +63,8 @@ impl Plugin for DebugPlugin {
 
         app.insert_resource(self.0)
             .init_resource::<DebugEntityMap>()
-            .add_system_to_stage(CoreStage::Last, track_debug_entities.system())
-            .add_system_to_stage(CoreStage::Last, scale_debug_entities.system());
+            .add_system_to_stage(CoreStage::Last, track_debug_entities)
+            .add_system_to_stage(CoreStage::Last, scale_debug_entities);
     }
 }
 

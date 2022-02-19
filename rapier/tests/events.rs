@@ -26,7 +26,7 @@ fn test_app() -> App {
         .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
-            bevy::transform::transform_propagate_system::transform_propagate_system.system(),
+            bevy::transform::transform_propagate_system::transform_propagate_system,
         );
     builder
 }

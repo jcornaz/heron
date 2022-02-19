@@ -9,8 +9,8 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default())
         .insert_resource(Gravity::from(Vec2::new(0.0, -600.0)))
-        .add_startup_system(spawn_ground_and_camera.system())
-        .add_startup_system(spawn.system())
+        .add_startup_system(spawn_ground_and_camera)
+        .add_startup_system(spawn)
         .run();
 }
 
