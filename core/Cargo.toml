@@ -14,7 +14,7 @@ all-features = true
 [features]
 default = []
 3d = []
-shape-from-mesh = ["bevy/render"]
+collision-from-mesh = ["bevy/render"]
 
 [dependencies]
 bevy = { version = "0.6.0", default-features = false }
