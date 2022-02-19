@@ -8,6 +8,15 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+## [1.2.0](https://github.com/jcornaz/heron/compare/v1.1.0...v1.2.0) (2022-02-19)
+
+
+### Features
+
+* generate collision shapes from mesh via the `PendingConvexCollision` component (behind the `collision-from-mesh` feature flag)  ([#190](https://github.com/jcornaz/heron/issues/190)) ([086a6a6](https://github.com/jcornaz/heron/commit/086a6a6cffaa7d16bd1612555949446c0a07d6a8))
+
+
+
 ## [1.1.0](https://github.com/jcornaz/heron/compare/v1.0.1...v1.1.0) (2022-01-25)
 
 
