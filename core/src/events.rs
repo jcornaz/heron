@@ -23,7 +23,7 @@ use crate::CollisionLayers;
 ///     }
 /// }
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum CollisionEvent {
     /// The two entities started to collide
     Started(CollisionData, CollisionData),
@@ -33,7 +33,7 @@ pub enum CollisionEvent {
 }
 
 /// Collision data concerning one of the two entity that collided
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CollisionData {
     rigid_body_entity: Entity,
     collision_shape_entity: Entity,
