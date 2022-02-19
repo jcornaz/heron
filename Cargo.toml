@@ -17,7 +17,8 @@ categories = ["game-development", "simulation"]
 all-features = true
 
 [features]
-default = []
+default = ["collision-from-mesh"]
+collision-from-mesh = ["heron_core/collision-from-mesh"]
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d", "heron_core/3d"]
 debug-2d = ["2d", "heron_debug/2d"]
