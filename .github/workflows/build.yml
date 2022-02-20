@@ -41,6 +41,8 @@ jobs:
       - run: cargo test --no-default-features
       - run: cargo test
       - run: cargo test --all-features
+      - run: cargo test --no-default-features --features collision-from-mesh
+        if: matrix.crate == 'core' || matrix.crate == '.'
       - run: cargo test --no-default-features --features 2d
         if: matrix.crate == 'rapier' || matrix.crate == 'debug' || matrix.crate == '.'
       - run: cargo test --no-default-features --features 3d
