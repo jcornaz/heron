@@ -139,6 +139,13 @@ mod tests {
     }
 
     #[test]
+    fn dont_fail_without_render_plugin() {
+        let mut app = App::new();
+        app.add_system(pending_collision_system);
+        app.update();
+    }
+
+    #[test]
     fn pending_collision_assignes() {
         let mut app = App::new();
         app.add_plugin(HeadlessRenderPlugin)
