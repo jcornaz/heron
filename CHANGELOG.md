@@ -8,6 +8,14 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+### [2.0.1](https://github.com/jcornaz/heron/compare/v2.0.0...v2.0.1) (2022-02-20)
+
+
+### Bug Fixes
+
+* **collision-from-mesh:** don't fail if there is no render plugin registered ([#196](https://github.com/jcornaz/heron/issues/196)) ([155c34c](https://github.com/jcornaz/heron/commit/155c34c5fd99681c4b0fb1491e70e8134a46e5ff))
+
+
 ## [2.0.0](https://github.com/jcornaz/heron/compare/v1.2.0...v2.0.0) (2022-02-20)
 
 
