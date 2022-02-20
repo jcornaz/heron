@@ -8,6 +8,23 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+## [2.0.0](https://github.com/jcornaz/heron/compare/v1.2.0...v2.0.0) (2022-02-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* `CollisionEvent` and `CollisionData` no longer implement `Copy`, `Eq`, and `PartialEq`
+
+### Features
+
+* add normals to `CollisionData` in events ([#189](https://github.com/jcornaz/heron/issues/189)) ([b89446c](https://github.com/jcornaz/heron/commit/b89446cc797b24a8a6eb86fdefcfea6b003af87b))
+
+
+### Documentation
+
+* **readme:** update example to bevy 0.6 syntax ([#191](https://github.com/jcornaz/heron/issues/191)) ([507f4f4](https://github.com/jcornaz/heron/commit/507f4f4ef53f34237aa0676f18a52ad73c7da5c1))
+
+
 ## [1.2.0](https://github.com/jcornaz/heron/compare/v1.1.0...v1.2.0) (2022-02-19)
 
 
