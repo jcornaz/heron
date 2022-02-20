@@ -5,6 +5,7 @@ use bevy::ecs::prelude::*;
 use bevy::ecs::system::SystemParam;
 use bevy::log::prelude::*;
 use bevy::math::Quat;
+use bevy::math::Vec2;
 use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
 
@@ -384,7 +385,7 @@ pub(crate) fn step(
     // Update the query pipleine
     query_pipeline.update(&islands, &bodies, &colliders);
 
-    event_manager.fire_events(&bodies, &colliders, &mut events);
+    event_manager.fire_events(&narrow_phase, &bodies, &colliders, &mut events);
 }
 
 pub(crate) struct EventManager {
@@ -424,6 +425,7 @@ impl Default for EventManager {
 impl EventManager {
     fn fire_events(
         &self,
+        narrow_phase: &NarrowPhase,
         bodies: &RigidBodySet,
         colliders: &ColliderSet,
         events: &mut Events<CollisionEvent>,
@@ -431,12 +433,12 @@ impl EventManager {
         while let Ok(event) = self.contact_recv.try_recv() {
             match event {
                 ContactEvent::Started(h1, h2) => {
-                    if let Some((d1, d2)) = Self::data(bodies, colliders, h1, h2) {
+                    if let Some((d1, d2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
                         events.send(CollisionEvent::Started(d1, d2));
                     }
                 }
                 ContactEvent::Stopped(h1, h2) => {
-                    if let Some((d1, d2)) = Self::data(bodies, colliders, h1, h2) {
+                    if let Some((d1, d2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
                         events.send(CollisionEvent::Stopped(d1, d2));
                     }
                 }
@@ -449,7 +451,9 @@ impl EventManager {
             intersecting,
         }) = self.intersection_recv.try_recv()
         {
-            if let Some((e1, e2)) = Self::data(bodies, colliders, collider1, collider2) {
+            if let Some((e1, e2)) =
+                Self::data(narrow_phase, bodies, colliders, collider1, collider2)
+            {
                 if intersecting {
                     events.send(CollisionEvent::Started(e1, e2));
                 } else {
@@ -461,6 +465,7 @@ impl EventManager {
 
     #[allow(clippy::cast_possible_truncation)]
     fn data(
+        narrow_phase: &NarrowPhase,
         bodies: &RigidBodySet,
         colliders: &ColliderSet,
         h1: ColliderHandle,
@@ -471,15 +476,42 @@ impl EventManager {
                 collider1.parent().and_then(|parent| bodies.get(parent)),
                 collider2.parent().and_then(|parent| bodies.get(parent)),
             ) {
+                let normals1 = narrow_phase
+                    .contact_pair(h1, h2)
+                    .map(|contact_pair| {
+                        contact_pair
+                            .manifolds
+                            .iter()
+                            .map(|manifold| {
+                                Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
+                            })
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                let normals2 = narrow_phase
+                    .contact_pair(h2, h1)
+                    .map(|contact_pair| {
+                        contact_pair
+                            .manifolds
+                            .iter()
+                            .map(|manifold| {
+                                Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
+                            })
+                            .collect()
+                    })
+                    .unwrap_or_default();
+
                 let d1 = CollisionData::new(
                     Entity::from_bits(rb1.user_data as u64),
                     Entity::from_bits(collider1.user_data as u64),
                     collider1.collision_groups().into_bevy(),
+                    normals1,
                 );
                 let d2 = CollisionData::new(
                     Entity::from_bits(rb2.user_data as u64),
                     Entity::from_bits(collider2.user_data as u64),
                     collider2.collision_groups().into_bevy(),
+                    normals2,
                 );
                 Some(
                     if Entity::from_bits(rb1.user_data as u64)
@@ -515,6 +547,7 @@ mod tests {
     use super::*;
 
     struct TestContext {
+        narrow_phase: NarrowPhase,
         bodies: RigidBodySet,
         colliders: ColliderSet,
         rb_entity_1: Entity,
@@ -529,6 +562,7 @@ mod tests {
 
     impl Default for TestContext {
         fn default() -> Self {
+            let narrow_phase = NarrowPhase::new();
             let mut bodies = RigidBodySet::new();
             let mut colliders = ColliderSet::new();
 
@@ -566,6 +600,7 @@ mod tests {
             );
 
             Self {
+                narrow_phase,
                 bodies,
                 colliders,
                 rb_entity_1,
@@ -591,11 +626,16 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
 
         assert_eq!(events.len(), 1);
-        let event = events[0];
+        let event = &events[0];
         assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
@@ -614,11 +654,16 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
 
         assert_eq!(events.len(), 1);
-        let event = events[0];
+        let event = &events[0];
         assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
@@ -641,11 +686,16 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
 
         assert_eq!(events.len(), 1);
-        let event = events[0];
+        let event = &events[0];
         assert!(matches!(event, CollisionEvent::Started(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
@@ -668,11 +718,16 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).copied().collect();
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
+        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
 
         assert_eq!(events.len(), 1);
-        let event = events[0];
+        let event = &events[0];
         assert!(matches!(event, CollisionEvent::Stopped(_, _)));
         assert_eq!(
             event.collision_shape_entities(),
@@ -691,7 +746,12 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
         assert_eq!(
             events
                 .get_reader()
@@ -714,7 +774,12 @@ mod tests {
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(&context.bodies, &context.colliders, &mut events);
+        manager.fire_events(
+            &context.narrow_phase,
+            &context.bodies,
+            &context.colliders,
+            &mut events,
+        );
         assert_eq!(
             events
                 .get_reader()
@@ -762,7 +827,7 @@ mod tests {
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
-                *runs = *runs + 1;
+                *runs += 1;
                 return;
             }
 
@@ -797,7 +862,7 @@ mod tests {
         fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
-                *runs = *runs + 1;
+                *runs += 1;
                 return;
             }
 
@@ -828,7 +893,7 @@ mod tests {
         ) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
-                *runs = *runs + 1;
+                *runs += 1;
                 return;
             }
 
@@ -875,7 +940,7 @@ mod tests {
         fn ray_cast(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
-                *runs = *runs + 1;
+                *runs += 1;
                 return;
             }
 
