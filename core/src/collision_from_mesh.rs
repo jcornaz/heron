@@ -39,8 +39,12 @@ pub(super) fn pending_collision_system(
     added_scenes: Query<'_, '_, (Entity, &Children, &PendingConvexCollision)>,
     scene_elements: Query<'_, '_, &Children, Without<PendingConvexCollision>>,
     mesh_handles: Query<'_, '_, &Handle<Mesh>>,
-    meshes: Res<'_, Assets<Mesh>>,
+    meshes: Option<Res<'_, Assets<Mesh>>>,
 ) {
+    let meshes = match meshes {
+        None => return,
+        Some(m) => m,
+    };
     for (entity, children, pending_collision) in added_scenes.iter() {
         if generate_collision(
             &mut commands,
@@ -132,6 +136,13 @@ mod tests {
             .add_plugin(AssetPlugin::default())
             .add_plugin(RenderPlugin::default());
         }
+    }
+
+    #[test]
+    fn dont_fail_without_render_plugin() {
+        let mut app = App::new();
+        app.add_system(pending_collision_system);
+        app.update();
     }
 
     #[test]
