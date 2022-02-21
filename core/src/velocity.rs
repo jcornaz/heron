@@ -3,7 +3,7 @@ use std::ops::{Mul, MulAssign};
 use bevy::ecs::component::Component;
 use bevy::math::prelude::*;
 use bevy::reflect::prelude::*;
-use duplicate::duplicate;
+use duplicate::duplicate_item;
 
 use crate::utils::NearZero;
 
@@ -210,7 +210,7 @@ impl Damping {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -221,7 +221,7 @@ impl From<Vec2> for Velocity {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -232,7 +232,7 @@ impl From<Vec3> for Velocity {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -243,7 +243,7 @@ impl From<Velocity> for Vec3 {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -254,7 +254,7 @@ impl From<AxisAngle> for Velocity {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -265,7 +265,7 @@ impl From<Quat> for Velocity {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -276,7 +276,7 @@ impl From<Velocity> for AxisAngle {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
@@ -305,7 +305,7 @@ impl From<AxisAngle> for f32 {
     }
 }
 
-#[duplicate(
+#[duplicate_item(
   Velocity;
   [ Velocity ];
   [ Acceleration ];
