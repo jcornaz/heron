@@ -32,7 +32,7 @@ jobs:
         working-directory: ${{ matrix.crate }}
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1.0.7
         with:
           toolchain: ${{ env.RUST_VERSION }}
@@ -56,7 +56,7 @@ jobs:
   code-style:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
@@ -69,7 +69,7 @@ jobs:
   documentation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - name: Install rust toolchain
         uses: actions-rs/toolchain@v1.0.7
         with:
@@ -81,7 +81,7 @@ jobs:
   unwanted-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1.0.7
         with:
           toolchain: stable
@@ -93,7 +93,7 @@ jobs:
   unused-dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1.0.7
         with:
           toolchain: nightly
@@ -140,7 +140,7 @@ jobs:
     env:
       CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1.0.7
         with:
           toolchain: stable
