@@ -2,7 +2,7 @@ use bevy::{prelude::*, utils::HashSet};
 
 use crate::CollisionEvent;
 
-/// Component which will be filled with a list of entities with which the current entity is currently in contact (if present).
+/// Component which will be filled (if present) with a list of entities with which the current entity is currently in contact.
 #[derive(Component, Default, Reflect)]
 pub struct CollidingEntities(pub HashSet<Entity>);
 
@@ -57,7 +57,10 @@ mod tests {
             .world
             .get_resource_mut::<Events<CollisionEvent>>()
             .unwrap();
-        collision_events.send(CollisionEvent::Started(collision_data1.clone(), collision_data2.clone()));
+        collision_events.send(CollisionEvent::Started(
+            collision_data1.clone(),
+            collision_data2.clone(),
+        ));
 
         app.update();
 
@@ -122,6 +125,5 @@ mod tests {
             0,
             "Colliding entity should be removed from the list when the collision ends"
         );
-
     }
 }
