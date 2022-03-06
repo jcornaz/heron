@@ -48,6 +48,10 @@ name = "debug_2d"
 required-features = ["debug-2d"]
 
 [[example]]
+name = "debug_3d"
+required-features = ["debug-3d"]
+
+[[example]]
 name = "quickstart"
 required-features = ["2d"]
 
