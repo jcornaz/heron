@@ -82,7 +82,8 @@ impl Plugin for CorePlugin {
             });
 
         #[cfg(feature = "collision-from-mesh")]
-        app.add_system(collision_from_mesh::pending_collision_system);
+        app.register_type::<PendingConvexCollision>()
+            .add_system(collision_from_mesh::pending_collision_system);
     }
 }
 

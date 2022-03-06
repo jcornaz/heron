@@ -25,7 +25,7 @@ use crate::{CollisionShape, RigidBody};
 ///         });
 /// }
 /// ```
-#[derive(Component)]
+#[derive(Component, Reflect)]
 pub struct PendingConvexCollision {
     /// Rigid body type which will be assigned to every scene entity.
     pub body_type: RigidBody,
