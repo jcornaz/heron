@@ -8,7 +8,6 @@ use bevy::math::Quat;
 use bevy::math::Vec2;
 use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
-use smallvec::SmallVec;
 
 use heron_core::{
     CollisionData, CollisionEvent, CollisionLayers, CollisionShape, Gravity, PhysicsStepDuration,
@@ -477,30 +476,24 @@ impl EventManager {
                 collider1.parent().and_then(|parent| bodies.get(parent)),
                 collider2.parent().and_then(|parent| bodies.get(parent)),
             ) {
-                let normals1: SmallVec<[Vec2; 1]> = narrow_phase
-                    .contact_pair(h1, h2)
-                    .map(|contact_pair| {
-                        contact_pair
-                            .manifolds
-                            .iter()
-                            .map(|manifold| {
+                let normals1 =
+                    narrow_phase
+                        .contact_pair(h1, h2)
+                        .into_iter()
+                        .flat_map(|contact_pair| {
+                            contact_pair.manifolds.iter().map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect()
-                    })
-                    .unwrap_or_default();
-                let normals2: SmallVec<[Vec2; 1]> = narrow_phase
-                    .contact_pair(h2, h1)
-                    .map(|contact_pair| {
-                        contact_pair
-                            .manifolds
-                            .iter()
-                            .map(|manifold| {
+                        });
+                let normals2 =
+                    narrow_phase
+                        .contact_pair(h2, h1)
+                        .into_iter()
+                        .flat_map(|contact_pair| {
+                            contact_pair.manifolds.iter().map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect()
-                    })
-                    .unwrap_or_default();
+                        });
 
                 let d1 = CollisionData::new(
                     Entity::from_bits(rb1.user_data as u64),
