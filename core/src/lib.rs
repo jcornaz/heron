@@ -10,6 +10,7 @@ use std::sync::Arc;
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
+use colliding_entities::CollidingEntities;
 #[cfg(feature = "collision-from-mesh")]
 pub use collision_from_mesh::PendingConvexCollision;
 pub use constraints::RotationConstraints;
@@ -20,6 +21,7 @@ pub use physics_time::PhysicsTime;
 pub use step::{PhysicsStepDuration, PhysicsSteps};
 pub use velocity::{Acceleration, AxisAngle, Damping, Velocity};
 
+mod colliding_entities;
 #[cfg(feature = "collision-from-mesh")]
 mod collision_from_mesh;
 mod constraints;
@@ -76,6 +78,8 @@ impl Plugin for CorePlugin {
             .register_type::<RotationConstraints>()
             .register_type::<CollisionLayers>()
             .register_type::<SensorShape>()
+            .register_type::<CollidingEntities>()
+            .add_system(colliding_entities::update_colliding_entities)
             .add_system_to_stage(CoreStage::First, PhysicsSteps::update)
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())
