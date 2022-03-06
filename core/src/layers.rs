@@ -32,8 +32,9 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///
 /// This component must be on the same entity of a [`CollisionShape`](crate::CollisionShape)
 ///
-/// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or
-/// `CollisionLayers::none()`, and then add or remove layers by calling
+/// To build an instance, start with either [`CollisionLayers::new()`], [`CollisionLayers::all_groups()`],
+/// [`CollisionLayers::all_masks()`], [`CollisionLayers::all()`] or
+/// [`CollisionLayers::none()`], and then add or remove layers by calling
 /// `with_group`/`without_group` and `with_mask`/`without_mask`.
 ///
 /// Theses methods take a type that implement [`PhysicsLayer`]. The best option is to create an enum
@@ -94,15 +95,34 @@ impl CollisionLayers {
         Self::from_bits(group.to_bits(), mask.to_bits())
     }
 
-    /// Contains all layers
+    /// Contains all groups and masks
     ///
-    /// The entity,will interacts with everything (except the entities that interact with nothing)
+    /// The entity, will interacts with everything (except the entities that interact with
+    /// nothing).
     #[must_use]
     pub fn all<L: PhysicsLayer>() -> Self {
         Self::from_bits(L::all_bits(), L::all_bits())
     }
 
-    /// Contains no layer
+    /// Contains all groups and no masks
+    ///
+    /// The entity, will not interact with anything, unless you add masks via [`CollisionLayers::with_mask`]. You
+    /// can also exclude specific groups using [`CollisionLayers::without_group`].
+    #[must_use]
+    pub fn all_groups<L: PhysicsLayer>() -> Self {
+        Self::from_bits(L::all_bits(), 0)
+    }
+
+    /// Contains no groups and all masks
+    ///
+    /// The entity, will not interact with anything, unless you add group via [`CollisionLayers::with_group`]. You
+    /// can also exclude specific masks using [`CollisionLayers::without_mask`].
+    #[must_use]
+    pub fn all_masks<L: PhysicsLayer>() -> Self {
+        Self::from_bits(0, L::all_bits())
+    }
+
+    /// Contains no masks and groups
     ///
     /// The entity, will not interact with anything
     #[must_use]
@@ -229,11 +249,20 @@ mod tests {
     #[rstest]
     #[case(CollisionLayers::all::<TestLayer>())]
     #[case(CollisionLayers::none())]
-    #[case(CollisionLayers::none().with_group(TestLayer::One).with_group(TestLayer::Two))]
-    #[case(CollisionLayers::all::<TestLayer>().without_group(TestLayer::One).without_group(TestLayer::Two))]
+    #[case(CollisionLayers::all_groups::<TestLayer>())]
+    #[case(CollisionLayers::all_masks::<TestLayer>())]
     fn none_does_not_interact_with_any_anything(#[case] other: CollisionLayers) {
         assert!(!CollisionLayers::none().interacts_with(other));
         assert!(!other.interacts_with(CollisionLayers::none()));
+    }
+
+    #[test]
+    fn empty_groups_and_masks_not_interact() {
+        let c1 = CollisionLayers::all_groups::<TestLayer>();
+        let c2 = CollisionLayers::all_masks::<TestLayer>();
+
+        assert!(!c1.interacts_with(c2));
+        assert!(!c2.interacts_with(c1));
     }
 
     #[test]
