@@ -54,7 +54,7 @@ struct Indexed;
 impl Plugin for DebugPlugin {
     fn build(&self, app: &mut App) {
         #[cfg(feature = "3d")]
-        app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin)
+        app.add_plugin(bevy_prototype_debug_lines::DebugLinesPlugin::default())
             .add_system_set_to_stage(CoreStage::PostUpdate, dim3::systems());
 
         #[cfg(all(feature = "2d", not(feature = "3d")))]

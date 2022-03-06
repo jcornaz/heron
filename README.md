@@ -101,6 +101,7 @@ One must choose to use either `2d` or `3d`. If neither of the two features is en
 * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
 * `2d` Enable simulation only on the first 2 axes `x` and `y`.
 * `debug-2d` Render 2d collision shapes.
+* `debug-3d` Render 3d collision shapes.
 * `enhanced-determinism` Enable rapier's [enhanced-determinism](https://rapier.rs/docs/user_guides/rust/determinism)
 
 
