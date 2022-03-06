@@ -106,13 +106,13 @@ impl CollisionData {
         rigid_body_entity: Entity,
         collision_shape_entity: Entity,
         collision_layers: CollisionLayers,
-        normals: SmallVec<[Vec2; 1]>,
+        normals: impl IntoIterator<Item = Vec2>,
     ) -> Self {
         Self {
             rigid_body_entity,
             collision_shape_entity,
             collision_layers,
-            normals,
+            normals: normals.into_iter().collect(),
         }
     }
 

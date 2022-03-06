@@ -8,6 +8,7 @@ use bevy::math::Quat;
 use bevy::math::Vec2;
 use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
+use smallvec::SmallVec;
 
 use heron_core::{
     CollisionData, CollisionEvent, CollisionLayers, CollisionShape, Gravity, PhysicsStepDuration,
@@ -476,7 +477,7 @@ impl EventManager {
                 collider1.parent().and_then(|parent| bodies.get(parent)),
                 collider2.parent().and_then(|parent| bodies.get(parent)),
             ) {
-                let normals1 = narrow_phase
+                let normals1: SmallVec<[Vec2; 1]> = narrow_phase
                     .contact_pair(h1, h2)
                     .map(|contact_pair| {
                         contact_pair
@@ -488,7 +489,7 @@ impl EventManager {
                             .collect()
                     })
                     .unwrap_or_default();
-                let normals2 = narrow_phase
+                let normals2: SmallVec<[Vec2; 1]> = narrow_phase
                     .contact_pair(h2, h1)
                     .map(|contact_pair| {
                         contact_pair
