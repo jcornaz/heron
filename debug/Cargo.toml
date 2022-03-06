@@ -25,5 +25,5 @@ bevy_prototype_debug_lines = { version = "0.6.1", default-features = false, opti
 [package.metadata.docs.rs]
 all-features = true
 
-[package.metadata.cargo-udeps]
-ignore = ["lyon_path", "bevy_prototype_lyon"] # False positive, they are used but only when 2d is enabled and 3d disabled
+[package.metadata.cargo-udeps.ignore]
+normal = ["lyon_path", "bevy_prototype_lyon"] # False positive, they are used but only when 2d is enabled and 3d disabled
