@@ -8,9 +8,6 @@ license = "MIT"
 description = "Rendering of Heron's collision shapes for debugging purposes"
 repository = "https://github.com/jcornaz/heron/"
 
-[package.metadata.docs.rs]
-all-features = true
-
 [features]
 default = []
 2d = ["heron_rapier/2d", "bevy_prototype_lyon", "lyon_path"]
@@ -24,3 +21,9 @@ bevy_prototype_lyon = { version = "0.4.0", optional = true }
 lyon_path = { version = "0.17.4", optional = true }
 fnv = "1.0"
 bevy_prototype_debug_lines = { version = "0.6.1", default-features = false, optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+
+[package.metadata.cargo-udeps]
+ignore = ["lyon_path", "bevy_prototype_lyon"] # False positive, they are used but only when 2d is enabled and 3d disabled
