@@ -32,8 +32,9 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///
 /// This component must be on the same entity of a [`CollisionShape`](crate::CollisionShape)
 ///
-/// To build an instance, start with either `CollisionLayers::new()`, `CollisionLayers::all()` or
-/// `CollisionLayers::none()`, and then add or remove layers by calling
+/// To build an instance, start with either [`CollisionLayers::new()`], [`CollisionLayers::all_groups()`],
+/// [`CollisionLayers::all_masks()`], [`CollisionLayers::all()`] or
+/// [`CollisionLayers::none()`], and then add or remove layers by calling
 /// `with_group`/`without_group` and `with_mask`/`without_mask`.
 ///
 /// Theses methods take a type that implement [`PhysicsLayer`]. The best option is to create an enum
@@ -105,8 +106,8 @@ impl CollisionLayers {
 
     /// Contains all groups and no masks
     ///
-    /// The entity, will not interact with anything, unless you add masks via [`with_mask`]. You
-    /// can also exclude specific groups using [`without_group`].
+    /// The entity, will not interact with anything, unless you add masks via [`CollisionLayers::with_mask`]. You
+    /// can also exclude specific groups using [`CollisionLayers::without_group`].
     #[must_use]
     pub fn all_groups<L: PhysicsLayer>() -> Self {
         Self::from_bits(L::all_bits(), 0)
@@ -114,8 +115,8 @@ impl CollisionLayers {
 
     /// Contains no groups and all masks
     ///
-    /// The entity, will not interact with anything, unless you add group via [`with_group`]. You
-    /// can also exclude specific masks using [`without_mask`].
+    /// The entity, will not interact with anything, unless you add group via [`CollisionLayers::with_group`]. You
+    /// can also exclude specific masks using [`CollisionLayers::without_mask`].
     #[must_use]
     pub fn all_masks<L: PhysicsLayer>() -> Self {
         Self::from_bits(0, L::all_bits())
