@@ -8,6 +8,19 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+## [2.1.0](https://github.com/jcornaz/heron/compare/v2.0.1...v2.1.0) (2022-03-06)
+
+
+### Features
+
+* add CollisionLayers::all_groups and CollisionLayers::all_masks ([#210](https://github.com/jcornaz/heron/issues/210)) ([62f87b2](https://github.com/jcornaz/heron/commit/62f87b2a18fe523aaca6d443e2ec8aefb8ac17af))
+* let `CollisionData::new` accept any implementation of `IntoIterator<Item=Vec2>` ([#211](https://github.com/jcornaz/heron/issues/211)) ([df3169a](https://github.com/jcornaz/heron/commit/df3169ac55b705a88ee363a964ea8c032dcee77a))
+
+
+### Documentation
+
+* **readme:** update table of supported bevy versions ([2399065](https://github.com/jcornaz/heron/commit/23990655eafee79e79f2519590e0ab9f1df9f7cb))
+
 ### [2.0.1](https://github.com/jcornaz/heron/compare/v2.0.0...v2.0.1) (2022-02-20)
 
 
