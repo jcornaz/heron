@@ -476,30 +476,24 @@ impl EventManager {
                 collider1.parent().and_then(|parent| bodies.get(parent)),
                 collider2.parent().and_then(|parent| bodies.get(parent)),
             ) {
-                let normals1 = narrow_phase
-                    .contact_pair(h1, h2)
-                    .map(|contact_pair| {
-                        contact_pair
-                            .manifolds
-                            .iter()
-                            .map(|manifold| {
+                let normals1 =
+                    narrow_phase
+                        .contact_pair(h1, h2)
+                        .into_iter()
+                        .flat_map(|contact_pair| {
+                            contact_pair.manifolds.iter().map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect()
-                    })
-                    .unwrap_or_default();
-                let normals2 = narrow_phase
-                    .contact_pair(h2, h1)
-                    .map(|contact_pair| {
-                        contact_pair
-                            .manifolds
-                            .iter()
-                            .map(|manifold| {
+                        });
+                let normals2 =
+                    narrow_phase
+                        .contact_pair(h2, h1)
+                        .into_iter()
+                        .flat_map(|contact_pair| {
+                            contact_pair.manifolds.iter().map(|manifold| {
                                 Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
                             })
-                            .collect()
-                    })
-                    .unwrap_or_default();
+                        });
 
                 let d1 = CollisionData::new(
                     Entity::from_bits(rb1.user_data as u64),
