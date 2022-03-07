@@ -340,6 +340,7 @@ mod physics_world {
             );
         }
 
+        #[allow(clippy::cast_possible_truncation)]
         fn intersections_with_shape_internal(
             &self,
             shape: &CollisionShape,
