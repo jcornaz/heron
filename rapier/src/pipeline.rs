@@ -1115,10 +1115,7 @@ mod tests {
     #[test]
     fn intersections_with_shape_miss() {
         /// System to test shape intersection
-        fn intersections_with_shape(
-            mut runs: Local<'_, i32>,
-            physics_world: PhysicsWorld<'_, '_>,
-        ) {
+        fn intersections_with_shape(mut runs: Local<'_, i32>, physics_world: PhysicsWorld<'_, '_>) {
             // Skip the first run to give time for the world to setup
             if *runs == 0 {
                 *runs += 1;
