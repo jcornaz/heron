@@ -10,7 +10,7 @@ use std::sync::Arc;
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
 
-use colliding_entities::CollidingEntities;
+pub use colliding_entities::CollidingEntities;
 #[cfg(feature = "collision-from-mesh")]
 pub use collision_from_mesh::PendingConvexCollision;
 pub use constraints::RotationConstraints;
