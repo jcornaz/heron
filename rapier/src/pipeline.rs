@@ -280,6 +280,109 @@ mod physics_world {
                 })
             })?
         }
+
+        /// Intersection tests will find all the colliders intersecting a given shape and apply
+        /// callback to each
+        ///
+        /// - `shape`: The [`CollisionShape`] to use for the shape cast
+        /// - `position`: The position of the collision shape
+        /// - `rotation`: The rotation of the collision shape
+        /// - `callback`: A closure taking an [`Entity`]. Will be called for every entity that
+        ///   intersects with the shape
+        ///
+        pub fn intersections_with_shape<C>(
+            &self,
+            shape: &CollisionShape,
+            position: Vec3,
+            rotation: Quat,
+            mut callback: C,
+        ) where
+            C: FnMut(Entity) -> bool,
+        {
+            self.intersections_with_shape_internal(
+                shape,
+                position,
+                rotation,
+                CollisionLayers::default(),
+                None,
+                &mut callback,
+            );
+        }
+
+        /// Behaves the same as [`intersections_with_shape`](Self::intersections_with_shape) but takes extra arguments for
+        /// filtering results:
+        ///
+        /// - `layers`: The [`CollisionLayers`] to considered for collisions, allowing for coarse
+        ///   filtering of collisions.
+        /// - `filter`: A closure taking an [`Entity`] and returning `true` if the entity should be
+        ///   considered for collisions, allowing for fine-grained, per-entity filtering of
+        ///   collisions.
+        ///
+        pub fn intersections_with_shape_with_filter<C, F>(
+            &self,
+            shape: &CollisionShape,
+            position: Vec3,
+            rotation: Quat,
+            layers: CollisionLayers,
+            mut callback: C,
+            filter: F,
+        ) where
+            C: FnMut(Entity) -> bool,
+            F: Fn(Entity) -> bool,
+        {
+            self.intersections_with_shape_internal(
+                shape,
+                position,
+                rotation,
+                layers,
+                Some(&filter),
+                &mut callback,
+            );
+        }
+
+        fn intersections_with_shape_internal(
+            &self,
+            shape: &CollisionShape,
+            position: Vec3,
+            rotation: Quat,
+            layers: CollisionLayers,
+            filter: Option<&dyn Fn(Entity) -> bool>,
+            callback: &mut dyn FnMut(Entity) -> bool,
+        ) {
+            let collider = shape.collider_builder().build();
+
+            self.query_pipeline.intersections_with_shape(
+                &*self.colliders,
+                &(position, rotation).into_rapier(),
+                collider.shape(),
+                InteractionGroups {
+                    memberships: layers.groups_bits(),
+                    filter: layers.masks_bits(),
+                },
+                filter
+                    .map(|filter| {
+                        move |handle: ColliderHandle| -> bool {
+                            self.colliders
+                                .get(handle)
+                                .map(|collider| Entity::from_bits(collider.user_data as u64))
+                                .map_or(false, filter)
+                        }
+                    })
+                    .as_ref()
+                    .map(|x| x as &dyn Fn(ColliderHandle) -> bool),
+                move |handle: ColliderHandle| -> bool {
+                    if let Some(entity) = self
+                        .colliders
+                        .get(handle)
+                        .map(|collider| Entity::from_bits(collider.user_data as u64))
+                    {
+                        callback(entity)
+                    } else {
+                        false
+                    }
+                },
+            );
+        }
     }
 }
 
@@ -957,6 +1060,96 @@ mod tests {
         let mut app = setup_ray_cast_test_app();
         // Add our system
         app.add_system(ray_cast);
+
+        // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
+        app.update();
+        app.update();
+    }
+
+    #[test]
+    fn intersections_with_shape_hit() {
+        /// System to test shape intersection
+        fn intersections_with_shape(
+            mut runs: Local<'_, i32>,
+            physics_world: PhysicsWorld<'_, '_>,
+            test_colliders: Query<'_, '_, (), With<RayCastTestCollider>>,
+        ) {
+            // Skip the first run to give time for the world to setup
+            if *runs == 0 {
+                *runs += 1;
+                return;
+            }
+
+            // record intersection here
+            let mut intersections = Vec::new();
+
+            // Cast a shape upword to try and hit the block we spawned with setup_ray_cast_test_app()
+            physics_world.intersections_with_shape(
+                &CollisionShape::Cuboid {
+                    half_extends: Vec3::new(20., 20., 20.),
+                    border_radius: None,
+                },
+                Vec3::new(0., 100., 0.),
+                Quat::default(),
+                |e| {
+                    intersections.push(e);
+                    true
+                },
+            );
+
+            // Verify intersection
+            assert_eq!(intersections.len(), 1);
+            assert!(test_colliders.get(intersections[0]).is_ok());
+        }
+
+        // Get the app
+        let mut app = setup_ray_cast_test_app();
+        // Add our system
+        app.add_system(intersections_with_shape);
+
+        // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
+        app.update();
+        app.update();
+    }
+
+    #[test]
+    fn intersections_with_shape_miss() {
+        /// System to test shape intersection
+        fn intersections_with_shape(
+            mut runs: Local<'_, i32>,
+            physics_world: PhysicsWorld<'_, '_>,
+        ) {
+            // Skip the first run to give time for the world to setup
+            if *runs == 0 {
+                *runs += 1;
+                return;
+            }
+
+            // record intersection here
+            let mut intersections = Vec::new();
+
+            // Cast a shape upword to try and hit the block we spawned with setup_ray_cast_test_app()
+            physics_world.intersections_with_shape(
+                &CollisionShape::Cuboid {
+                    half_extends: Vec3::new(10., 10., 10.),
+                    border_radius: None,
+                },
+                Vec3::default(),
+                Quat::default(),
+                |e| {
+                    intersections.push(e);
+                    true
+                },
+            );
+
+            // Verify intersection
+            assert_eq!(intersections.len(), 0);
+        }
+
+        // Get the app
+        let mut app = setup_ray_cast_test_app();
+        // Add our system
+        app.add_system(intersections_with_shape);
 
         // Run the app for a couple of loops to make sure the setup is completed and the ray has been cast
         app.update();
