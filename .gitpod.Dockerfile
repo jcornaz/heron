@@ -1,5 +1,8 @@
-FROM gitpod/workspace-rust
+FROM gitpod/workspace-base
 
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH $PATH:$HOME/.cargo/bin
+RUN rustup toolchain install stable nightly
+RUN rustup default stable
 RUN rustup target install wasm32-unknown-unknown
-RUN env -u CARGO_HOME cargo install wasm-server-runner cargo-deny
-RUN rustup component add clippy
+RUN cargo install cargo-watch cargo-deny cargo-udeps wasm-server-runner
