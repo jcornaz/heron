@@ -4,28 +4,28 @@ use crate::CollisionEvent;
 
 /// Component which will be filled (if present) with a list of entities with which the current entity is currently in contact.
 #[derive(Component, Default, Reflect)]
-pub struct CollidingEntities(pub HashSet<Entity>);
+pub struct Collisions(pub HashSet<Entity>);
 
 /// Adds entity to [`CollidingEntities`] on starting collision and removes from it when the
 /// collision end.
-pub(super) fn update_colliding_entities(
+pub(super) fn update_collisions(
     mut collision_events: EventReader<'_, '_, CollisionEvent>,
-    mut colliding_entities: Query<'_, '_, &mut CollidingEntities>,
+    mut collisions: Query<'_, '_, &mut Collisions>,
 ) {
     for event in collision_events.iter() {
         let (entity1, entity2) = event.rigid_body_entities();
         if event.is_started() {
-            if let Ok(mut entities) = colliding_entities.get_mut(entity1) {
+            if let Ok(mut entities) = collisions.get_mut(entity1) {
                 entities.0.insert(entity2);
             }
-            if let Ok(mut entities) = colliding_entities.get_mut(entity2) {
+            if let Ok(mut entities) = collisions.get_mut(entity2) {
                 entities.0.insert(entity1);
             }
         } else {
-            if let Ok(mut entities) = colliding_entities.get_mut(entity1) {
+            if let Ok(mut entities) = collisions.get_mut(entity1) {
                 entities.0.remove(&entity2);
             }
-            if let Ok(mut entities) = colliding_entities.get_mut(entity2) {
+            if let Ok(mut entities) = collisions.get_mut(entity2) {
                 entities.0.remove(&entity1);
             }
         }
@@ -41,13 +41,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn colliding_entities_updates() {
+    fn collisions_update() {
         let mut app = App::new();
         app.add_event::<CollisionEvent>()
-            .add_system(update_colliding_entities);
+            .add_system(update_collisions);
 
-        let entity1 = app.world.spawn().insert(CollidingEntities::default()).id();
-        let entity2 = app.world.spawn().insert(CollidingEntities::default()).id();
+        let entity1 = app.world.spawn().insert(Collisions::default()).id();
+        let entity2 = app.world.spawn().insert(Collisions::default()).id();
 
         let collision_data1 =
             CollisionData::new(entity1, Entity::from_raw(0), CollisionLayers::default(), []);
@@ -64,34 +64,26 @@ mod tests {
 
         app.update();
 
-        let colliding_entities1 = app
-            .world
-            .entity(entity1)
-            .get::<CollidingEntities>()
-            .unwrap();
+        let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
         assert_eq!(
-            colliding_entities1.0.len(),
+            collisions1.0.len(),
             1,
             "There should be one colliding entity"
         );
         assert_eq!(
-            colliding_entities1.0.iter().next().unwrap(),
+            collisions1.0.iter().next().unwrap(),
             &entity2,
             "Colliding entity should be equal to second entity"
         );
 
-        let colliding_entities2 = app
-            .world
-            .entity(entity2)
-            .get::<CollidingEntities>()
-            .unwrap();
+        let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
         assert_eq!(
-            colliding_entities2.0.len(),
+            collisions2.0.len(),
             1,
             "There should be one colliding entity"
         );
         assert_eq!(
-            colliding_entities2.0.iter().next().unwrap(),
+            collisions2.0.iter().next().unwrap(),
             &entity1,
             "Colliding entity should be equal to second entity"
         );
@@ -104,24 +96,16 @@ mod tests {
 
         app.update();
 
-        let colliding_entities1 = app
-            .world
-            .entity(entity1)
-            .get::<CollidingEntities>()
-            .unwrap();
+        let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
         assert_eq!(
-            colliding_entities1.0.len(),
+            collisions1.0.len(),
             0,
             "Colliding entity should be removed from the list when the collision ends"
         );
 
-        let colliding_entities2 = app
-            .world
-            .entity(entity2)
-            .get::<CollidingEntities>()
-            .unwrap();
+        let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
         assert_eq!(
-            colliding_entities2.0.len(),
+            collisions2.0.len(),
             0,
             "Colliding entity should be removed from the list when the collision ends"
         );
