@@ -2,20 +2,50 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - name: example
-    init: |
-      gp sync-await update
-      cargo build --target wasm32-unknown-unknown --example demo
-    command: cargo run --target wasm32-unknown-unknown --example demo
-    
-  - name: test
+  - name: root
     init: |
       cargo update
       gp sync-done update
-      cargo test --all-features --workspace
-      cargo clippy --all-features --all-targets --workspace
-      cargo doc --all-features --no-deps --workspace
-    command: cargo watch -x 'test --all-features --workspace --tests' -x 'clippy --all-features --all-targets --workspace' -x 'doc --all-features --no-deps --workspace'
+      cargo test --all-features
+      cargo clippy --all-features --all-targets
+      cargo doc --all-features --no-deps
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+
+  - name: core
+    before: cd core
+    init: |
+      gp sync-await update
+      cargo test --all-features
+      cargo clippy --all-features --all-targets
+      cargo doc --all-features --no-deps
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+
+  - name: debug
+    before: cd debug
+    init: |
+      gp sync-await update
+      cargo test --all-features
+      cargo clippy --all-features --all-targets
+      cargo doc --all-features --no-deps
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+
+  - name: macros
+    before: cd macros
+    init: |
+      gp sync-await update
+      cargo test --all-features
+      cargo clippy --all-features --all-targets
+      cargo doc --all-features --no-deps
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+
+  - name: rapier
+    before: cd rapier
+    init: |
+      gp sync-await update
+      cargo test --all-features
+      cargo clippy --all-features --all-targets
+      cargo doc --all-features --no-deps
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
 
 vscode:
   extensions:
@@ -39,4 +69,3 @@ github:
     addCheck: true
     addComment: false
     addBadge: false
-    
