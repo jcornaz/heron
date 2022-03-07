@@ -4,7 +4,24 @@ use crate::CollisionEvent;
 
 /// Component which will be filled (if present) with a list of entities with which the current entity is currently in contact.
 #[derive(Component, Default, Reflect)]
-pub struct Collisions(pub HashSet<Entity>);
+pub struct Collisions(HashSet<Entity>);
+
+impl Collisions {
+    /// Returns the number of colliding entities.
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    /// Returns `true` if the collisions contains the specified entity.
+    pub fn contains(&self, entity: &Entity) -> bool {
+        self.0.contains(entity)
+    }
+
+    /// An iterator visiting all colliding entities in arbitrary order.
+    pub fn iter(&self) -> impl Iterator<Item = &Entity> {
+        self.0.iter()
+    }
+}
 
 /// Adds entity to [`CollidingEntities`] on starting collision and removes from it when the
 /// collision end.
@@ -65,25 +82,17 @@ mod tests {
         app.update();
 
         let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
+        assert_eq!(collisions1.len(), 1, "There should be one colliding entity");
         assert_eq!(
-            collisions1.0.len(),
-            1,
-            "There should be one colliding entity"
-        );
-        assert_eq!(
-            collisions1.0.iter().next().unwrap(),
+            collisions1.iter().next().unwrap(),
             &entity2,
             "Colliding entity should be equal to second entity"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
+        assert_eq!(collisions2.len(), 1, "There should be one colliding entity");
         assert_eq!(
-            collisions2.0.len(),
-            1,
-            "There should be one colliding entity"
-        );
-        assert_eq!(
-            collisions2.0.iter().next().unwrap(),
+            collisions2.iter().next().unwrap(),
             &entity1,
             "Colliding entity should be equal to second entity"
         );
@@ -98,14 +107,14 @@ mod tests {
 
         let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
         assert_eq!(
-            collisions1.0.len(),
+            collisions1.len(),
             0,
             "Colliding entity should be removed from the list when the collision ends"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
         assert_eq!(
-            collisions2.0.len(),
+            collisions2.len(),
             0,
             "Colliding entity should be removed from the list when the collision ends"
         );
