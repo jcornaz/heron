@@ -6,36 +6,35 @@ tasks:
     init: |
       cargo update
       gp sync-done update
-      cargo test --all-features
-      cargo clippy --all-features --all-targets
       cargo doc --all-features --no-deps
-    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+      cargo clippy --all-features --all-targets
+      cargo test --all-features
 
   - name: core
     before: cd core
     init: |
       gp sync-await update
-      cargo test --all-features
-      cargo clippy --all-features --all-targets
       cargo doc --all-features --no-deps
+      cargo clippy --all-features --all-targets
+      cargo test --all-features
     command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
 
   - name: debug
     before: cd debug
     init: |
       gp sync-await update
-      cargo test --all-features
-      cargo clippy --all-features --all-targets
       cargo doc --all-features --no-deps
+      cargo clippy --all-features --all-targets
+      cargo test --all-features
     command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
 
   - name: macros
     before: cd macros
     init: |
       gp sync-await update
-      cargo test --all-features
-      cargo clippy --all-features --all-targets
       cargo doc --all-features --no-deps
+      cargo clippy --all-features --all-targets
+      cargo test --all-features
     command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
 
   - name: rapier
