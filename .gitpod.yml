@@ -52,13 +52,7 @@ vscode:
     - matklad.rust-analyzer
     - serayuzgur.crates
     - bungcip.better-toml
-
-ports:
-  - name: example (wasm)
-    port: 1334
-    visibility: private
-    onOpen: notify
-
+    
 github:
   prebuilds:
     master: true
