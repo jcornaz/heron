@@ -1,6 +1,6 @@
 [package]
 name = "heron_rapier"
-version = "2.1.0"
+version = "2.2.0"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -18,7 +18,7 @@ default = []
 enhanced-determinism = ["rapier2d/enhanced-determinism", "rapier3d/enhanced-determinism"]
 
 [dependencies]
-heron_core = { version = "2.1.0", path = "../core" }
+heron_core = { version = "2.2.0", path = "../core" }
 bevy = { version = "0.6.0", default-features = false }
 rapier2d = { version = "0.11.1", optional = true }
 rapier3d = { version = "0.11.1", optional = true }

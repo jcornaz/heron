@@ -3,7 +3,7 @@ members = ["core", "debug", "rapier", "macros"]
 
 [package]
 name = "heron"
-version = "2.1.0"
+version = "2.2.0"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -26,10 +26,10 @@ debug-3d = ["3d", "heron_debug/3d"]
 enhanced-determinism = ["heron_rapier/enhanced-determinism"]
 
 [dependencies]
-heron_core = { version = "2.1.0", path = "core" }
-heron_macros = { version = "2.1.0", path = "macros" }
-heron_rapier = { version = "2.1.0", path = "rapier" }
-heron_debug = { version = "2.1.0", path = "debug", optional = true }
+heron_core = { version = "2.2.0", path = "core" }
+heron_macros = { version = "2.2.0", path = "macros" }
+heron_rapier = { version = "2.2.0", path = "rapier" }
+heron_debug = { version = "2.2.0", path = "debug", optional = true }
 bevy = { version = "0.6.0", default-features = false }
 
 [dev-dependencies]
