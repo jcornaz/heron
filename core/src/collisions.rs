@@ -13,6 +13,12 @@ impl Collisions {
         self.0.len()
     }
 
+    /// Returns `true` if there is no colliding entities.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
     /// Returns `true` if the collisions contains the specified entity.
     #[must_use]
     pub fn contains(&self, entity: &Entity) -> bool {
@@ -20,7 +26,6 @@ impl Collisions {
     }
 
     /// An iterator visiting all colliding entities in arbitrary order.
-    #[must_use]
     pub fn iter(&self) -> impl Iterator<Item = &Entity> {
         self.0.iter()
     }
