@@ -14,7 +14,8 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 ### Features
 
 * **debug:** reintroduce the 3d debug renderer (was removed when migrating to bevy 0.6) ([#214](https://github.com/jcornaz/heron/issues/214)) ([4bcbd34](https://github.com/jcornaz/heron/commit/4bcbd34b95426328a724ee3b8313cc72c23c3d86))
-* implement Reflect for PendingConvexCollision ([#213](https://github.com/jcornaz/heron/issues/213)) ([d09192c](https://github.com/jcornaz/heron/commit/d09192c08cf9167a3e1272ff2f92b479b30c2dc3))
+* implement `Reflect` for `PendingConvexCollision` ([#213](https://github.com/jcornaz/heron/issues/213)) ([d09192c](https://github.com/jcornaz/heron/commit/d09192c08cf9167a3e1272ff2f92b479b30c2dc3))
+
 
 ## [2.1.0](https://github.com/jcornaz/heron/compare/v2.0.1...v2.1.0) (2022-03-06)
 
