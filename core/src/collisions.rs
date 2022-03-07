@@ -8,16 +8,19 @@ pub struct Collisions(HashSet<Entity>);
 
 impl Collisions {
     /// Returns the number of colliding entities.
+    #[must_use]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
     /// Returns `true` if the collisions contains the specified entity.
+    #[must_use]
     pub fn contains(&self, entity: &Entity) -> bool {
         self.0.contains(entity)
     }
 
     /// An iterator visiting all colliding entities in arbitrary order.
+    #[must_use]
     pub fn iter(&self) -> impl Iterator<Item = &Entity> {
         self.0.iter()
     }
