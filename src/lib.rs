@@ -146,9 +146,9 @@ pub mod prelude {
 
     #[allow(deprecated)]
     pub use crate::{
-        stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape, Damping,
-        Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem, PhysicsTime,
-        RigidBody, RotationConstraints, Velocity,
+        stage, Acceleration, AxisAngle, CollisionEvent, CollisionLayers, CollisionShape,
+        Collisions, Damping, Gravity, PhysicMaterial, PhysicsLayer, PhysicsPlugin, PhysicsSystem,
+        PhysicsTime, RigidBody, RotationConstraints, Velocity,
     };
 }
 
