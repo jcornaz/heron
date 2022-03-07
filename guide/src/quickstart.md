@@ -12,7 +12,7 @@ with this code. You should also add this to your projects's `Cargo.toml`:
 
 <!--- x-release-please-start-version --->
 ```toml
-heron = { version = "2.1.0", features = ["2d"] }
+heron = { version = "2.2.0", features = ["2d"] }
 ```
 <!--- x-release-please-end-version --->
 

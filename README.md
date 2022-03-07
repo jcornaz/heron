@@ -60,7 +60,7 @@ enum Layer {
 **For a 2d game:**
 <!--- x-release-please-start-version --->
 ```toml
-heron = { version = "2.1.0", features = ["2d"] }
+heron = { version = "2.2.0", features = ["2d"] }
 ```
 <!--- x-release-please-end-version --->
 
@@ -68,7 +68,7 @@ heron = { version = "2.1.0", features = ["2d"] }
 **For a 3d game:**
 <!--- x-release-please-start-version --->
 ```toml
-heron = { version = "2.1.0", features = ["3d"] }
+heron = { version = "2.2.0", features = ["3d"] }
 ```
 <!--- x-release-please-end-version --->
 

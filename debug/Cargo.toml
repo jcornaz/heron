@@ -1,6 +1,6 @@
 [package]
 name = "heron_debug"
-version = "2.1.0"
+version = "2.2.0"
 rust-version = "1.57"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
@@ -14,8 +14,8 @@ default = []
 3d = ["heron_rapier/3d", "bevy_prototype_debug_lines/3d"]
 
 [dependencies]
-heron_core = { version = "2.1.0", path = "../core" }
-heron_rapier = { version = "2.1.0", path = "../rapier" }
+heron_core = { version = "2.2.0", path = "../core" }
+heron_rapier = { version = "2.2.0", path = "../rapier" }
 bevy = { version = "0.6.0", default-features = false, features = ["render"] }
 bevy_prototype_lyon = { version = "0.4.0", optional = true }
 lyon_path = { version = "0.17.4", optional = true }
