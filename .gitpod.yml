@@ -1,0 +1,42 @@
+image:
+  file: .gitpod.Dockerfile
+
+tasks:
+  - name: example
+    init: |
+      gp sync-await update
+      cargo build --target wasm32-unknown-unknown --example demo
+    command: cargo run --target wasm32-unknown-unknown --example demo
+    
+  - name: test
+    init: |
+      cargo update
+      gp sync-done update
+      cargo test --all-features --workspace
+      cargo clippy --all-features --all-targets --workspace
+      cargo doc --all-features --no-deps --workspace
+    command: cargo watch -x 'test --all-features --workspace --tests' -x 'clippy --all-features --all-targets --workspace' -x 'doc --all-features --no-deps --workspace'
+
+vscode:
+  extensions:
+    - belfz.search-crates-io
+    - matklad.rust-analyzer
+    - serayuzgur.crates
+    - bungcip.better-toml
+
+ports:
+  - name: example (wasm)
+    port: 1334
+    visibility: private
+    onOpen: notify
+
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addCheck: true
+    addComment: false
+    addBadge: false
+    
