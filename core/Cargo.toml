@@ -14,7 +14,7 @@ all-features = true
 [features]
 default = []
 3d = []
-collision-from-mesh = ["bevy/render"]
+collision-from-mesh = ["bevy/bevy_render"]
 
 [dependencies]
 bevy = { version = "0.6.0", default-features = false }
@@ -23,7 +23,6 @@ smallvec = "1.8"
 
 [dev-dependencies]
 rstest = "0.12"
-bevy = { version = "0.6.0", default-features = false, features = ["render"] }
 
 [build-dependencies]
 cfg_aliases = "0.1.1"
