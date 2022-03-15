@@ -126,13 +126,13 @@ impl CollisionLayers {
     ///
     /// The entity, will not interact with anything
     #[must_use]
-    pub fn none() -> Self {
+    pub const fn none() -> Self {
         Self::from_bits(0, 0)
     }
 
     #[must_use]
     #[allow(missing_docs)]
-    pub fn from_bits(groups: u32, masks: u32) -> Self {
+    pub const fn from_bits(groups: u32, masks: u32) -> Self {
         Self { groups, masks }
     }
 
