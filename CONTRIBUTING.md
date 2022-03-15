@@ -26,21 +26,29 @@ You may (but don't have to) write a message in the issue to say you are working 
 
 ## Build from source
 
-This is a standard `cargo` setup, and you shouldn't be too surprised.
+This is a standard `cargo` workspace, and you shouldn't be too surprised.
 
-* Run the tests with: `cargo test --workspace`
+* Run the tests: `cargo test --workspace --all-features`
 * Run the demo: `cargo run --example demo --features "2d"`
 
 
 ## Coding standards
 
-As long as you run `cargo fmt` and clippy doesn't complain, you should be good to go ;-)
+Good API (minimized, ergonomic, extensible) and tested implementation is all I care about.
 
-When designing an API: 
+For the rest, simply use `cargo fmt` and `clippy`.
+
+
+### Design of new API 
 
 * Think about how it would look like if the physics engine was 100% made with bevy.
-* Consider Ergonomics/Simplicity/Safety *Before* considering too much the performances. (Although performances remains important)
-* Discuss the API in the issues.
+* Consider Ergonomics/Simplicity/Safety/Extensibility *before* considering too much the performances. (Even if performances remain important)
+* Consider how we will be able to extend the API in the future without breaking change
+  * Avoid public fields
+  * Don't leak implementation details
+  * Don't add more API than needed to solve the use-case at hand (YAGNI)
+* Discuss the API in the issues
+
 
 ### No breaking change
 
@@ -48,13 +56,15 @@ Please *add* new stuff without breaking the existing API. We may eventually depr
 
 The only exception to this rule is the update of a non-optional public dependency (bevy or rapier)
 
+In general breaking changes should be absolutely necessary and have a clear and significant benefits.
+If you don't see how to improve an API without breaking it, you can start a discussion in the issues.
+
 
 ## Open a pull request
 
 * Make sure the change is wanted by discussing it first in the [issues](https://github.com/jcornaz/heron)
 * Keep your pull request small, and split it in many smaller ones if necessary
-  * a pull request that solves only part of an issue, is perfectly fine.
-    It might still be merged and the issue split into many smaller ones.
+  * a pull request that solves only part of an issue, is perfectly fine
 * Write automated tests covering the new feature or fix
   * if you are not sure how to test your changes, open the pull request as Draft.
     I'll gladly help you to write the tests.
@@ -63,9 +73,6 @@ The only exception to this rule is the update of a non-optional public dependenc
   * explain what problem is solved (with a reference to an existing issue if applicable)
   * help to read and understand the code changes
   * point parts that requires special attention or consideration
-* Update the changelog `CHANGELOG.md`
 * Update documentation if necessary
-  * A guide has been started (but not yet published) in the `guide` directory. 
-  * It uses [mdbook](https://github.com/rust-lang/mdBook) (`cargo install mdbook`) and can be served with `mdbook serve guide`.
 
 **In case you are not sure about something, it is better to open a pull request early (as a draft) and discuss it ;-)**
