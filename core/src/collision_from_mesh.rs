@@ -47,6 +47,7 @@ impl Default for PendingConvexCollision {
 
 /// Generates collision and attaches physics body for all entities with [`PendingConvexCollision`].
 #[allow(deprecated)]
+#[allow(clippy::type_complexity)] // Do not warn about long query
 pub(super) fn pending_collision_system(
     mut commands: Commands<'_, '_>,
     added_scenes: Query<
