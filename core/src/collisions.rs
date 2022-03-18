@@ -128,16 +128,14 @@ mod tests {
         app.update();
 
         let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
-        assert_eq!(
-            collisions1.len(),
-            0,
+        assert!(
+            collisions1.is_empty(),
             "Colliding entity should be removed from the Collisions component when the collision ends"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
-        assert_eq!(
-            collisions2.len(),
-            0,
+        assert!(
+            collisions2.is_empty(),
             "Colliding entity should be removed from the Collisions component when the collision ends"
         );
     }
@@ -160,9 +158,8 @@ mod tests {
         app.update();
 
         let collisions = app.world.entity(entity).get::<Collisions>().unwrap();
-        assert_eq!(
-            collisions.len(),
-            0,
+        assert!(
+            collisions.is_empty(),
             "Despawned entity should be removed from the Collisions component"
         );
     }
