@@ -59,7 +59,7 @@ pub(super) fn update_collisions_system(
 
 /// Removes deleted entities from [`Collisions`] component because
 /// entity deletion doesn't emit [`CollisionEvent::Stopped`].
-/// It's an upstream issue, see https://github.com/dimforge/rapier/issues/299.
+/// It's an upstream [issue](https://github.com/dimforge/rapier/issues/299).
 pub(super) fn cleanup_collisions_system(
     removed_rigid_bodies: RemovedComponents<'_, RigidBody>,
     mut collisions: Query<'_, '_, &mut Collisions>,
