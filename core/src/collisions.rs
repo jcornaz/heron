@@ -33,7 +33,7 @@ impl Collisions {
 
 /// Adds entity to [`CollidingEntities`] on starting collision and removes from it when the
 /// collision end.
-pub(super) fn update_collisions(
+pub(super) fn update_collisions_system(
     mut collision_events: EventReader<'_, '_, CollisionEvent>,
     mut collisions: Query<'_, '_, &mut Collisions>,
 ) {
@@ -69,7 +69,7 @@ mod tests {
     fn collisions_update() {
         let mut app = App::new();
         app.add_event::<CollisionEvent>()
-            .add_system(update_collisions);
+            .add_system(update_collisions_system);
 
         let entity1 = app.world.spawn().insert(Collisions::default()).id();
         let entity2 = app.world.spawn().insert(Collisions::default()).id();
