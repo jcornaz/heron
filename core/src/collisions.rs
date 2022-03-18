@@ -66,7 +66,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn collisions_update() {
+    fn collisions_updates() {
         let mut app = App::new();
         app.add_event::<CollisionEvent>()
             .add_system(update_collisions_system);
@@ -94,7 +94,7 @@ mod tests {
         assert_eq!(
             collisions1.iter().next().unwrap(),
             &entity2,
-            "Colliding entity should be equal to second entity"
+            "Colliding entity should be equal to the second entity"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
@@ -102,7 +102,7 @@ mod tests {
         assert_eq!(
             collisions2.iter().next().unwrap(),
             &entity1,
-            "Colliding entity should be equal to second entity"
+            "Colliding entity should be equal to the first entity"
         );
 
         let mut collision_events = app
@@ -117,14 +117,16 @@ mod tests {
         assert_eq!(
             collisions1.len(),
             0,
-            "Colliding entity should be removed from the list when the collision ends"
+            "Colliding entity should be removed from the Collisions component when the collision ends"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
         assert_eq!(
             collisions2.len(),
             0,
-            "Colliding entity should be removed from the list when the collision ends"
+            "Colliding entity should be removed from the Collisions component when the collision ends"
+        );
+    }
         );
     }
 }
