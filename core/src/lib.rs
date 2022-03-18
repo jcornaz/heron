@@ -80,6 +80,7 @@ impl Plugin for CorePlugin {
             .register_type::<SensorShape>()
             .register_type::<Collisions>()
             .add_system(collisions::update_collisions_system)
+            .add_system_to_stage(CoreStage::PostUpdate, collisions::cleanup_collisions_system)
             .add_system_to_stage(CoreStage::First, PhysicsSteps::update)
             .add_stage_before(CoreStage::PostUpdate, crate::stage::ROOT, {
                 Schedule::default().with_stage(crate::stage::UPDATE, SystemStage::parallel())

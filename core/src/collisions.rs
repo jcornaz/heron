@@ -1,6 +1,6 @@
 use bevy::{prelude::*, utils::HashSet};
 
-use crate::CollisionEvent;
+use crate::{CollisionEvent, RigidBody};
 
 /// Component which will be filled (if present) with a list of entities with which the current entity is currently in contact.
 #[derive(Component, Default, Reflect)]
@@ -53,6 +53,20 @@ pub(super) fn update_collisions_system(
             if let Ok(mut entities) = collisions.get_mut(entity2) {
                 entities.0.remove(&entity1);
             }
+        }
+    }
+}
+
+/// Removes deleted entities from [`Collisions`] component because
+/// entity deletion doesn't emit [`CollisionEvent::Stopped`].
+/// It's an upstream issue, see https://github.com/dimforge/rapier/issues/299.
+pub(super) fn cleanup_collisions_system(
+    removed_rigid_bodies: RemovedComponents<'_, RigidBody>,
+    mut collisions: Query<'_, '_, &mut Collisions>,
+) {
+    for rigid_body in removed_rigid_bodies.iter() {
+        for mut colliding_entities in collisions.iter_mut() {
+            colliding_entities.0.remove(&rigid_body);
         }
     }
 }
@@ -127,6 +141,29 @@ mod tests {
             "Colliding entity should be removed from the Collisions component when the collision ends"
         );
     }
+
+    #[test]
+    fn collisions_react_on_entity_removal() {
+        let mut app = App::new();
+        app.add_event::<CollisionEvent>()
+            .add_system(cleanup_collisions_system);
+
+        let removing_entity = app.world.spawn().insert(RigidBody::Static).id();
+        let mut collisions = Collisions::default();
+        collisions.0.insert(removing_entity);
+        let entity = app.world.spawn().insert(collisions).id();
+
+        app.update();
+
+        app.world.entity_mut(removing_entity).despawn();
+
+        app.update();
+
+        let collisions = app.world.entity(entity).get::<Collisions>().unwrap();
+        assert_eq!(
+            collisions.len(),
+            0,
+            "Despawned entity should be removed from the Collisions component"
         );
     }
 }
