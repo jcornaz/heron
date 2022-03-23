@@ -26,8 +26,8 @@ impl Collisions {
     }
 
     /// An iterator visiting all colliding entities in arbitrary order.
-    pub fn iter(&self) -> impl Iterator<Item = &Entity> {
-        self.0.iter()
+    pub fn iter(&self) -> impl Iterator<Item = Entity> + '_ {
+        self.0.iter().copied()
     }
 }
 
@@ -107,7 +107,7 @@ mod tests {
         assert_eq!(collisions1.len(), 1, "There should be one colliding entity");
         assert_eq!(
             collisions1.iter().next().unwrap(),
-            &entity2,
+            entity2,
             "Colliding entity should be equal to the second entity"
         );
 
@@ -115,7 +115,7 @@ mod tests {
         assert_eq!(collisions2.len(), 1, "There should be one colliding entity");
         assert_eq!(
             collisions2.iter().next().unwrap(),
-            &entity1,
+            entity1,
             "Colliding entity should be equal to the first entity"
         );
 
