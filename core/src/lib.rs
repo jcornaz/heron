@@ -71,6 +71,7 @@ impl Plugin for CorePlugin {
             .init_resource::<PhysicsSteps>()
             .register_type::<CollisionShape>()
             .register_type::<RigidBody>()
+            .register_type::<RigidBodyDominance>()
             .register_type::<PhysicMaterial>()
             .register_type::<Velocity>()
             .register_type::<Acceleration>()
@@ -326,6 +327,32 @@ impl RigidBody {
             RigidBody::Static | RigidBody::Sensor | RigidBody::KinematicPositionBased => false,
         }
     }
+}
+
+/// Component that defines the dominance of the rigid body
+///
+/// When two dynamic rigid bodies collide, the body with the higher dominance will be treated with infinite mass (i.e. will not be pushed).
+/// This is particularly useful in player controller scenarios
+///
+/// It must be inserted on the same entity of a [`RigidBody`]
+///
+/// # Example
+///
+/// ```
+/// # use bevy::prelude::*;
+/// # use heron_core::*;
+/// fn spawn(mut commands: Commands) {
+///     commands.spawn_bundle(todo!("Spawn your sprite/mesh, incl. at least a GlobalTransform"))
+///         .insert(CollisionShape::Sphere { radius: 1.0 }) // Make a body (is dynamic by default)
+///         .insert(RigidBodyDominance {
+///             dominance: i8::MAX, // Define the dominance of the dynamic rigid body. Higher will dominate
+///         });
+/// }
+/// ```
+#[derive(Debug, Component, Copy, Clone, Default, Reflect)]
+pub struct RigidBodyDominance {
+    /// The dominance of the rigid body. The higher value in a collision will dominate
+    pub dominance: i8,
 }
 
 /// Mark the [`CollisionShape`] of the same entity as being a *sensor*.
