@@ -4,7 +4,7 @@ members = ["core", "debug", "rapier", "macros"]
 [package]
 name = "heron"
 version = "2.3.0"
-rust-version = "1.57"
+rust-version = "1.60"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
 license = "MIT"
