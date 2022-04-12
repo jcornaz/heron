@@ -1,4 +1,4 @@
-use bevy::{ecs::entity::Entity, math::Vec2};
+use bevy::{ecs::entity::Entity, math::Vec3};
 use smallvec::SmallVec;
 
 use crate::CollisionLayers;
@@ -38,7 +38,7 @@ pub struct CollisionData {
     rigid_body_entity: Entity,
     collision_shape_entity: Entity,
     collision_layers: CollisionLayers,
-    normals: SmallVec<[Vec2; 1]>,
+    normals: SmallVec<[Vec3; 1]>,
 }
 
 impl From<CollisionEvent> for (CollisionData, CollisionData) {
@@ -106,7 +106,7 @@ impl CollisionData {
         rigid_body_entity: Entity,
         collision_shape_entity: Entity,
         collision_layers: CollisionLayers,
-        normals: impl IntoIterator<Item = Vec2>,
+        normals: impl IntoIterator<Item = Vec3>,
     ) -> Self {
         Self {
             rigid_body_entity,
@@ -136,7 +136,7 @@ impl CollisionData {
 
     /// Returns the normal vector pointing toward this entity and away from the other entity
     #[must_use]
-    pub fn normals(&self) -> &[Vec2] {
+    pub fn normals(&self) -> &[Vec3] {
         &self.normals
     }
 }
