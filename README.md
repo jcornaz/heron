@@ -99,7 +99,7 @@ One must choose to use either `2d` or `3d`. If neither of the two features is en
 
 ## MSRV
 
-The minimum supported rust version is currently: `1.57`
+The minimum supported rust version is currently: `1.60`
 
 **It *may* be increased to a newer stable version in a minor release.** (but only if needed)
 
