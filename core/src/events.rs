@@ -1,4 +1,4 @@
-use bevy::{ecs::entity::Entity, math::Vec2};
+use bevy::{ecs::entity::Entity, math::Vec2, prelude::Reflect};
 use smallvec::SmallVec;
 
 use crate::CollisionLayers;
@@ -33,7 +33,7 @@ pub enum CollisionEvent {
 }
 
 /// Collision data concerning one of the two entity that collided
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Reflect)]
 pub struct CollisionData {
     rigid_body_entity: Entity,
     collision_shape_entity: Entity,
