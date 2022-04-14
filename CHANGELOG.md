@@ -8,6 +8,18 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+## [2.4.0](https://github.com/jcornaz/heron/compare/v2.3.0...v2.4.0) (2022-04-14)
+
+
+### Features
+
+* expose CollisionData in Collisions component ([#234](https://github.com/jcornaz/heron/issues/234)) ([96525d8](https://github.com/jcornaz/heron/commit/96525d8aad46b4a22361b046c6476e8c876cdc8f))
+
+
+### Documentation
+
+* **readme:** declare MSRV policy ([10b060b](https://github.com/jcornaz/heron/commit/10b060b44adbbc6b74e727e5f35e90de8d7d1d5d))
+
 ## [2.3.0](https://github.com/jcornaz/heron/compare/v2.2.0...v2.3.0) (2022-03-23)
 
 
