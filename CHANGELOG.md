@@ -20,6 +20,7 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 
 * **readme:** declare MSRV policy ([10b060b](https://github.com/jcornaz/heron/commit/10b060b44adbbc6b74e727e5f35e90de8d7d1d5d))
 
+
 ## [2.3.0](https://github.com/jcornaz/heron/compare/v2.2.0...v2.3.0) (2022-03-23)
 
 
