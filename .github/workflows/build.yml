@@ -101,8 +101,6 @@ jobs:
           toolchain: nightly
           override: true
           profile: minimal
-      - run: cargo --version
-      - run: rustc --version
       - run: cargo install cargo-udeps --locked
       - run: cargo udeps --workspace --all-features
 
