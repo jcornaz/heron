@@ -66,9 +66,10 @@ enum Layer {
 }
 ```
 
-## Get started
+## Documentation
 
-Read the documentation at: https://docs.rs/heron
+* [guide and reference](https://docs.rs/heron)
+* [changelog](CHANGELOG.md)
 
 
 ## MSRV
