@@ -23,6 +23,7 @@ pub extern crate rapier3d;
 
 use bevy::ecs::component::Component;
 use bevy::prelude::*;
+use bevy::transform::TransformSystem;
 #[cfg(dim2)]
 pub(crate) use rapier2d as rapier;
 #[cfg(dim3)]
@@ -143,7 +144,8 @@ fn step_systems() -> SystemSet {
         .with_system(
             body::update_bevy_transform
                 .label(PhysicsSystem::TransformUpdate)
-                .after(PhysicsSystem::Events),
+                .after(PhysicsSystem::Events)
+                .before(TransformSystem::TransformPropagate),
         )
         .with_system(
             velocity::update_velocity_component
@@ -155,4 +157,51 @@ fn step_systems() -> SystemSet {
                 .after(PhysicsSystem::Events)
                 .after(PhysicsSystem::VelocityUpdate),
         )
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+    use bevy::core::CorePlugin;
+    use heron_core::{RigidBody, *};
+
+    #[test]
+    fn updates_transform_before_transform_propagation() {
+        for _ in 0..10 {
+            let mut app = App::new();
+
+            app.add_plugin(CorePlugin)
+                .add_plugin(TransformPlugin)
+                .add_plugin(RapierPlugin::default())
+                .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)));
+
+            let child = app
+                .world
+                .spawn()
+                .insert_bundle((Transform::default(), GlobalTransform::default()))
+                .id();
+
+            let parent = app
+                .world
+                .spawn()
+                .insert_bundle((
+                    RigidBody::KinematicVelocityBased,
+                    CollisionShape::Sphere { radius: 1.0 },
+                    Velocity::from_linear(Vec3::X),
+                    Transform::default(),
+                    GlobalTransform::default(),
+                ))
+                .push_children(&[child])
+                .id();
+
+            app.update();
+
+            assert_eq!(
+                app.world.get::<GlobalTransform>(child).unwrap().translation,
+                Vec3::X
+            );
+        }
+    }
 }
