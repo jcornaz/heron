@@ -13,7 +13,7 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 
 ### Bug Fixes
 
-* children lagging behind when the parent rigid body is moved by physics ([#241](https://github.com/jcornaz/heron/issues/241)) ([a918dbc](https://github.com/jcornaz/heron/commit/a918dbc9d7d3ba3c4c97ee2c3ca26b1e9a567080))
+* children entities lagging behind when the parent is moved by physics ([#241](https://github.com/jcornaz/heron/issues/241)) ([a918dbc](https://github.com/jcornaz/heron/commit/a918dbc9d7d3ba3c4c97ee2c3ca26b1e9a567080))
 
 
 ### Documentation
@@ -21,7 +21,8 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 * document `collision-from-mesh` feature ([98aad5e](https://github.com/jcornaz/heron/commit/98aad5e9be82b5cd75f151583fd066e27566703a))
 * hide deprecated members ([8ae6fea](https://github.com/jcornaz/heron/commit/8ae6fea5e61ccd78448e08ac88ed120b1e67449c))
 * mention layers and `Collisions` component from the root crate doc ([1f1a9f5](https://github.com/jcornaz/heron/commit/1f1a9f5ae27dccaaf5866e889227d5775a34ab89))
-* **readme:** remove get started section and refer to docs.rs instead ([601b1a9](https://github.com/jcornaz/heron/commit/601b1a92a3a85af40e98f13ecb4145027168140e))
+* **readme:** replace "installation" and "feature flags" sections by a referenc to docs.rs ([601b1a9](https://github.com/jcornaz/heron/commit/601b1a92a3a85af40e98f13ecb4145027168140e))
+
 
 ## [2.4.0](https://github.com/jcornaz/heron/compare/v2.3.0...v2.4.0) (2022-04-14)
 
