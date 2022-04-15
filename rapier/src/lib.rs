@@ -165,7 +165,7 @@ mod tests {
 
     use super::*;
     use bevy::core::CorePlugin;
-    use heron_core::{RigidBody, *};
+    use heron_core::{CollisionShape, PhysicsSteps, RigidBody, Velocity};
 
     #[test]
     fn updates_transform_before_transform_propagation() {
@@ -183,8 +183,7 @@ mod tests {
                 .insert_bundle((Transform::default(), GlobalTransform::default()))
                 .id();
 
-            let parent = app
-                .world
+            app.world
                 .spawn()
                 .insert_bundle((
                     RigidBody::KinematicVelocityBased,
@@ -193,8 +192,7 @@ mod tests {
                     Transform::default(),
                     GlobalTransform::default(),
                 ))
-                .push_children(&[child])
-                .id();
+                .push_children(&[child]);
 
             app.update();
 
