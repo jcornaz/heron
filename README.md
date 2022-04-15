@@ -66,35 +66,9 @@ enum Layer {
 }
 ```
 
-## Installation
+## Get started
 
-
-**For a 2d game:**
-<!--- x-release-please-start-version --->
-```toml
-heron = { version = "2.4.0", features = ["2d"] }
-```
-<!--- x-release-please-end-version --->
-
-
-**For a 3d game:**
-<!--- x-release-please-start-version --->
-```toml
-heron = { version = "2.4.0", features = ["3d"] }
-```
-<!--- x-release-please-end-version --->
-
-
-## Feature flags
-
-One must choose to use either `2d` or `3d`. If neither of the two features is enabled, the `PhysicsPlugin` won't be available.
-
-* `collision-from-mesh` Add a component to generate convex hull collision for a mesh.
-* `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
-* `2d` Enable simulation only on the first 2 axes `x` and `y`.
-* `debug-2d` Render 2d collision shapes.
-* `debug-3d` Render 3d collision shapes.
-* `enhanced-determinism` Enable rapier's [enhanced-determinism](https://rapier.rs/docs/user_guides/rust/determinism)
+Read the documentation at: https://docs.rs/heron
 
 
 ## MSRV
