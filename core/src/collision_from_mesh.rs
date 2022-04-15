@@ -30,6 +30,7 @@ use crate::{CollisionLayers, CollisionShape, RigidBody};
 pub struct PendingConvexCollision {
     /// Rigid body type which will be assigned to every scene entity.
     #[deprecated(note = "Insert body type component into the entity with this component")]
+    #[doc(hidden)]
     pub body_type: RigidBody,
     /// Border radius that will be used for [`CollisionShape::ConvexHull`].
     pub border_radius: Option<f32>,
