@@ -21,11 +21,11 @@ jobs:
     strategy:
       matrix:
         crate:
-          - '.'
-          - 'core'
-          - 'rapier'
-          - 'debug'
-          - 'macros'
+          - "."
+          - "core"
+          - "rapier"
+          - "debug"
+          - "macros"
 
     defaults:
       run:
@@ -117,7 +117,6 @@ jobs:
           command: release-pr
           changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"perf","section":"Performance","hidden":false},{"type":"docs","section":"Documentation","hidden":false}]'
           extra-files: |
-            README.md
             src/lib.rs
             guide/src/quickstart.md
 
@@ -149,22 +148,22 @@ jobs:
           toolchain: stable
           override: true
           profile: minimal
-          
+
       - name: Publish heron_core
         run: cargo publish
         working-directory: core
-        
+
       - name: Publish heron_macros
         run: cargo publish
         working-directory: macros
-        
+
       - name: Publish heron_rapier
         run: sleep 30 && cargo publish
         working-directory: rapier
-        
+
       - name: Publish heron_debug
         run: sleep 30 && cargo publish
         working-directory: debug
-        
+
       - name: Publish heron
         run: sleep 30 && cargo publish
