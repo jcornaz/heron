@@ -121,10 +121,12 @@
 //! ## See also
 //!
 //! * How to define a [`RigidBody`]
-//! * How to choose a [`CollisionShape`]
+//! * How to add a [`CollisionShape`]
+//! * How to define [`CollisionLayers`]
 //! * How to define the world's [`Gravity`]
 //! * How to define the world's [`PhysicsTime`]
 //! * How to define the [`PhysicMaterial`]
+//! * How to get the current [`Collisions`]
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]
 //! * How to define [`CustomCollisionShape`] for [`heron_rapier`]
