@@ -33,7 +33,7 @@
 //!
 //! One must choose to use either `2d` or `3d`. If none of theses two features is enabled, the plugin won't be available.
 //!
-//! 
+//!
 //! * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
 //! * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
 //! * `debug-2d` Render 2d collision shapes
