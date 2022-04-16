@@ -86,7 +86,7 @@ pub(super) fn cleanup_collisions_system(
 
 #[cfg(test)]
 mod tests {
-    use bevy::app::Events;
+    use bevy::ecs::event::Events;
 
     use crate::{CollisionData, CollisionLayers};
 

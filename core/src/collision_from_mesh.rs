@@ -134,7 +134,7 @@ mod tests {
         asset::AssetPlugin,
         core::CorePlugin,
         prelude::shape::{Capsule, Cube},
-        render::{options::WgpuOptions, RenderPlugin},
+        render::{settings::WgpuSettings, RenderPlugin},
         window::WindowPlugin,
     };
 
@@ -145,7 +145,7 @@ mod tests {
 
     impl Plugin for HeadlessRenderPlugin {
         fn build(&self, app: &mut App) {
-            app.insert_resource(WgpuOptions {
+            app.insert_resource(WgpuSettings {
                 backends: None,
                 ..Default::default()
             })

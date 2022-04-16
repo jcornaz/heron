@@ -30,10 +30,10 @@ heron_core = { version = "2.4.1", path = "core" }
 heron_macros = { version = "2.4.1", path = "macros" }
 heron_rapier = { version = "2.4.1", path = "rapier" }
 # heron_debug = { version = "2.4.1", path = "debug", optional = true }
-bevy = { version = "0.6.0", default-features = false }
+bevy = { version = "0.7.0", default-features = false }
 
 [dev-dependencies]
-bevy = { version = "0.6.0", default-features = false, features=["bevy_sprite", "bevy_render", "bevy_core_pipeline", "x11"] }
+bevy = { version = "0.7.0", default-features = false, features=["bevy_sprite", "bevy_render", "bevy_core_pipeline", "x11"] }
 rstest = "0.12"
 
 [build-dependencies]
