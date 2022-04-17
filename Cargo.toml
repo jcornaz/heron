@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "rapier", "macros"]
+members = ["core", "rapier", "macros", "debug"]
 
 [package]
 name = "heron"
@@ -21,7 +21,7 @@ default = ["collision-from-mesh"]
 collision-from-mesh = ["heron_core/collision-from-mesh"]
 2d = ["heron_rapier/2d"]
 3d = ["heron_rapier/3d", "heron_core/3d"]
-# debug-2d = ["2d", "heron_debug/2d"]
+debug-2d = ["2d", "heron_debug/2d"]
 # debug-3d = ["3d", "heron_debug/3d"]
 enhanced-determinism = ["heron_rapier/enhanced-determinism"]
 
@@ -29,7 +29,7 @@ enhanced-determinism = ["heron_rapier/enhanced-determinism"]
 heron_core = { version = "2.4.1", path = "core" }
 heron_macros = { version = "2.4.1", path = "macros" }
 heron_rapier = { version = "2.4.1", path = "rapier" }
-# heron_debug = { version = "2.4.1", path = "debug", optional = true }
+heron_debug = { version = "2.4.1", path = "debug", optional = true }
 bevy = { version = "0.7.0", default-features = false }
 
 [dev-dependencies]
@@ -45,7 +45,7 @@ required-features = ["2d"]
 
 [[example]]
 name = "debug_2d"
-# required-features = ["debug-2d"]
+required-features = ["debug-2d"]
 
 [[example]]
 name = "debug_3d"
@@ -57,7 +57,7 @@ required-features = ["2d"]
 
 [[example]]
 name = "collision_shapes_in_child_entity"
-# required-features = ["debug-2d"]
+required-features = ["debug-2d"]
 
 [[example]]
 name = "layers"

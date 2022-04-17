@@ -52,7 +52,7 @@ vscode:
     - matklad.rust-analyzer
     - serayuzgur.crates
     - bungcip.better-toml
-    
+
 github:
   prebuilds:
     master: true
