@@ -13,28 +13,15 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 
 ### ⚠ BREAKING CHANGES
 
+* require bevy 0.7 (#244)
+* require rust 1.60 (#236)
 * make `CollisionData` use `Vec3` normals (instead of `Vec2`) (#238)
-* require rust 1.60
-* **deps:** remove the `debug-3d` feature
-
-### Features
-
-* avoid pulling unnecessary dependencies for `enhanced-determinism` ([#236](https://github.com/jcornaz/heron/issues/236)) ([cca0033](https://github.com/jcornaz/heron/commit/cca00330e9aa5e2f660c341afde6a8a916560388))
-
+* remove the `debug-3d` feature (#244)
 
 ### Bug Fixes
 
-* make `CollisionData` use `Vec3` normals (instead of `Vec2`) ([#238](https://github.com/jcornaz/heron/issues/238)) ([9993816](https://github.com/jcornaz/heron/commit/99938162a18a2386d605ba51dcc89576aa612b6e))
+* avoid pulling unnecessary dependencies for `enhanced-determinism` (#236)
 
-
-### Documentation
-
-* **readme:** add link to changelog ([7b72751](https://github.com/jcornaz/heron/commit/7b727512323d25ec1e45d27afe29c39ab45024ea))
-
-
-### chore
-
-* **deps:** require bevy 0.7 ([#244](https://github.com/jcornaz/heron/issues/244)) ([b75ffe2](https://github.com/jcornaz/heron/commit/b75ffe24bcf310018c387819560caab132d61bdf))
 
 ### [2.4.1](https://github.com/jcornaz/heron/compare/v2.4.0...v2.4.1) (2022-04-15)
 
