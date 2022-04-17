@@ -109,8 +109,7 @@ fn removal_stage() -> SystemStage {
 fn update_rapier_world_stage() -> SystemStage {
     SystemStage::parallel()
         .with_system(
-            bevy::transform::transform_propagate_system::transform_propagate_system
-                .label(InternalSystem::TransformPropagation),
+            bevy::transform::transform_propagate_system.label(InternalSystem::TransformPropagation),
         )
         .with_system(body::update_rapier_position.after(InternalSystem::TransformPropagation))
         .with_system(velocity::update_rapier_velocity)
