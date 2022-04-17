@@ -10,6 +10,18 @@
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
+
+## Design principles
+
+* Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
+* Provide a single API that works for both 2d and 3d.
+* Data oriented. Using this library should feel like its a part of [bevy].
+* Avoid asking the user to lookup in resources via *handles*. Data should be accessible and modifiable directly in components.
+* Hide the actual physics engine. This is an implementation detail the user shouldn't have to worry about.
+    * But, allow advanced users to access the underlying [rapier] resources, so the user is never blocked by a missing
+      element in the API of heron.
+
+
 ## What it looks like
 
 ```rust,no_run
@@ -54,55 +66,29 @@ enum Layer {
 }
 ```
 
-## Installation
+## Documentation
+
+* [guide and reference](https://docs.rs/heron)
+* [changelog](CHANGELOG.md)
 
 
-**For a 2d game:**
-<!--- x-release-please-start-version --->
-```toml
-heron = { version = "2.3.0", features = ["2d"] }
-```
-<!--- x-release-please-end-version --->
+## MSRV
 
+The minimum supported rust version is currently: `1.57`
 
-**For a 3d game:**
-<!--- x-release-please-start-version --->
-```toml
-heron = { version = "2.3.0", features = ["3d"] }
-```
-<!--- x-release-please-end-version --->
+**It *may* be increased to a newer stable version in a minor release.** (but only if needed)
+
+It *will* be increased to the latest stable version in a major release. (even if not needed)
 
 
 ## Supported Bevy Versions
 
 | bevy | heron      |
 |------|------------|
+| 0.7  | 3          |
 | 0.6  | 1 - 2      |
 | 0.5  | 0.4 - 0.13 |
 | 0.4  | 0.1 - 0.3  |
-
-## Design principles
-
-* Use [bevy] types, resources and components when possible (`Vec3`, `Quat`, `Transform`, `Events`, etc.)
-* Provide a single API that works for both 2d and 3d. (Like bevy does)
-* Data oriented. Using this library should feel like its a part of [bevy].
-* Avoid asking the user to lookup in resources via *handles*. Data should be accessible and modifiable directly in components.
-* Hide the actual physics engine. This is an implementation detail the user shouldn't have to worry about.
-    * But, allow advanced users to access the underlying [rapier] resources, so the user is never blocked by a missing
-      element in the API of heron.
-
-
-## Feature flags
-
-One must choose to use either `2d` or `3d`. If neither of the two features is enabled, the `PhysicsPlugin` won't be available.
-
-
-* `collision-from-mesh` Add a component to generate convex hull collision for a mesh.
-* `3d` Enable simulation on the 3 axes `x`, `y`, and `z`.
-* `2d` Enable simulation only on the first 2 axes `x` and `y`.
-* `debug-2d` Render 2d collision shapes.
-* `debug-3d` Render 3d collision shapes.
-* `enhanced-determinism` Enable rapier's [enhanced-determinism](https://rapier.rs/docs/user_guides/rust/determinism)
 
 
 ## How does this project compare to bevy_rapier?

@@ -5,46 +5,10 @@ tasks:
   - name: root
     init: |
       cargo update
-      gp sync-done update
-      cargo doc --all-features --no-deps
-      cargo clippy --all-features --all-targets
-      cargo test --all-features
-
-  - name: core
-    before: cd core
-    init: |
-      gp sync-await update
-      cargo doc --all-features --no-deps
-      cargo clippy --all-features --all-targets
-      cargo test --all-features
-    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
-
-  - name: debug
-    before: cd debug
-    init: |
-      gp sync-await update
-      cargo doc --all-features --no-deps
-      cargo clippy --all-features --all-targets
-      cargo test --all-features
-    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
-
-  - name: macros
-    before: cd macros
-    init: |
-      gp sync-await update
-      cargo doc --all-features --no-deps
-      cargo clippy --all-features --all-targets
-      cargo test --all-features
-    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
-
-  - name: rapier
-    before: cd rapier
-    init: |
-      gp sync-await update
-      cargo test --all-features
-      cargo clippy --all-features --all-targets
-      cargo doc --all-features --no-deps
-    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
+      cargo doc --all-features --workspace --no-deps
+      cargo clippy --all-features --workspace --all-targets
+      cargo test --all-features --workspace
+    command: cargo watch -x 'test --all-features --workspace' -x 'clippy --all-features --all-targets --workspace' -x 'doc --all-features --workspace --no-deps'
 
 vscode:
   extensions:
@@ -52,7 +16,7 @@ vscode:
     - matklad.rust-analyzer
     - serayuzgur.crates
     - bungcip.better-toml
-    
+
 github:
   prebuilds:
     master: true

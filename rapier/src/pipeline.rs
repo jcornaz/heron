@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use bevy::app::Events;
+use bevy::ecs::event::Events;
 use bevy::ecs::prelude::*;
 use bevy::ecs::system::SystemParam;
 use bevy::log::prelude::*;
