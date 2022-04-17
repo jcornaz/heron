@@ -23,6 +23,7 @@ pub extern crate rapier3d;
 
 use bevy::ecs::component::Component;
 use bevy::prelude::*;
+use bevy::transform::TransformSystem;
 #[cfg(dim2)]
 pub(crate) use rapier2d as rapier;
 #[cfg(dim3)]
@@ -108,8 +109,7 @@ fn removal_stage() -> SystemStage {
 fn update_rapier_world_stage() -> SystemStage {
     SystemStage::parallel()
         .with_system(
-            bevy::transform::transform_propagate_system::transform_propagate_system
-                .label(InternalSystem::TransformPropagation),
+            bevy::transform::transform_propagate_system.label(InternalSystem::TransformPropagation),
         )
         .with_system(body::update_rapier_position.after(InternalSystem::TransformPropagation))
         .with_system(velocity::update_rapier_velocity)
@@ -143,7 +143,8 @@ fn step_systems() -> SystemSet {
         .with_system(
             body::update_bevy_transform
                 .label(PhysicsSystem::TransformUpdate)
-                .after(PhysicsSystem::Events),
+                .after(PhysicsSystem::Events)
+                .before(TransformSystem::TransformPropagate),
         )
         .with_system(
             velocity::update_velocity_component
@@ -155,4 +156,49 @@ fn step_systems() -> SystemSet {
                 .after(PhysicsSystem::Events)
                 .after(PhysicsSystem::VelocityUpdate),
         )
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use super::*;
+    use bevy::core::CorePlugin;
+    use heron_core::{CollisionShape, PhysicsSteps, RigidBody, Velocity};
+
+    #[test]
+    fn updates_transform_before_transform_propagation() {
+        for _ in 0..10 {
+            let mut app = App::new();
+
+            app.add_plugin(CorePlugin)
+                .add_plugin(TransformPlugin)
+                .add_plugin(RapierPlugin::default())
+                .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)));
+
+            let child = app
+                .world
+                .spawn()
+                .insert_bundle((Transform::default(), GlobalTransform::default()))
+                .id();
+
+            app.world
+                .spawn()
+                .insert_bundle((
+                    RigidBody::KinematicVelocityBased,
+                    CollisionShape::Sphere { radius: 1.0 },
+                    Velocity::from_linear(Vec3::X),
+                    Transform::default(),
+                    GlobalTransform::default(),
+                ))
+                .push_children(&[child]);
+
+            app.update();
+
+            assert_eq!(
+                app.world.get::<GlobalTransform>(child).unwrap().translation,
+                Vec3::X
+            );
+        }
+    }
 }
