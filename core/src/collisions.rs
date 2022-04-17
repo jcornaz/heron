@@ -105,10 +105,7 @@ mod tests {
             CollisionData::new(entity1, Entity::from_raw(0), CollisionLayers::default(), []);
         let collision_data2 =
             CollisionData::new(entity2, Entity::from_raw(0), CollisionLayers::default(), []);
-        let mut collision_events = app
-            .world
-            .get_resource_mut::<Events<CollisionEvent>>()
-            .unwrap();
+        let mut collision_events = app.world.resource_mut::<Events<CollisionEvent>>();
         collision_events.send(CollisionEvent::Started(
             collision_data1.clone(),
             collision_data2.clone(),
@@ -144,10 +141,7 @@ mod tests {
             "Colliding entity data should be equal to the first collision data"
         );
 
-        let mut collision_events = app
-            .world
-            .get_resource_mut::<Events<CollisionEvent>>()
-            .unwrap();
+        let mut collision_events = app.world.resource_mut::<Events<CollisionEvent>>();
         collision_events.send(CollisionEvent::Stopped(collision_data1, collision_data2));
 
         app.update();

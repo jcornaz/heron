@@ -66,11 +66,6 @@ pub struct RigidBodyHandle(dynamics::RigidBodyHandle);
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Component)]
 pub struct ColliderHandle(geometry::ColliderHandle);
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash, SystemLabel)]
-enum InternalSystem {
-    TransformPropagation,
-}
-
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin)
@@ -108,10 +103,10 @@ fn removal_stage() -> SystemStage {
 
 fn update_rapier_world_stage() -> SystemStage {
     SystemStage::parallel()
+        .with_system(bevy::transform::transform_propagate_system)
         .with_system(
-            bevy::transform::transform_propagate_system.label(InternalSystem::TransformPropagation),
+            body::update_rapier_position.after(bevy::transform::transform_propagate_system),
         )
-        .with_system(body::update_rapier_position.after(InternalSystem::TransformPropagation))
         .with_system(velocity::update_rapier_velocity)
         .with_system(acceleration::update_rapier_force_and_torque)
         .with_system(damping::update_rapier_damping)

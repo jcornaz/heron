@@ -46,8 +46,8 @@ fn can_use_child_entity_for_the_collision_shape() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
+    let colliders = app.world.resource::<ColliderSet>();
 
     assert_eq!(bodies.len(), 1);
     assert_eq!(colliders.len(), 1);
@@ -102,7 +102,7 @@ fn can_change_the_position_of_a_shape_inserted_in_child_entity() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
 
     let (_, collider) = colliders.iter().next().unwrap();
 
@@ -138,7 +138,7 @@ fn updating_local_transform_of_a_rigid_body_doesnt_affect_the_shape() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
 
     let (_, collider) = colliders.iter().next().unwrap();
 
