@@ -33,7 +33,7 @@ heron_rapier = { version = "2.4.1", path = "rapier" }
 bevy = { version = "0.7.0", default-features = false }
 
 [dev-dependencies]
-bevy = { version = "0.7.0", default-features = false, features=["bevy_sprite", "bevy_render", "bevy_core_pipeline", "x11"] }
+bevy = { version = "0.7.0", default-features = false, features=["bevy_sprite", "bevy_render", "bevy_core_pipeline", "x11", "bevy_pbr"] }
 rstest = "0.12"
 
 [build-dependencies]

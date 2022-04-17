@@ -8,7 +8,7 @@ fn main() {
         .insert_resource(Gravity::from(Vec3::new(0., -9.81, 0.)))
         .add_plugins(DefaultPlugins)
         .add_plugin(PhysicsPlugin::default())
-        .add_startup_system(setup.system())
+        .add_startup_system(setup)
         .run();
 }
 

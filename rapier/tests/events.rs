@@ -2,10 +2,10 @@
 
 use std::time::Duration;
 
-use bevy::app::{Events, ManualEventReader};
-use bevy::core::CorePlugin;
+use bevy::ecs::event::ManualEventReader;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::{core::CorePlugin, ecs::event::Events};
 use rstest::*;
 
 use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
@@ -26,7 +26,7 @@ fn test_app() -> App {
         .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
-            bevy::transform::transform_propagate_system::transform_propagate_system,
+            bevy::transform::transform_propagate_system,
         );
     builder
 }
