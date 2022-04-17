@@ -9,6 +9,7 @@ tasks:
       cargo doc --all-features --no-deps
       cargo clippy --all-features --all-targets
       cargo test --all-features
+    command: cargo watch -x 'test --all-features' -x 'clippy --all-features --all-targets' -x 'doc --all-features --no-deps'
 
   - name: core
     before: cd core
