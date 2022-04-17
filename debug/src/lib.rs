@@ -18,12 +18,6 @@ use heron_core::RigidBody;
 #[cfg(all(feature = "2d", not(feature = "3d")))]
 mod dim2;
 
-#[cfg(feature = "3d")]
-mod dim3;
-
-#[cfg(feature = "3d")]
-mod shape3d_wireframe;
-
 /// Plugin that enables rendering of collision shapes
 #[derive(Debug, Copy, Clone, Default)]
 pub struct DebugPlugin(DebugColor);
