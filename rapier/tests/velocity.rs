@@ -48,7 +48,7 @@ fn body_is_created_with_velocity(#[case] body_type: RigidBody) {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(
@@ -102,7 +102,7 @@ fn velocity_may_be_added_after_creating_the_body(#[case] body_type: RigidBody) {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(

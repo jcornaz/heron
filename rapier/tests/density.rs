@@ -40,7 +40,7 @@ fn bodies_are_created_with_a_default_density() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -75,7 +75,7 @@ fn bodies_are_created_with_defined_density() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -111,7 +111,7 @@ fn density_can_be_updated_after_creation() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world

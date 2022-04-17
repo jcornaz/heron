@@ -26,10 +26,7 @@ fn can_define_gravity_before_plugin() {
         builder
     };
 
-    assert_eq!(
-        Vec3::Y,
-        app.world.get_resource::<Gravity>().unwrap().vector()
-    );
+    assert_eq!(Vec3::Y, app.world.resource::<Gravity>().vector());
 }
 
 #[test]
@@ -46,10 +43,7 @@ fn can_define_time_scale_before_plugin() {
         builder
     };
 
-    assert_eq!(
-        0.5,
-        app.world.get_resource::<PhysicsTime>().unwrap().scale()
-    );
+    assert_eq!(0.5, app.world.resource::<PhysicsTime>().scale());
 }
 
 #[test]

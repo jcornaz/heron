@@ -60,7 +60,7 @@ fn sets_the_collision_groups() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world
@@ -98,7 +98,7 @@ fn updates_the_collision_groups() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world
@@ -135,7 +135,7 @@ fn restore_the_collision_groups_on_removal() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world

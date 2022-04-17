@@ -39,7 +39,7 @@ fn create_dynamic_body() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -68,7 +68,7 @@ fn create_static_body() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -97,7 +97,7 @@ fn create_kinematic_position_based_body() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -126,7 +126,7 @@ fn create_kinematic_velocity_based_body() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -155,7 +155,7 @@ fn create_sensor_body() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let body = colliders
         .get(
             app.world
@@ -189,7 +189,7 @@ fn can_change_to_static_after_creation() {
     app.update();
 
     {
-        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+        let bodies = app.world.resource::<RigidBodySet>();
         let body = bodies
             .get(
                 app.world
@@ -224,7 +224,7 @@ fn can_change_to_sensor_after_creation() {
     app.update();
 
     {
-        let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+        let colliders = app.world.resource::<ColliderSet>();
         let collider = colliders
             .get(
                 app.world
@@ -259,7 +259,7 @@ fn can_change_to_dynamic_after_creation() {
     app.update();
 
     {
-        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+        let bodies = app.world.resource::<RigidBodySet>();
         let body = bodies
             .get(
                 app.world

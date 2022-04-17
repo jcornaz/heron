@@ -170,7 +170,7 @@ mod tests {
         app.add_plugin(HeadlessRenderPlugin)
             .add_system(pending_collision_system);
 
-        let mut meshes = app.world.get_resource_mut::<Assets<Mesh>>().unwrap();
+        let mut meshes = app.world.resource_mut::<Assets<Mesh>>();
         let cube = meshes.add(Cube::default().into());
         let capsule = meshes.add(Capsule::default().into());
 
@@ -210,7 +210,7 @@ mod tests {
             "Entities with mesh handles should have rigid bodies and collision shapes after update"
         );
 
-        let meshes = app.world.get_resource::<Assets<Mesh>>().unwrap();
+        let meshes = app.world.resource::<Assets<Mesh>>();
         for (mesh_handle, body_type, collision_shape, collision_layers) in query.iter(&app.world) {
             assert_eq!(
                 *body_type, BODY_TYPE,

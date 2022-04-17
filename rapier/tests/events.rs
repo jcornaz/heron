@@ -74,11 +74,7 @@ fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody
             .x += 30.0;
     }
 
-    let mut event_reader = app
-        .world
-        .get_resource::<Events<CollisionEvent>>()
-        .unwrap()
-        .get_reader();
+    let mut event_reader = app.world.resource::<Events<CollisionEvent>>().get_reader();
 
     let mut events = vec![];
 
@@ -151,6 +147,6 @@ fn collect_events(
     app: &App,
     reader: &mut ManualEventReader<CollisionEvent>,
 ) -> Vec<CollisionEvent> {
-    let events = app.world.get_resource::<Events<CollisionEvent>>().unwrap();
+    let events = app.world.resource::<Events<CollisionEvent>>();
     reader.iter(events).cloned().collect()
 }
