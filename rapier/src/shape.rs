@@ -334,6 +334,9 @@ fn heightfield_builder(size: Vec2, heights: &[Vec<f32>]) -> ColliderBuilder {
 
 #[cfg(test)]
 mod tests {
+    use std::mem;
+
+    use approx::assert_ulps_eq;
     use bevy::math::Vec3;
 
     use heron_core::CustomCollisionShape;
@@ -350,7 +353,7 @@ mod tests {
             .shape()
             .as_ball()
             .expect("Created shape was not a ball");
-        assert_eq!(ball.radius, 4.2);
+        assert_ulps_eq!(ball.radius, 4.2);
     }
 
     #[test]
@@ -367,11 +370,11 @@ mod tests {
             .as_cuboid()
             .expect("Created shape was not a cuboid");
 
-        assert_eq!(cuboid.half_extents.x, 1.0);
-        assert_eq!(cuboid.half_extents.y, 2.0);
+        assert_ulps_eq!(cuboid.half_extents.x, 1.0);
+        assert_ulps_eq!(cuboid.half_extents.y, 2.0);
 
         #[cfg(dim3)]
-        assert_eq!(cuboid.half_extents.z, 3.0);
+        assert_ulps_eq!(cuboid.half_extents.z, 3.0);
     }
 
     #[test]
@@ -388,16 +391,16 @@ mod tests {
             .as_capsule()
             .expect("Created shape was not a capsule");
 
-        assert_eq!(capsule.radius, 5.0);
-        assert_eq!(capsule.segment.a.x, 0.0);
-        assert_eq!(capsule.segment.b.x, 0.0);
-        assert_eq!(capsule.segment.a.y, -10.0);
-        assert_eq!(capsule.segment.b.y, 10.0);
+        assert_ulps_eq!(capsule.radius, 5.0);
+        assert_ulps_eq!(capsule.segment.a.x, 0.0);
+        assert_ulps_eq!(capsule.segment.b.x, 0.0);
+        assert_ulps_eq!(capsule.segment.a.y, -10.0);
+        assert_ulps_eq!(capsule.segment.b.y, 10.0);
 
         #[cfg(dim3)]
-        assert_eq!(capsule.segment.a.z, 0.0);
+        assert_ulps_eq!(capsule.segment.a.z, 0.0);
         #[cfg(dim3)]
-        assert_eq!(capsule.segment.b.z, 0.0);
+        assert_ulps_eq!(capsule.segment.b.z, 0.0);
     }
 
     #[test]
@@ -429,8 +432,8 @@ mod tests {
                 field.scale(),
                 &crate::rapier::na::Vector3::new(2.0, 1.0, 1.0)
             );
-            assert_eq!(field.cell_height(), 1.0);
-            assert_eq!(field.cell_width(), 1.0);
+            assert_ulps_eq!(field.cell_height(), 1.0);
+            assert_ulps_eq!(field.cell_width(), 1.0);
         }
     }
 
@@ -446,7 +449,7 @@ mod tests {
             .shape()
             .as_ball()
             .expect("Created shape was not a ball");
-        assert_eq!(ball.radius, 4.2);
+        assert_ulps_eq!(ball.radius, 4.2);
     }
 
     #[test]
@@ -454,9 +457,11 @@ mod tests {
         expected = "Unsupported custom collision shape is used: CustomCollisionShape(())"
     )]
     fn build_custom_unsupported() {
-        let _ = CollisionShape::Custom {
-            shape: CustomCollisionShape::new(()),
-        }
-        .collider_builder();
+        mem::drop(
+            CollisionShape::Custom {
+                shape: CustomCollisionShape::new(()),
+            }
+            .collider_builder(),
+        );
     }
 }

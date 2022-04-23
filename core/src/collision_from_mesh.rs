@@ -147,7 +147,7 @@ mod tests {
         fn build(&self, app: &mut App) {
             app.insert_resource(WgpuSettings {
                 backends: None,
-                ..Default::default()
+                ..WgpuSettings::default()
             })
             .add_plugin(CorePlugin::default())
             .add_plugin(WindowPlugin::default())

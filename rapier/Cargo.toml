@@ -27,6 +27,7 @@ crossbeam = "0.8.0"
 
 [dev-dependencies]
 rstest = "0.12"
+approx = "0.5.1"
 
 [build-dependencies]
 cfg_aliases = "0.1.1"
