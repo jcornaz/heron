@@ -11,8 +11,7 @@ use crate::utils::NearZero;
 ///
 /// It must be inserted on the same entity of a [`RigidBody`](crate::RigidBody)
 ///
-/// The linear part is in "unit" per second on each axis, represented as a `Vec3`. (The unit, being your game unit, be it pixel or anything else)
-/// The angular part is in radians per second around an axis, represented as a `Quat`.
+/// This component can be used for controlling and reading the velocity of the rigid body.
 ///
 /// # Example
 ///
@@ -33,6 +32,8 @@ use crate::utils::NearZero;
 #[derive(Debug, Component, Copy, Clone, PartialEq, Default, Reflect)]
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
+    ///
+    /// (The unit, being your game unit, be it pixel or anything else)
     pub linear: Vec3,
 
     /// Angular velocity in radians-per-second around an axis
