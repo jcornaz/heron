@@ -33,7 +33,7 @@ use crate::utils::NearZero;
 pub struct Velocity {
     /// Linear velocity in units-per-second on each axis
     ///
-    /// (The unit, being your game unit, be it pixel or anything else)
+    /// The unit is your game unit, be it meter, pixel or anything else
     pub linear: Vec3,
 
     /// Angular velocity in radians-per-second around an axis
