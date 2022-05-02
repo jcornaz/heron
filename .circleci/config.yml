@@ -1,0 +1,68 @@
+version: 2.1
+
+workflows:
+  ci:
+    jobs:
+      - test-core
+      - test-macros
+      - test-rapier
+      - test-debug
+      - test-root
+
+jobs:
+  test-core:
+    docker:
+      - image: cimg/rust
+    steps:
+      - checkout
+      - run: cargo test --no-default-features
+      - run: cargo test --no-default-features --features collision-from-mesh
+      - run: cargo test --no-default-features --features 3d
+      - run: cargo test
+      - run: cargo test --all-features
+      - run: cargo test --all-features -- --ignored
+  test-macros:
+    docker:
+      - image: cimg/rust
+    steps:
+      - checkout
+      - run: cargo test --no-default-features
+      - run: cargo test
+      - run: cargo test --all-features
+      - run: cargo test --all-features -- --ignored
+  test-rapier:
+    docker:
+      - image: cimg/rust
+    steps:
+      - checkout
+      - run: cargo test --no-default-features
+      - run: cargo test --no-default-features --features 2d
+      - run: cargo test --no-default-features --features 3d
+      - run: cargo test --no-default-features --features enhanced-determinism
+      - run: cargo test
+      - run: cargo test --all-features
+      - run: cargo test --all-features -- --ignored
+  test-debug:
+    docker:
+      - image: cimg/rust
+    steps:
+      - checkout
+      - run: cargo test --no-default-features
+      - run: cargo test --no-default-features --features 2d
+      - run: cargo test
+      - run: cargo test --all-features
+      - run: cargo test --all-features -- --ignored
+  test-root:
+    docker:
+      - image: cimg/rust
+    steps:
+      - checkout
+      - run: cargo test --no-default-features
+      - run: cargo test --no-default-features --features collision-from-mesh
+      - run: cargo test --no-default-features --features 2d
+      - run: cargo test --no-default-features --features 3d
+      - run: cargo test --no-default-features --features enhanced-determinism
+      - run: cargo test --no-default-features --features debug-2d
+      - run: cargo test
+      - run: cargo test --all-features
+      - run: cargo test --all-features -- --ignored      
