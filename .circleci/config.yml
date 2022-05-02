@@ -4,10 +4,21 @@ workflows:
   ci:
     jobs:
       - test-core
-      - test-macros
-      - test-rapier
-      - test-debug
-      - test-root
+      - test-macros:
+          requires:
+            - test-core
+      - test-rapier:
+          requires:
+            - test-core
+      - test-debug:
+          requires:
+            - test-core
+            - test-rapier
+      - test-root:
+          requires:
+            - test-core
+            - test-rapier
+            - test-debug
 
 executors:
   rust:
@@ -25,18 +36,30 @@ jobs:
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
   test-macros:
     executor: rust
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run: cargo test --no-default-features
       - run: cargo test
       - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
+      - run: cargo test --all-features -- --ignored   
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
   test-rapier:
     executor: rust
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features 2d
       - run: cargo test --no-default-features --features 3d
@@ -44,19 +67,31 @@ jobs:
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
   test-debug:
     executor: rust
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features 2d
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
   test-root:
     executor: rust
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features collision-from-mesh
       - run: cargo test --no-default-features --features 2d
