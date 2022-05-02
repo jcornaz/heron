@@ -4,18 +4,10 @@ workflows:
   ci:
     jobs:
       - test-root
-      - test-core:
-          requires:
-            - test-root
-      - test-macros:
-          requires:
-            - test-root
-      - test-rapier:
-          requires:
-            - test-root
-      - test-debug:
-          requires:
-            - test-root
+      - test-core
+      - test-macros
+      - test-rapier
+      - test-debug
 
 executors:
   rust:
@@ -29,7 +21,7 @@ jobs:
       - checkout
       - run: cargo update
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-root-{{ checksum "Cargo.lock" }}
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features collision-from-mesh
       - run: cargo test --no-default-features --features 2d
@@ -38,50 +30,53 @@ jobs:
       - run: cargo test --no-default-features --features debug-2d
       - run: cargo test
       - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored   
+      - run: cargo test --all-features -- --ignored
       - save_cache:
           paths:
             - ~/.cargo
-          key: cargo-{{ checksum "Cargo.lock" }}
-      - persist_to_workspace:
-          root: .
-          paths:
             - target
-            - Cargo.lock
+          key: cargo-root-{{ checksum "Cargo.lock" }}
   test-core:
     executor: rust
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - run: cargo update
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-core-{{ checksum "Cargo.lock" }}
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features collision-from-mesh
       - run: cargo test --no-default-features --features 3d
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - target
+          key: cargo-core-{{ checksum "Cargo.lock" }}
   test-macros:
     executor: rust
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - run: cargo update
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-macros-{{ checksum "Cargo.lock" }}
       - run: cargo test --no-default-features
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - target
+          key: cargo-macros-{{ checksum "Cargo.lock" }}
   test-rapier:
     executor: rust
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - run: cargo update
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-rapier-{{ checksum "Cargo.lock" }}
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features 2d
       - run: cargo test --no-default-features --features 3d
@@ -89,16 +84,25 @@ jobs:
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - target
+          key: cargo-rapier-{{ checksum "Cargo.lock" }}
   test-debug:
     executor: rust
     steps:
       - checkout
-      - attach_workspace:
-          at: .
+      - run: cargo update
       - restore_cache:
-          key: cargo-{{ checksum "Cargo.lock" }}
+          key: cargo-debug{{ checksum "Cargo.lock" }}
       - run: cargo test --no-default-features
       - run: cargo test --no-default-features --features 2d
       - run: cargo test
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
+      - save_cache:
+          paths:
+            - ~/.cargo
+            - target
+          key: cargo-debug-{{ checksum "Cargo.lock" }}
