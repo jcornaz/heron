@@ -9,10 +9,14 @@ workflows:
       - test-debug
       - test-root
 
+executors:
+  rust:
+    docker:
+      - image: cimgcimg/rust:1.60
+      
 jobs:
   test-core:
-    docker:
-      - image: cimg/rust
+    executor: rust
     steps:
       - checkout
       - run: cargo test --no-default-features
@@ -22,8 +26,7 @@ jobs:
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
   test-macros:
-    docker:
-      - image: cimg/rust
+    executor: rust
     steps:
       - checkout
       - run: cargo test --no-default-features
@@ -31,8 +34,7 @@ jobs:
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
   test-rapier:
-    docker:
-      - image: cimg/rust
+    executor: rust
     steps:
       - checkout
       - run: cargo test --no-default-features
@@ -43,8 +45,7 @@ jobs:
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
   test-debug:
-    docker:
-      - image: cimg/rust
+    executor: rust
     steps:
       - checkout
       - run: cargo test --no-default-features
@@ -53,8 +54,7 @@ jobs:
       - run: cargo test --all-features
       - run: cargo test --all-features -- --ignored
   test-root:
-    docker:
-      - image: cimg/rust
+    executor: rust
     steps:
       - checkout
       - run: cargo test --no-default-features
