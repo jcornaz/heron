@@ -3,11 +3,8 @@ version: 2.1
 workflows:
   ci:
     jobs:
-      - test-root
-      - test-core
-      - test-macros
-      - test-rapier
-      - test-debug
+      - test
+      - code-style
 
 executors:
   rust:
@@ -15,94 +12,23 @@ executors:
       - image: cimg/rust:1.60
       
 jobs:
-  test-root:
+  test:
     executor: rust
     steps:
       - checkout
-      - run: cargo update
-      - restore_cache:
-          key: cargo-root-{{ checksum "Cargo.lock" }}
-      - run: cargo test --no-default-features
-      - run: cargo test --no-default-features --features collision-from-mesh
-      - run: cargo test --no-default-features --features 2d
-      - run: cargo test --no-default-features --features 3d
-      - run: cargo test --no-default-features --features enhanced-determinism
-      - run: cargo test --no-default-features --features debug-2d
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - target
-          key: cargo-root-{{ checksum "Cargo.lock" }}
-  test-core:
+      - run: cargo test --workspace --no-default-features
+      - run: cargo test --workspace --no-default-features --features collision-from-mesh
+      - run: cargo test --workspace --no-default-features --features 2d
+      - run: cargo test --workspace --no-default-features --features 3d
+      - run: cargo test --workspace --no-default-features --features enhanced-determinism
+      - run: cargo test --workspace --no-default-features --features debug-2d
+      - run: cargo test --workspace 
+      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features -- --ignored
+      - run: cargo doc --workspace --all-features --no-deps
+  code-style:
     executor: rust
     steps:
       - checkout
-      - run: cargo update
-      - restore_cache:
-          key: cargo-core-{{ checksum "Cargo.lock" }}
-      - run: cargo test --no-default-features
-      - run: cargo test --no-default-features --features collision-from-mesh
-      - run: cargo test --no-default-features --features 3d
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - target
-          key: cargo-core-{{ checksum "Cargo.lock" }}
-  test-macros:
-    executor: rust
-    steps:
-      - checkout
-      - run: cargo update
-      - restore_cache:
-          key: cargo-macros-{{ checksum "Cargo.lock" }}
-      - run: cargo test --no-default-features
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - target
-          key: cargo-macros-{{ checksum "Cargo.lock" }}
-  test-rapier:
-    executor: rust
-    steps:
-      - checkout
-      - run: cargo update
-      - restore_cache:
-          key: cargo-rapier-{{ checksum "Cargo.lock" }}
-      - run: cargo test --no-default-features
-      - run: cargo test --no-default-features --features 2d
-      - run: cargo test --no-default-features --features 3d
-      - run: cargo test --no-default-features --features enhanced-determinism
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - target
-          key: cargo-rapier-{{ checksum "Cargo.lock" }}
-  test-debug:
-    executor: rust
-    steps:
-      - checkout
-      - run: cargo update
-      - restore_cache:
-          key: cargo-debug{{ checksum "Cargo.lock" }}
-      - run: cargo test --no-default-features
-      - run: cargo test --no-default-features --features 2d
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --all-features -- --ignored
-      - save_cache:
-          paths:
-            - ~/.cargo
-            - target
-          key: cargo-debug-{{ checksum "Cargo.lock" }}
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --all-features --workspace
