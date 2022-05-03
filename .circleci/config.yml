@@ -3,12 +3,28 @@ version: 2.1
 workflows:
   ci:
     jobs:
-      - test
-      - test-2d
-      - test-3d
-      - test-enhanced-determinism
-      - test-debug-2d
-      - documentation
+      - build
+      - test-no-feature:
+          requires:
+            - build
+      - test-all-features:
+          requires:
+            - build
+      - test-2d:
+          requires:
+            - build
+      - test-3d:
+          requires:
+            - build
+      - test-enhanced-determinism:
+          requires:
+            - build
+      - test-debug-2d:
+          requires:
+            - build
+      - documentation:
+          requires:
+            - build
       - code-style
 
 executors:
@@ -17,43 +33,84 @@ executors:
       - image: cimg/rust:1.60
       
 jobs:
-  test:
+  build:
     executor: rust
     steps:
       - checkout
+      - run: cargo update
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
+      - run: cargo build --workspace --all-features
+      - save_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
+          paths:
+            - ~/.cargo
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+  test-no-feature:
+    executor: rust
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test --workspace --no-default-features
-      - run: cargo test --workspace 
+      - run: cargo test --workspace
+  test-all-features:
+    executor: rust
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test --workspace --all-features
       - run: cargo test --workspace --all-features -- --ignored
   test-2d:
     executor: rust
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test -p heron_rapier --no-default-features --features 2d
       - run: cargo test -p heron_debug --no-default-features --features 2d
       - run: cargo test --no-default-features --features 2d
   test-3d:
     executor: rust
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test -p heron_core --no-default-features --features 3d
       - run: cargo test -p heron_rapier --no-default-features --features 3d
       - run: cargo test --no-default-features --features 3d
   test-enhanced-determinism:
     executor: rust
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test -p heron_rapier --no-default-features --features enhanced-determinism
       - run: cargo test --no-default-features --features enhanced-determinism
   test-debug-2d:
     executor: rust
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo test --no-default-features --features debug-2d
   documentation:
     executor: rust
     steps:
-      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: cargo-v1-{{ checksum "Cargo.toml" }}
       - run: cargo doc --workspace --all-features --no-deps
   code-style:
     executor: rust
