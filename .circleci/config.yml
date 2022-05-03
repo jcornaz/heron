@@ -12,7 +12,9 @@ workflows:
       - test-collision-from-mesh
       - documentation
       - code-style
-
+      - unwanted-dependencies
+      - unused-dependencies
+      
 jobs:
   test-no-feature:
     executor: rust
