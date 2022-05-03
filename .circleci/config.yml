@@ -13,13 +13,6 @@ workflows:
       - documentation
       - code-style
 
-executors:
-  rust:
-    docker:
-      - image: cimg/rust:1.60
-    environment:
-        RUSTFLAGS: "-D warnings"
-
 jobs:
   test-no-feature:
     executor: rust
@@ -77,3 +70,23 @@ jobs:
       - checkout
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-features --workspace
+  unwanted-dependencies:
+    executor: rust
+    steps:
+      - checkout
+      - run: cargo install cargo-deny --locked
+      - run: cargo deny check
+  unused-dependencies:
+    executor: rust
+    steps:
+      - checkout
+      - run: rustup toolchain install nightly
+      - run: cargo install cargo-udeps --locked
+      - run: cargo +nightly udeps --workspace --all-features
+
+executors:
+  rust:
+    docker:
+      - image: cimg/rust:1.60
+    environment:
+        RUSTFLAGS: "-D warnings"
