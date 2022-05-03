@@ -18,6 +18,7 @@ workflows:
 jobs:
   test-no-feature:
     executor: rust
+    resource_class: medium
     steps:
       - checkout
       - run: cargo test --workspace --no-default-features
@@ -61,6 +62,7 @@ jobs:
       - run: cargo test --no-default-features --features debug-2d
   documentation:
     executor: rust
+    resource_class: medium
     environment:
         RUSTDOCFLAGS: "-D warnings"
     steps:
@@ -68,6 +70,7 @@ jobs:
       - run: cargo doc --workspace --all-features --no-deps
   code-style:
     executor: rust
+    resource_class: medium
     steps:
       - checkout
       - run: cargo fmt --all -- --check
@@ -88,7 +91,6 @@ jobs:
 
 executors:
   rust:
-    resource_class: medium 
     docker:
       - image: cimg/rust:1.60
     environment:
