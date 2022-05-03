@@ -7,8 +7,9 @@ workflows:
       - test-all-features
       - test-2d
       - test-3d
-      - test-enhanced-determinism
       - test-debug-2d
+      - test-enhanced-determinism
+      - test-collision-from-mesh
       - documentation
       - code-style
 
@@ -16,7 +17,9 @@ executors:
   rust:
     docker:
       - image: cimg/rust:1.60
-      
+    environment:
+        RUSTFLAGS: "-D warnings"
+
 jobs:
   test-no-feature:
     executor: rust
@@ -50,6 +53,12 @@ jobs:
       - checkout
       - run: cargo test -p heron_rapier --no-default-features --features enhanced-determinism
       - run: cargo test --no-default-features --features enhanced-determinism
+  test-collision-from-mesh:
+    executor: rust
+    steps:
+      - checkout
+      - run: cargo test -p heron_core --no-default-features --features collision-from-mesh
+      - run: cargo test --no-default-features --features collision-from-mesh      
   test-debug-2d:
     executor: rust
     steps:
@@ -57,6 +66,8 @@ jobs:
       - run: cargo test --no-default-features --features debug-2d
   documentation:
     executor: rust
+    environment:
+        RUSTDOCFLAGS: "-D warnings"
     steps:
       - checkout
       - run: cargo doc --workspace --all-features --no-deps
