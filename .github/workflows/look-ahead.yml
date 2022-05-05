@@ -10,9 +10,10 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
-  bevy-main:
+  next-rust:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true
     strategy:
       matrix:
         rust-version: ['stable', 'beta', 'nightly']
