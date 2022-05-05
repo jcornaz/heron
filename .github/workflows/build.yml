@@ -14,23 +14,9 @@ env:
   RUSTDOCFLAGS: "-D warnings"
 
 jobs:
-  test:
+  test-no-feature:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
-    strategy:
-      matrix:
-        crate:
-          - "."
-          - "core"
-          - "rapier"
-          - "debug"
-          - "macros"
-
-    defaults:
-      run:
-        working-directory: ${{ matrix.crate }}
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions-rs/toolchain@v1.0.7
@@ -38,21 +24,81 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           profile: minimal
           override: true
-      - run: cargo test --no-default-features
-      - run: cargo test
-      - run: cargo test --all-features
-      - run: cargo test --no-default-features --features collision-from-mesh
-        if: matrix.crate == 'core' || matrix.crate == '.'
+      - run: cargo test --workspace --no-default-features
+      - run: cargo test --workspace
+  test-all-features:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+      - run: cargo test --workspace --all-features
+      - run: cargo test --workspace --all-features -- --ignored
+  test-2d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+      - run: cargo test -p heron_rapier --no-default-features --features 2d
+      - run: cargo test -p heron_debug --no-default-features --features 2d
       - run: cargo test --no-default-features --features 2d
-        if: matrix.crate == 'rapier' || matrix.crate == 'debug' || matrix.crate == '.'
+  test-3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+      - run: cargo test -p heron_core --no-default-features --features 3d
+      - run: cargo test -p heron_rapier --no-default-features --features 3d
       - run: cargo test --no-default-features --features 3d
-        if: matrix.crate == 'rapier' || matrix.crate == '.'
-      - run: cargo test --no-default-features --features enhanced-determinism
-        if: matrix.crate == 'rapier' || matrix.crate == '.'
+  test-debug-2d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
       - run: cargo test --no-default-features --features debug-2d
-        if: matrix.crate == '.'
-      - run: cargo test --all-features -- --ignored
-
+  test-enhanced-determinism:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+      - run: cargo test -p heron_rapier --no-default-features --features enhanced-determinism
+      - run: cargo test --no-default-features --features enhanced-determinism
+  test-collision-from-mesh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          profile: minimal
+          override: true
+      - run: cargo test -p heron_core --no-default-features --features collision-from-mesh
+      - run: cargo test --no-default-features --features collision-from-mesh  
   code-style:
     runs-on: ubuntu-latest
     steps:
@@ -65,7 +111,6 @@ jobs:
           components: clippy, rustfmt
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-features --workspace
-
   documentation:
     runs-on: ubuntu-latest
     steps:
@@ -75,9 +120,8 @@ jobs:
         with:
           toolchain: stable
           override: true
-          profile: minimal
+          components: clippy, rustfmt
       - run: cargo doc --all-features --no-deps --workspace
-
   unwanted-dependencies:
     runs-on: ubuntu-latest
     steps:
@@ -89,7 +133,6 @@ jobs:
           profile: minimal
       - run: cargo install cargo-deny --locked
       - run: cargo deny check
-
   unused-dependencies:
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +144,6 @@ jobs:
           profile: minimal
       - run: cargo install cargo-udeps --locked
       - run: cargo udeps --workspace --all-features
-
   release-pr:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -117,22 +159,27 @@ jobs:
           extra-files: |
             src/lib.rs
             guide/src/quickstart.md
-
   release:
-    needs: [test, documentation, release-pr]
+    needs: 
+      - test-no-feature
+      - test-all-features
+      - test-2d
+      - test-3d
+      - test-debug-2d
+      - test-enhanced-determinism
+      - test-collision-from-mesh
+      - documentation
+      - release-pr
     runs-on: ubuntu-latest
     if: ${{ !needs.release-pr.outputs.pr }}
-
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
-
     steps:
       - uses: google-github-actions/release-please-action@v3.1
         id: release
         with:
           release-type: rust
           command: github-release
-
   publish:
     needs: release
     runs-on: ubuntu-latest
