@@ -29,4 +29,5 @@ jobs:
           override: true
           profile: minimal
 
-      - run: cargo test --all-features
+      - run: cargo test --all-features --workspace
+      - run: cargo doc --all-features --workspace --no-deps
