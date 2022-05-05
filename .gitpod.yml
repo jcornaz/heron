@@ -6,9 +6,9 @@ tasks:
     init: |
       cargo update
       cargo doc --all-features --workspace --no-deps
-      cargo clippy --all-features --workspace --all-targets
-      cargo test --all-features --workspace
-    command: cargo watch -x 'test --all-features --workspace' -x 'clippy --all-features --all-targets --workspace' -x 'doc --all-features --workspace --no-deps'
+      cargo clippy --all-features --workspace
+      cargo test --all-features --workspace --tests
+    command: cargo watch -x 'test --all-features --workspace --tests' -x 'clippy --all-features --workspace' -x 'doc --all-features --workspace --no-deps'
 
 vscode:
   extensions:
