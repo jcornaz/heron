@@ -233,6 +233,7 @@ mod tests {
     use bevy::math::{Quat, Vec3};
 
     use super::*;
+    use approx::assert_ulps_eq;
 
     #[cfg(dim2)]
     mod angle2d {
@@ -269,11 +270,11 @@ mod tests {
         fn set_translation() {
             let translation = Vec3::new(1.0, 2.0, 3.0);
             let result = (translation, Quat::IDENTITY).into_rapier();
-            assert_eq!(translation.x, result.translation.x);
-            assert_eq!(translation.y, result.translation.y);
+            assert_ulps_eq!(translation.x, result.translation.x);
+            assert_ulps_eq!(translation.y, result.translation.y);
 
             #[cfg(dim3)]
-            assert_eq!(translation.z, result.translation.z);
+            assert_ulps_eq!(translation.z, result.translation.z);
         }
 
         #[test]
@@ -285,10 +286,10 @@ mod tests {
             let quat = Quat::from_axis_angle(axis, angle).normalize();
             let result = (Vec3::default(), quat).into_rapier();
 
-            assert_eq!(result.rotation.i, quat.x);
-            assert_eq!(result.rotation.j, quat.y);
-            assert_eq!(result.rotation.k, quat.z);
-            assert_eq!(result.rotation.w, quat.w);
+            assert_ulps_eq!(result.rotation.i, quat.x);
+            assert_ulps_eq!(result.rotation.j, quat.y);
+            assert_ulps_eq!(result.rotation.k, quat.z);
+            assert_ulps_eq!(result.rotation.w, quat.w);
         }
     }
 }

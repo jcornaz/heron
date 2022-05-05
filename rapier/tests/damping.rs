@@ -41,7 +41,7 @@ fn body_is_created_with_damping() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -76,7 +76,7 @@ fn damping_can_be_added_after_creation() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -118,7 +118,7 @@ fn damping_can_be_updated_after_creation() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world
@@ -155,7 +155,7 @@ fn restore_damping_on_removal() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     let body = bodies
         .get(
             app.world

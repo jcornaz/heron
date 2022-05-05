@@ -15,8 +15,6 @@ mod utils;
 
 fn test_app() -> App {
     let mut builder = App::new();
-    let mut parameters = IntegrationParameters::default();
-    parameters.dt = 1.0;
 
     builder
         .init_resource::<TypeRegistryArc>()
@@ -45,8 +43,7 @@ fn a_non_sensor_body_can_have_a_sensor_shape() {
 
     let collider = app
         .world
-        .get_resource::<ColliderSet>()
-        .unwrap()
+        .resource::<ColliderSet>()
         .get(
             app.world
                 .get::<ColliderHandle>(entity)
@@ -80,8 +77,7 @@ fn sensor_flag_can_be_added_after_creation() {
 
     let collider = app
         .world
-        .get_resource::<ColliderSet>()
-        .unwrap()
+        .resource::<ColliderSet>()
         .get(
             app.world
                 .get::<ColliderHandle>(entity)
@@ -116,8 +112,7 @@ fn sensor_flag_can_removed() {
 
     let collider = app
         .world
-        .get_resource::<ColliderSet>()
-        .unwrap()
+        .resource::<ColliderSet>()
         .get(
             app.world
                 .get::<ColliderHandle>(entity)
@@ -152,8 +147,7 @@ fn removing_sensor_flag_has_no_effect_if_body_is_sensor() {
 
     let collider = app
         .world
-        .get_resource::<ColliderSet>()
-        .unwrap()
+        .resource::<ColliderSet>()
         .get(
             app.world
                 .get::<ColliderHandle>(entity)

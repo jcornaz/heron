@@ -39,7 +39,7 @@ fn rotation_is_not_constrained_without_the_component() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     assert_eq!(
         bodies
@@ -72,7 +72,7 @@ fn rotation_can_be_locked_at_creation() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     assert_eq!(
         bodies
@@ -110,7 +110,7 @@ fn rotation_can_be_locked_after_creation() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     assert_eq!(
         bodies
@@ -147,7 +147,7 @@ fn rotation_is_unlocked_if_component_is_removed() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     assert_eq!(
         bodies

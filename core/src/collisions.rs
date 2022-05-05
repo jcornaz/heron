@@ -1,10 +1,10 @@
-use bevy::{prelude::*, utils::HashSet};
+use bevy::{prelude::*, utils::HashMap};
 
-use crate::{CollisionEvent, RigidBody};
+use crate::{CollisionData, CollisionEvent, RigidBody};
 
 /// Component which will be filled (if present) with a list of entities with which the current entity is currently in contact.
 #[derive(Component, Default, Reflect)]
-pub struct Collisions(HashSet<Entity>);
+pub struct Collisions(HashMap<Entity, CollisionData>);
 
 impl Collisions {
     /// Returns the number of colliding entities.
@@ -22,12 +22,24 @@ impl Collisions {
     /// Returns `true` if the collisions contains the specified entity.
     #[must_use]
     pub fn contains(&self, entity: &Entity) -> bool {
-        self.0.contains(entity)
+        self.0.contains_key(entity)
     }
 
     /// An iterator visiting all colliding entities in arbitrary order.
+    #[deprecated(note = "Please use `entities()` instead")]
+    #[doc(hidden)]
     pub fn iter(&self) -> impl Iterator<Item = Entity> + '_ {
-        self.0.iter().copied()
+        self.entities()
+    }
+
+    /// An iterator visiting all colliding entities in arbitrary order.
+    pub fn entities(&self) -> impl Iterator<Item = Entity> + '_ {
+        self.0.keys().copied()
+    }
+
+    /// An iterator visiting all data from colliding entities in arbitrary order.
+    pub fn collision_data(&self) -> impl Iterator<Item = &CollisionData> + '_ {
+        self.0.values()
     }
 }
 
@@ -38,13 +50,14 @@ pub(super) fn update_collisions_system(
     mut collisions: Query<'_, '_, &mut Collisions>,
 ) {
     for event in collision_events.iter() {
-        let (entity1, entity2) = event.rigid_body_entities();
+        let (data1, data2) = event.clone().data();
+        let (entity1, entity2) = (data1.rigid_body_entity(), data2.rigid_body_entity());
         if event.is_started() {
             if let Ok(mut entities) = collisions.get_mut(entity1) {
-                entities.0.insert(entity2);
+                entities.0.insert(entity2, data2);
             }
             if let Ok(mut entities) = collisions.get_mut(entity2) {
-                entities.0.insert(entity1);
+                entities.0.insert(entity1, data1);
             }
         } else {
             if let Ok(mut entities) = collisions.get_mut(entity1) {
@@ -73,7 +86,7 @@ pub(super) fn cleanup_collisions_system(
 
 #[cfg(test)]
 mod tests {
-    use bevy::app::Events;
+    use bevy::ecs::event::Events;
 
     use crate::{CollisionData, CollisionLayers};
 
@@ -92,10 +105,7 @@ mod tests {
             CollisionData::new(entity1, Entity::from_raw(0), CollisionLayers::default(), []);
         let collision_data2 =
             CollisionData::new(entity2, Entity::from_raw(0), CollisionLayers::default(), []);
-        let mut collision_events = app
-            .world
-            .get_resource_mut::<Events<CollisionEvent>>()
-            .unwrap();
+        let mut collision_events = app.world.resource_mut::<Events<CollisionEvent>>();
         collision_events.send(CollisionEvent::Started(
             collision_data1.clone(),
             collision_data2.clone(),
@@ -106,23 +116,32 @@ mod tests {
         let collisions1 = app.world.entity(entity1).get::<Collisions>().unwrap();
         assert_eq!(collisions1.len(), 1, "There should be one colliding entity");
         assert_eq!(
-            collisions1.iter().next().unwrap(),
+            collisions1.entities().next().unwrap(),
             entity2,
             "Colliding entity should be equal to the second entity"
+        );
+
+        assert_eq!(
+            collisions1.collision_data().next().unwrap(),
+            &collision_data2,
+            "Colliding entity data should be equal to the second collision data"
         );
 
         let collisions2 = app.world.entity(entity2).get::<Collisions>().unwrap();
         assert_eq!(collisions2.len(), 1, "There should be one colliding entity");
         assert_eq!(
-            collisions2.iter().next().unwrap(),
+            collisions2.entities().next().unwrap(),
             entity1,
             "Colliding entity should be equal to the first entity"
         );
 
-        let mut collision_events = app
-            .world
-            .get_resource_mut::<Events<CollisionEvent>>()
-            .unwrap();
+        assert_eq!(
+            collisions2.collision_data().next().unwrap(),
+            &collision_data1,
+            "Colliding entity data should be equal to the first collision data"
+        );
+
+        let mut collision_events = app.world.resource_mut::<Events<CollisionEvent>>();
         collision_events.send(CollisionEvent::Stopped(collision_data1, collision_data2));
 
         app.update();
@@ -148,7 +167,15 @@ mod tests {
 
         let removing_entity = app.world.spawn().insert(RigidBody::Static).id();
         let mut collisions = Collisions::default();
-        collisions.0.insert(removing_entity);
+        collisions.0.insert(
+            removing_entity,
+            CollisionData::new(
+                removing_entity,
+                Entity::from_raw(0),
+                CollisionLayers::default(),
+                [],
+            ),
+        );
         let entity = app.world.spawn().insert(collisions).id();
 
         app.update();

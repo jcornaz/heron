@@ -30,6 +30,7 @@ use crate::{CollisionLayers, CollisionShape, RigidBody};
 pub struct PendingConvexCollision {
     /// Rigid body type which will be assigned to every scene entity.
     #[deprecated(note = "Insert body type component into the entity with this component")]
+    #[doc(hidden)]
     pub body_type: RigidBody,
     /// Border radius that will be used for [`CollisionShape::ConvexHull`].
     pub border_radius: Option<f32>,
@@ -133,7 +134,7 @@ mod tests {
         asset::AssetPlugin,
         core::CorePlugin,
         prelude::shape::{Capsule, Cube},
-        render::{options::WgpuOptions, RenderPlugin},
+        render::{settings::WgpuSettings, RenderPlugin},
         window::WindowPlugin,
     };
 
@@ -144,9 +145,9 @@ mod tests {
 
     impl Plugin for HeadlessRenderPlugin {
         fn build(&self, app: &mut App) {
-            app.insert_resource(WgpuOptions {
+            app.insert_resource(WgpuSettings {
                 backends: None,
-                ..Default::default()
+                ..WgpuSettings::default()
             })
             .add_plugin(CorePlugin::default())
             .add_plugin(WindowPlugin::default())
@@ -169,7 +170,7 @@ mod tests {
         app.add_plugin(HeadlessRenderPlugin)
             .add_system(pending_collision_system);
 
-        let mut meshes = app.world.get_resource_mut::<Assets<Mesh>>().unwrap();
+        let mut meshes = app.world.resource_mut::<Assets<Mesh>>();
         let cube = meshes.add(Cube::default().into());
         let capsule = meshes.add(Capsule::default().into());
 
@@ -209,7 +210,7 @@ mod tests {
             "Entities with mesh handles should have rigid bodies and collision shapes after update"
         );
 
-        let meshes = app.world.get_resource::<Assets<Mesh>>().unwrap();
+        let meshes = app.world.resource::<Assets<Mesh>>();
         for (mesh_handle, body_type, collision_shape, collision_layers) in query.iter(&app.world) {
             assert_eq!(
                 *body_type, BODY_TYPE,

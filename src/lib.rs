@@ -18,14 +18,14 @@
 //! For a 3d game:
 //! ```toml
 //! # x-release-please-start-version
-//! heron = { version = "1.0.1", features = ["3d"] }
+//! heron = { version = "3.0.0", features = ["3d"] }
 //! # x-release-please-end-version
 //! ```
 //!
 //! For as 2d game:
 //! ```toml
 //! # x-release-please-start-version
-//! heron = { version = "1.0.1", features = ["2d"] }
+//! heron = { version = "3.0.0", features = ["2d"] }
 //! # x-release-please-end-version
 //! ```
 //!
@@ -33,10 +33,11 @@
 //!
 //! One must choose to use either `2d` or `3d`. If none of theses two features is enabled, the plugin won't be available.
 //!
+//!
 //! * `3d` Enable simulation on the 3 axes `x`, `y`, and `z`. Incompatible with the feature `2d`.
 //! * `2d` Enable simulation only on the first 2 axes `x` and `y`. Incompatible with the feature `3d`, therefore require to disable the default features.
 //! * `debug-2d` Render 2d collision shapes
-//! * `debug-3d` Render 3d collision shapes
+//! * `collision-from-mesh` Add the [`PendingConvexCollision`] component to generate convex hull collision shapes from a mesh
 //! * `enhanced-determinism` Enable rapier's [enhanced-determinism](https://rapier.rs/docs/user_guides/rust/determinism)
 //!
 //!
@@ -119,10 +120,12 @@
 //! ## See also
 //!
 //! * How to define a [`RigidBody`]
-//! * How to choose a [`CollisionShape`]
+//! * How to add a [`CollisionShape`]
+//! * How to define [`CollisionLayers`]
 //! * How to define the world's [`Gravity`]
 //! * How to define the world's [`PhysicsTime`]
 //! * How to define the [`PhysicMaterial`]
+//! * How to get the current [`Collisions`]
 //! * How to listen to [`CollisionEvent`]
 //! * How to define [`RotationConstraints`]
 //! * How to define [`CustomCollisionShape`] for [`heron_rapier`]

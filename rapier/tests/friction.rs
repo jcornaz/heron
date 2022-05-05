@@ -44,7 +44,7 @@ fn friction_can_be_defined_when_creating_body() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world
@@ -81,7 +81,7 @@ fn friction_can_be_updated() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world

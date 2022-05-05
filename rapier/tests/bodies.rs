@@ -48,8 +48,8 @@ fn creates_body_in_rapier_world() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
+    let colliders = app.world.resource::<ColliderSet>();
 
     let body = bodies
         .get(
@@ -124,7 +124,7 @@ fn update_shape() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     let collider = colliders
         .get(
             app.world
@@ -163,7 +163,7 @@ fn update_rapier_position() {
 
     app.update();
 
-    let colliders = app.world.get_resource::<RigidBodySet>().unwrap();
+    let colliders = app.world.resource::<RigidBodySet>();
     let rigid_body = colliders
         .get(
             app.world
@@ -209,10 +209,10 @@ fn remove_body_component() {
     assert!(app.world.get::<RigidBodyHandle>(entity).is_none());
     assert!(app.world.get::<ColliderHandle>(entity).is_none());
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     assert_eq!(bodies.len(), 0);
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     assert_eq!(colliders.len(), 0);
 }
 
@@ -238,10 +238,10 @@ fn despawn_body_entity() {
     assert!(app.world.get::<RigidBodyHandle>(entity).is_none());
     assert!(app.world.get::<ColliderHandle>(entity).is_none());
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     assert_eq!(bodies.len(), 0);
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     assert_eq!(colliders.len(), 0);
 }
 
@@ -260,18 +260,15 @@ fn despawn_body_while_paused() {
         .id();
 
     app.update();
-    app.world.get_resource_mut::<PhysicsTime>().unwrap().pause();
+    app.world.resource_mut::<PhysicsTime>();
     app.world.despawn(entity);
     app.update();
-    app.world
-        .get_resource_mut::<PhysicsTime>()
-        .unwrap()
-        .resume();
+    app.world.resource_mut::<PhysicsTime>().resume();
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
     assert_eq!(bodies.len(), 0);
 
-    let colliders = app.world.get_resource::<ColliderSet>().unwrap();
+    let colliders = app.world.resource::<ColliderSet>();
     assert_eq!(colliders.len(), 0);
 }

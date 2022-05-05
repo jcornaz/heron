@@ -10,9 +10,10 @@ env:
   RUSTFLAGS: "-D warnings"
 
 jobs:
-  bevy-main:
+  next-rust:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: true
     strategy:
       matrix:
         rust-version: ['stable', 'beta', 'nightly']
@@ -28,4 +29,5 @@ jobs:
           override: true
           profile: minimal
 
-      - run: cargo test --all-features
+      - run: cargo test --all-features --workspace
+      - run: cargo doc --all-features --workspace --no-deps

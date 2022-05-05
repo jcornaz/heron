@@ -1,11 +1,10 @@
 use std::marker::PhantomData;
 
-use bevy::app::Events;
+use bevy::ecs::event::Events;
 use bevy::ecs::prelude::*;
 use bevy::ecs::system::SystemParam;
 use bevy::log::prelude::*;
 use bevy::math::Quat;
-use bevy::math::Vec2;
 use bevy::math::Vec3;
 use crossbeam::channel::{Receiver, Sender};
 
@@ -482,7 +481,13 @@ impl EventManager {
                         .into_iter()
                         .flat_map(|contact_pair| {
                             contact_pair.manifolds.iter().map(|manifold| {
-                                Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
+                                #[cfg(dim2)]
+                                let z = 0.0;
+
+                                #[cfg(not(dim2))]
+                                let z = manifold.data.normal.z;
+
+                                Vec3::new(manifold.data.normal.x, manifold.data.normal.y, z)
                             })
                         });
                 let normals2 =
@@ -491,7 +496,13 @@ impl EventManager {
                         .into_iter()
                         .flat_map(|contact_pair| {
                             contact_pair.manifolds.iter().map(|manifold| {
-                                Vec2::new(manifold.data.normal.x, manifold.data.normal.y)
+                                #[cfg(dim2)]
+                                let z = 0.0;
+
+                                #[cfg(not(dim2))]
+                                let z = manifold.data.normal.z;
+
+                                Vec3::new(manifold.data.normal.x, manifold.data.normal.y, z)
                             })
                         });
 

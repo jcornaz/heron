@@ -1,7 +1,7 @@
 [package]
 name = "heron_core"
-version = "2.3.0"
-rust-version = "1.57"
+version = "3.0.0"
+rust-version = "1.60"
 edition = "2021"
 authors = ["Jonathan Cornaz"]
 license = "MIT"
@@ -17,12 +17,13 @@ default = []
 collision-from-mesh = ["bevy/bevy_render"]
 
 [dependencies]
-bevy = { version = "0.6.0", default-features = false }
+bevy = { version = "0.7.0", default-features = false }
 duplicate = "0.4.0"
 smallvec = "1.8"
 
 [dev-dependencies]
 rstest = "0.12"
+approx = "0.5.1"
 
 [build-dependencies]
 cfg_aliases = "0.1.1"

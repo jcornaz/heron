@@ -2,22 +2,19 @@
 
 use std::time::Duration;
 
-use bevy::app::{Events, ManualEventReader};
-use bevy::core::CorePlugin;
+use bevy::ecs::event::ManualEventReader;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::{core::CorePlugin, ecs::event::Events};
 use rstest::*;
 
 use heron_core::{CollisionEvent, CollisionShape, PhysicsSteps, RigidBody, Velocity};
 use heron_rapier::RapierPlugin;
-use utils::*;
 
 mod utils;
 
 fn test_app() -> App {
     let mut builder = App::new();
-    let mut parameters = IntegrationParameters::default();
-    parameters.dt = 1.0;
 
     builder
         .init_resource::<TypeRegistryArc>()
@@ -26,7 +23,7 @@ fn test_app() -> App {
         .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
-            bevy::transform::transform_propagate_system::transform_propagate_system,
+            bevy::transform::transform_propagate_system,
         );
     builder
 }
@@ -74,11 +71,7 @@ fn collision_events_are_fired(#[case] type1: RigidBody, #[case] type2: RigidBody
             .x += 30.0;
     }
 
-    let mut event_reader = app
-        .world
-        .get_resource::<Events<CollisionEvent>>()
-        .unwrap()
-        .get_reader();
+    let mut event_reader = app.world.resource::<Events<CollisionEvent>>().get_reader();
 
     let mut events = vec![];
 
@@ -151,6 +144,6 @@ fn collect_events(
     app: &App,
     reader: &mut ManualEventReader<CollisionEvent>,
 ) -> Vec<CollisionEvent> {
-    let events = app.world.get_resource::<Events<CollisionEvent>>().unwrap();
+    let events = app.world.resource::<Events<CollisionEvent>>();
     reader.iter(events).cloned().collect()
 }

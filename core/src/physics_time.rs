@@ -71,6 +71,7 @@ impl PhysicsTime {
     /// Get the physics emulation time scale
     #[must_use]
     #[deprecated(note = "Please use 'scale()' instead")]
+    #[doc(hidden)]
     pub fn get_scale(&self) -> f32 {
         self.scale
     }

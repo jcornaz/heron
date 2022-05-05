@@ -50,7 +50,7 @@ fn body_is_created_with_acceleration() {
     app.update();
 
     {
-        let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+        let bodies = app.world.resource::<RigidBodySet>();
 
         let body = bodies
             .get(
@@ -68,7 +68,7 @@ fn body_is_created_with_acceleration() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(
@@ -114,7 +114,7 @@ fn acceleration_may_be_added_after_creating_the_body() {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(

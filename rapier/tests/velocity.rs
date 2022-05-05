@@ -48,7 +48,7 @@ fn body_is_created_with_velocity(#[case] body_type: RigidBody) {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(
@@ -102,7 +102,7 @@ fn velocity_may_be_added_after_creating_the_body(#[case] body_type: RigidBody) {
 
     app.update();
 
-    let bodies = app.world.get_resource::<RigidBodySet>().unwrap();
+    let bodies = app.world.resource::<RigidBodySet>();
 
     let body = bodies
         .get(
@@ -159,7 +159,7 @@ fn velocity_is_updated_to_reflect_rapier_world() {
     assert_eq!(velocity.linear.z, linear.z);
 
     #[cfg(dim3)]
-    assert_eq!(angular, velocity.angular.into());
+    assert_eq!(angular, velocity.angular);
 
     #[cfg(dim2)]
     assert!((angular.angle() - velocity.angular.angle()).abs() < 0.001);
