@@ -1,8 +1,12 @@
 use std::collections::LinkedList;
 
-use bevy::{prelude::*, render::mesh::VertexAttributeValues};
-
 use crate::{CollisionLayers, CollisionShape, RigidBody};
+use bevy_asset::prelude::*;
+use bevy_ecs::prelude::*;
+use bevy_hierarchy::Children;
+use bevy_math::Vec3;
+use bevy_reflect::prelude::*;
+use bevy_render::{mesh::VertexAttributeValues, prelude::*};
 
 /// Component which indicates that this entity or its children contains meshes which waiting for collision generation.
 ///
@@ -130,13 +134,16 @@ fn recursive_scene_children(
 
 #[cfg(test)]
 mod tests {
-    use bevy::{
-        asset::AssetPlugin,
-        core::CorePlugin,
-        prelude::shape::{Capsule, Cube},
-        render::{settings::WgpuSettings, RenderPlugin},
-        window::WindowPlugin,
+    use bevy_app::prelude::*;
+    use bevy_asset::AssetPlugin;
+    use bevy_core::CorePlugin;
+    use bevy_hierarchy::BuildWorldChildren;
+    use bevy_render::{
+        mesh::shape::{Capsule, Cube},
+        settings::WgpuSettings,
+        RenderPlugin,
     };
+    use bevy_window::WindowPlugin;
 
     use super::*;
 

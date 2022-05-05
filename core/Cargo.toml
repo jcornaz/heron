@@ -14,16 +14,22 @@ all-features = true
 [features]
 default = []
 3d = []
-collision-from-mesh = ["bevy/bevy_render"]
+collision-from-mesh = ["bevy_render", "bevy_hierarchy", "bevy_asset"]
 
 [dependencies]
-bevy = { version = "0.7.0", default-features = false }
+bevy_utils = { version = "0.7.0", default-features = false }
+bevy_core = { version = "0.7.0", default-features = false }
+bevy_math = { version = "0.7.0", default-features = false }
+bevy_ecs = { version = "0.7.0", default-features = false }
+bevy_app = { version = "0.7.0", default-features = false }
+bevy_reflect = { version = "0.7.0", default-features = false, features = ["hashbrown"] }
+bevy_render = { version = "0.7.0", default-features = false, optional = true }
+bevy_hierarchy = { version = "0.7.0", default-features = false, optional = true }
+bevy_asset = { version = "0.7.0", default-features = false, optional = true }
 duplicate = "0.4.0"
 smallvec = "1.8"
 
 [dev-dependencies]
 rstest = "0.12"
 approx = "0.5.1"
-
-[build-dependencies]
-cfg_aliases = "0.1.1"
+bevy_window = { version = "0.7.0", default-features = false }

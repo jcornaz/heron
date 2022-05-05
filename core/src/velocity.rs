@@ -1,8 +1,8 @@
 use std::ops::{Mul, MulAssign};
 
-use bevy::ecs::component::Component;
-use bevy::math::prelude::*;
-use bevy::reflect::prelude::*;
+use bevy_ecs::component::Component;
+use bevy_math::prelude::*;
+use bevy_reflect::prelude::*;
 use duplicate::duplicate_item;
 
 use crate::utils::NearZero;

@@ -1,5 +1,5 @@
-use bevy::ecs::component::Component;
-use bevy::math::{Vec2, Vec3};
+use bevy_ecs::component::Component;
+use bevy_math::{Vec2, Vec3};
 
 /// Resource that defines world's gravity.
 ///

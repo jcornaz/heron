@@ -7,8 +7,10 @@
 use core::any::Any;
 use std::sync::Arc;
 
-use bevy::ecs::schedule::ShouldRun;
-use bevy::prelude::*;
+use bevy_app::prelude::*;
+use bevy_ecs::{prelude::*, schedule::ShouldRun};
+use bevy_math::{Vec2, Vec3};
+use bevy_reflect::prelude::*;
 
 #[cfg(feature = "collision-from-mesh")]
 pub use collision_from_mesh::PendingConvexCollision;
@@ -215,7 +217,7 @@ pub enum CollisionShape {
     ///
     /// This shape is exclusive to the 3d API, you must enable the "3d" flag to use it.
     /// For the 2d equivalent, look at [`Sphere`](CollisionShape::Sphere).
-    #[cfg(dim3)]
+    #[cfg(feature = "3d")]
     Cone {
         /// Half of the height from the base of the cone to the top point
         half_height: f32,
@@ -227,7 +229,7 @@ pub enum CollisionShape {
     ///
     /// This shape is exclusive to the 3d API, you must enable the "3d" flag to use it.
     /// For the 2d equivalent, look at [`Sphere`](CollisionShape::Sphere).
-    #[cfg(dim3)]
+    #[cfg(feature = "3d")]
     Cylinder {
         /// Half of the height from the base of the cylinder to the top
         half_height: f32,

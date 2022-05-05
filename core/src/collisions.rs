@@ -1,4 +1,6 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy_ecs::prelude::*;
+use bevy_reflect::prelude::*;
+use bevy_utils::HashMap;
 
 use crate::{CollisionData, CollisionEvent, RigidBody};
 
@@ -86,7 +88,8 @@ pub(super) fn cleanup_collisions_system(
 
 #[cfg(test)]
 mod tests {
-    use bevy::ecs::event::Events;
+    use bevy_app::App;
+    use bevy_ecs::event::Events;
 
     use crate::{CollisionData, CollisionLayers};
 

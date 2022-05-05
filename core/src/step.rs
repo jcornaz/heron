@@ -1,6 +1,7 @@
 use std::time::Duration;
 
-use bevy::prelude::*;
+use bevy_core::{Time, Timer};
+use bevy_ecs::prelude::*;
 
 /// Resource to control how many physics steps are performed per second.
 ///

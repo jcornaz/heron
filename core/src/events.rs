@@ -1,4 +1,6 @@
-use bevy::{ecs::entity::Entity, math::Vec3, prelude::Reflect};
+use bevy_ecs::entity::Entity;
+use bevy_math::Vec3;
+use bevy_reflect::Reflect;
 use smallvec::SmallVec;
 
 use crate::CollisionLayers;
