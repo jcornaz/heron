@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - circleci-project-setup
 
   pull_request:
   workflow_dispatch:
