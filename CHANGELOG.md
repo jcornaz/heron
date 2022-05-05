@@ -8,6 +8,14 @@ Unreleased changes (if any) can be found in the latest [release pull-request].
 [release pull-request]: https://github.com/jcornaz/heron/pulls?q=is%3Apr+is%3Aopen+label%3A%22autorelease%3A+pending%22
 
 
+### [3.0.1](https://github.com/jcornaz/heron/compare/v3.0.0...v3.0.1) (2022-05-05)
+
+
+### Documentation
+
+* clarify that the velocity component can also be used to read the velocity ([#252](https://github.com/jcornaz/heron/issues/252)) ([994a757](https://github.com/jcornaz/heron/commit/994a7577ae0e0c8c1f5995640863927befe0d4c5))
+* **readme:** remove dependency badge ([b4dd473](https://github.com/jcornaz/heron/commit/b4dd47380dd09d19e713caa4529dd4bfb663649b))
+
 ## [3.0.0](https://github.com/jcornaz/heron/compare/v2.4.1...v3.0.0) (2022-04-17)
 
 
