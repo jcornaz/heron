@@ -20,8 +20,8 @@ enhanced-determinism = ["rapier2d?/enhanced-determinism", "rapier3d?/enhanced-de
 [dependencies]
 heron_core = { version = "3.0.0", path = "../core" }
 bevy = { version = "0.7.0", default-features = false }
-rapier2d = { version = "0.11.1", optional = true }
-rapier3d = { version = "0.11.1", optional = true }
+rapier2d = { version = "0.11.3", optional = true }
+rapier3d = { version = "0.11.3", optional = true }
 fnv = "1.0"
 crossbeam = "0.8.0"
 
