@@ -8,6 +8,10 @@
       "groupName": "bevy"
     },
     {
+      "matchPackagePatterns": ["^rapier(2|3)d$"],
+      "groupName": "rapier"
+    },
+    {
       "matchDepTypes": ["dev-dependencies"],
       "automerge": true
     }
