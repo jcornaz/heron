@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "config:base", ":automergePatch", "schedule:weekends", ":semanticCommitTypeAll(chore)"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^bevy"],
+      "groupName": "bevy"
+    },
+    {
+      "matchDepTypes": ["dev-dependencies"],
+      "automerge": true
+    }
+  ]
+}
