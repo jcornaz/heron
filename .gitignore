@@ -14,6 +14,5 @@
 .trashes
 *.db
 
-# Release process
-autorel
-autorel.tar.gz
+# Nodes tools
+/node_modules
