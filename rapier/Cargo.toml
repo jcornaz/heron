@@ -23,7 +23,7 @@ bevy = { version = "0.7.0", default-features = false }
 rapier2d = { version = "0.11.3", optional = true }
 rapier3d = { version = "0.11.3", optional = true }
 fnv = "1.0"
-crossbeam = "0.8.0"
+crossbeam = "0.8.1"
 
 [dev-dependencies]
 rstest = "0.12"
