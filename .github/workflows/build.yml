@@ -98,7 +98,7 @@ jobs:
           profile: minimal
           override: true
       - run: cargo test -p heron_core --no-default-features --features collision-from-mesh
-      - run: cargo test --no-default-features --features collision-from-mesh  
+      - run: cargo test --no-default-features --features collision-from-mesh
   code-style:
     runs-on: ubuntu-latest
     steps:
@@ -144,23 +144,9 @@ jobs:
           profile: minimal
       - run: cargo install cargo-udeps --locked
       - run: cargo udeps --workspace --all-features
-  release-pr:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    outputs:
-      pr: ${{ steps.release_please.outputs.pr }}
-    steps:
-      - uses: google-github-actions/release-please-action@v3
-        id: release_please
-        with:
-          release-type: rust
-          command: release-pr
-          changelog-types: '[{"type":"feat","section":"Features","hidden":false},{"type":"fix","section":"Bug Fixes","hidden":false},{"type":"perf","section":"Performance","hidden":false},{"type":"docs","section":"Documentation","hidden":false}]'
-          extra-files: |
-            src/lib.rs
-            guide/src/quickstart.md
+
   release:
-    needs: 
+    needs:
       - test-no-feature
       - test-all-features
       - test-2d
@@ -169,46 +155,19 @@ jobs:
       - test-enhanced-determinism
       - test-collision-from-mesh
       - documentation
-      - release-pr
+    environment: release
     runs-on: ubuntu-latest
-    if: ${{ !needs.release-pr.outputs.pr }}
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-    steps:
-      - uses: google-github-actions/release-please-action@v3.2
-        id: release
-        with:
-          release-type: rust
-          command: github-release
-  publish:
-    needs: release
-    runs-on: ubuntu-latest
-    if: ${{ needs.release.outputs.release_created }}
-    env:
-      CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          fetch-depth: 0
+      - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
           profile: minimal
-
-      - name: Publish heron_core
-        run: cargo publish
-        working-directory: core
-
-      - name: Publish heron_macros
-        run: cargo publish
-        working-directory: macros
-
-      - name: Publish heron_rapier
-        run: sleep 30 && cargo publish
-        working-directory: rapier
-
-      - name: Publish heron_debug
-        run: sleep 30 && cargo publish
-        working-directory: debug
-
-      - name: Publish heron
-        run: sleep 30 && cargo publish
+      - run: npm install --no-save conventional-changelog-conventionalcommits @semantic-release/exec
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
