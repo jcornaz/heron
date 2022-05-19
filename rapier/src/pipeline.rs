@@ -141,8 +141,8 @@ mod physics_world {
         ///
         /// - `shape`: The [`CollisionShape`] to use for the shape cast
         /// - `start_position`: The position to start the shape cast at
-        /// - `rotation`: The rotation of the collision shape
-        /// - `end_posiion`: The end position of the shape cast
+        /// - `start_rotation`: The rotation of the collision shape
+        /// - `ray`: A vector indicating the direction and the distance to cast the shape
         ///
         /// # Panics
         ///

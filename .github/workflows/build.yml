@@ -162,6 +162,7 @@ jobs:
       - run: cargo udeps --workspace --all-features
 
   release:
+    if: ${{ github.event_name != 'pull_request' }}
     needs:
       - test-no-feature
       - test-all-features
