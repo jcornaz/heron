@@ -103,6 +103,7 @@ fn removal_stage() -> SystemStage {
 
 fn update_rapier_world_stage() -> SystemStage {
     SystemStage::parallel()
+        .with_run_criteria(heron_core::should_run)
         .with_system(bevy::transform::transform_propagate_system)
         .with_system(
             body::update_rapier_position.after(bevy::transform::transform_propagate_system),
@@ -157,9 +158,13 @@ fn step_systems() -> SystemSet {
 mod tests {
     use std::time::Duration;
 
-    use super::*;
     use bevy::core::CorePlugin;
-    use heron_core::{CollisionShape, PhysicsSteps, RigidBody, Velocity};
+
+    use heron_core::{
+        Acceleration, CollisionShape, PhysicsSteps, PhysicsTime, RigidBody, Velocity,
+    };
+
+    use super::*;
 
     #[test]
     fn updates_transform_before_transform_propagation() {
@@ -195,5 +200,31 @@ mod tests {
                 Vec3::X
             );
         }
+    }
+
+    #[test]
+    fn does_not_update_rapier_when_paused() {
+        let mut app = App::new();
+        app.add_plugin(CorePlugin)
+            .add_plugin(RapierPlugin::default())
+            .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)));
+        let entity = app
+            .world
+            .spawn()
+            .insert_bundle((
+                RigidBody::Dynamic,
+                CollisionShape::Sphere { radius: 1.0 },
+                Velocity::default(),
+                Acceleration::from_linear(Vec3::X),
+                Transform::default(),
+                GlobalTransform::default(),
+            ))
+            .id();
+        app.update();
+        app.world.resource_mut::<PhysicsTime>().pause();
+        app.update();
+        app.world.resource_mut::<PhysicsTime>().resume();
+        app.update();
+        assert_eq!(app.world.get::<Velocity>(entity).unwrap().linear, Vec3::X);
     }
 }
