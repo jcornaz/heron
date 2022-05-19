@@ -1,6 +1,5 @@
 # Rust
 /target
-/.cargo/*.toml
 /Cargo.lock
 *.rmeta
 
