@@ -57,7 +57,6 @@
         [
             "@semantic-release/exec",
             {
-                "verifyConditionsCmd": "cargo publish --dry-run",
                 "prepareCmd": "cargo install cargo-edit && cargo set-version --workspace ${nextRelease.version}",
                 "publishCmd": "./publish.sh"
             }
