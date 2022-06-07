@@ -33,7 +33,7 @@ use heron_core::{CollisionEvent, PhysicsSystem};
 pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 
 use crate::rapier::dynamics::{
-    self, CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
+    self, CCDSolver, IntegrationParameters, IslandManager, ImpulseJointSet, MultibodyJointSet, RigidBodySet,
 };
 use crate::rapier::geometry::{self, BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
@@ -80,7 +80,8 @@ impl Plugin for RapierPlugin {
             .insert_resource(QueryPipeline::new())
             .insert_resource(IslandManager::new())
             .insert_resource(ColliderSet::new())
-            .insert_resource(JointSet::new())
+            .insert_resource(ImpulseJointSet::new())
+            .insert_resource(MultibodyJointSet::new())
             .insert_resource(CCDSolver::new())
             .stage("heron-physics", |schedule: &mut Schedule| {
                 schedule

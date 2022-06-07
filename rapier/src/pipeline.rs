@@ -15,13 +15,13 @@ use heron_core::{
 pub use physics_world::PhysicsWorld;
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{
-    CCDSolver, IntegrationParameters, IslandManager, JointSet, RigidBodySet,
-};
-use crate::rapier::geometry::{
-    BroadPhase, ColliderHandle, ColliderSet, ContactEvent, InteractionGroups, IntersectionEvent,
+use crate::rapier::{self, prelude::{
+    ContactPair,
+    CCDSolver, IntegrationParameters, IslandManager, ImpulseJointSet, MultibodyJointSet, RigidBodySet,
+    BroadPhase, ColliderHandle, ColliderSet, InteractionGroups,
     NarrowPhase,
-};
+}};
+
 use crate::rapier::parry::query::{Ray, TOIStatus};
 use crate::rapier::pipeline::{EventHandler, PhysicsPipeline, QueryPipeline};
 use crate::shape::ColliderFactory;
@@ -359,7 +359,8 @@ pub(crate) fn step(
     mut narrow_phase: ResMut<'_, NarrowPhase>,
     mut bodies: ResMut<'_, RigidBodySet>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
+    mut impulse_joints: ResMut<'_, ImpulseJointSet>,
+    mut multibody_joints: ResMut<'_, MultibodyJointSet>,
     mut ccd_solver: ResMut<'_, CCDSolver>,
     event_manager: Local<'_, EventManager>,
     mut events: ResMut<'_, Events<CollisionEvent>>,
@@ -375,7 +376,8 @@ pub(crate) fn step(
         &mut narrow_phase,
         &mut bodies,
         &mut colliders,
-        &mut joints,
+        &mut impulse_joints,
+        &mut multibody_joints,
         &mut ccd_solver,
         &(),
         &*event_manager,
@@ -388,35 +390,30 @@ pub(crate) fn step(
 }
 
 pub(crate) struct EventManager {
-    contact_recv: Receiver<ContactEvent>,
-    intersection_recv: Receiver<IntersectionEvent>,
-    contact_send: Sender<ContactEvent>,
-    intersection_send: Sender<IntersectionEvent>,
+    recv: Receiver<rapier::prelude::CollisionEvent>,
+    send: Sender<rapier::prelude::CollisionEvent>,
 }
 
 impl EventHandler for EventManager {
-    fn handle_intersection_event(&self, event: IntersectionEvent) {
-        if self.intersection_send.send(event).is_err() {
-            error!("Failed to forward intersection event!");
-        }
-    }
-
-    fn handle_contact_event(&self, event: ContactEvent, _: &crate::rapier::prelude::ContactPair) {
-        if self.contact_send.send(event).is_err() {
-            error!("Failed to forward contact event!");
+    fn handle_collision_event(
+        &self,
+        _: &RigidBodySet,
+        _: &ColliderSet,
+        event: rapier::prelude::CollisionEvent,
+        _: Option<&ContactPair>,
+    ) {
+        if let Err(err) = self.send.send(event) {
+            error!("Failed to handle collision even ({})", err)
         }
     }
 }
 
 impl Default for EventManager {
     fn default() -> Self {
-        let (contact_send, contact_recv) = crossbeam::channel::unbounded();
-        let (intersection_send, intersection_recv) = crossbeam::channel::unbounded();
+        let (send, recv) = crossbeam::channel::unbounded();
         Self {
-            contact_recv,
-            intersection_recv,
-            contact_send,
-            intersection_send,
+            recv,
+            send,
         }
     }
 }
@@ -429,35 +426,18 @@ impl EventManager {
         colliders: &ColliderSet,
         events: &mut Events<CollisionEvent>,
     ) {
-        while let Ok(event) = self.contact_recv.try_recv() {
+        while let Ok(event) = self.recv.try_recv() {
             match event {
-                ContactEvent::Started(h1, h2) => {
-                    if let Some((d1, d2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
-                        events.send(CollisionEvent::Started(d1, d2));
+                rapier::prelude::CollisionEvent::Started(h1, h2, _) => {
+                    if let Some((e1, e2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
+                        events.send(CollisionEvent::Started(e1, e2));
                     }
-                }
-                ContactEvent::Stopped(h1, h2) => {
-                    if let Some((d1, d2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
-                        events.send(CollisionEvent::Stopped(d1, d2));
+                },
+                rapier::prelude::CollisionEvent::Stopped(h1, h2, _) => {
+                    if let Some((e1, e2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
+                        events.send(CollisionEvent::Stopped(e1, e2));
                     }
-                }
-            }
-        }
-
-        while let Ok(IntersectionEvent {
-            collider1,
-            collider2,
-            intersecting,
-        }) = self.intersection_recv.try_recv()
-        {
-            if let Some((e1, e2)) =
-                Self::data(narrow_phase, bodies, colliders, collider1, collider2)
-            {
-                if intersecting {
-                    events.send(CollisionEvent::Started(e1, e2));
-                } else {
-                    events.send(CollisionEvent::Stopped(e1, e2));
-                }
+                },
             }
         }
     }
@@ -545,8 +525,7 @@ mod tests {
     use heron_core::RigidBody;
 
     use crate::pipeline::EventManager;
-    use crate::rapier::dynamics::RigidBodyBuilder;
-    use crate::rapier::geometry::{ColliderBuilder, ColliderHandle};
+    use crate::rapier::prelude::{CollisionEventFlags, ColliderBuilder, ColliderHandle, RigidBodyBuilder};
     use crate::RapierPlugin;
 
     use super::*;
@@ -578,12 +557,12 @@ mod tests {
             let layers_1 = CollisionLayers::from_bits(1, 2);
             let layers_2 = CollisionLayers::from_bits(3, 4);
             let body1 = bodies.insert(
-                RigidBodyBuilder::new_dynamic()
+                RigidBodyBuilder::dynamic()
                     .user_data(rb_entity_1.to_bits().into())
                     .build(),
             );
             let body2 = bodies.insert(
-                RigidBodyBuilder::new_dynamic()
+                RigidBodyBuilder::dynamic()
                     .user_data(rb_entity_2.to_bits().into())
                     .build(),
             );
@@ -626,8 +605,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .contact_send
-            .send(ContactEvent::Started(context.handle1, context.handle2))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -654,8 +633,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .contact_send
-            .send(ContactEvent::Stopped(context.handle1, context.handle2))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -682,12 +661,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .intersection_send
-            .send(IntersectionEvent::new(
-                context.handle1,
-                context.handle2,
-                true,
-            ))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -714,12 +689,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .intersection_send
-            .send(IntersectionEvent::new(
-                context.handle1,
-                context.handle2,
-                false,
-            ))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -746,8 +717,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .contact_send
-            .send(ContactEvent::Started(context.handle1, context.handle2))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -774,8 +745,8 @@ mod tests {
         let context = TestContext::default();
 
         manager
-            .contact_send
-            .send(ContactEvent::Started(context.handle1, context.handle2))
+            .send
+            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
