@@ -15,12 +15,14 @@ use heron_core::{
 pub use physics_world::PhysicsWorld;
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::{self, prelude::{
-    ContactPair,
-    CCDSolver, IntegrationParameters, IslandManager, ImpulseJointSet, MultibodyJointSet, RigidBodySet,
-    BroadPhase, ColliderHandle, ColliderSet, InteractionGroups,
-    NarrowPhase,
-}};
+use crate::rapier::{
+    self,
+    prelude::{
+        BroadPhase, CCDSolver, ColliderHandle, ColliderSet, ContactPair, ImpulseJointSet,
+        IntegrationParameters, InteractionGroups, IslandManager, MultibodyJointSet, NarrowPhase,
+        RigidBodySet,
+    },
+};
 
 use crate::rapier::parry::query::{Ray, TOIStatus};
 use crate::rapier::pipeline::{EventHandler, PhysicsPipeline, QueryPipeline};
@@ -403,7 +405,7 @@ impl EventHandler for EventManager {
         _: Option<&ContactPair>,
     ) {
         if let Err(err) = self.send.send(event) {
-            error!("Failed to handle collision even ({})", err)
+            error!("Failed to handle collision even ({})", err);
         }
     }
 }
@@ -411,10 +413,7 @@ impl EventHandler for EventManager {
 impl Default for EventManager {
     fn default() -> Self {
         let (send, recv) = crossbeam::channel::unbounded();
-        Self {
-            recv,
-            send,
-        }
+        Self { recv, send }
     }
 }
 
@@ -432,12 +431,12 @@ impl EventManager {
                     if let Some((e1, e2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
                         events.send(CollisionEvent::Started(e1, e2));
                     }
-                },
+                }
                 rapier::prelude::CollisionEvent::Stopped(h1, h2, _) => {
                     if let Some((e1, e2)) = Self::data(narrow_phase, bodies, colliders, h1, h2) {
                         events.send(CollisionEvent::Stopped(e1, e2));
                     }
-                },
+                }
             }
         }
     }
@@ -525,7 +524,9 @@ mod tests {
     use heron_core::RigidBody;
 
     use crate::pipeline::EventManager;
-    use crate::rapier::prelude::{CollisionEventFlags, ColliderBuilder, ColliderHandle, RigidBodyBuilder};
+    use crate::rapier::prelude::{
+        ColliderBuilder, ColliderHandle, CollisionEventFlags, RigidBodyBuilder,
+    };
     use crate::RapierPlugin;
 
     use super::*;
@@ -606,7 +607,11 @@ mod tests {
 
         manager
             .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
+            .send(rapier::prelude::CollisionEvent::Started(
+                context.handle1,
+                context.handle2,
+                CollisionEventFlags::all(),
+            ))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -634,63 +639,11 @@ mod tests {
 
         manager
             .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
-            .unwrap();
-
-        let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(
-            &context.narrow_phase,
-            &context.bodies,
-            &context.colliders,
-            &mut events,
-        );
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
-
-        assert_eq!(events.len(), 1);
-        let event = &events[0];
-        assert!(matches!(event, CollisionEvent::Stopped(_, _)));
-        assert_eq!(
-            event.collision_shape_entities(),
-            (context.collider_entity_1, context.collider_entity_2)
-        );
-    }
-
-    #[test]
-    fn intersection_true_fires_collision_started() {
-        let manager = EventManager::default();
-        let context = TestContext::default();
-
-        manager
-            .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
-            .unwrap();
-
-        let mut events = Events::<CollisionEvent>::default();
-        manager.fire_events(
-            &context.narrow_phase,
-            &context.bodies,
-            &context.colliders,
-            &mut events,
-        );
-        let events: Vec<CollisionEvent> = events.get_reader().iter(&events).cloned().collect();
-
-        assert_eq!(events.len(), 1);
-        let event = &events[0];
-        assert!(matches!(event, CollisionEvent::Started(_, _)));
-        assert_eq!(
-            event.collision_shape_entities(),
-            (context.collider_entity_1, context.collider_entity_2)
-        );
-    }
-
-    #[test]
-    fn intersection_false_fires_collision_stopped() {
-        let manager = EventManager::default();
-        let context = TestContext::default();
-
-        manager
-            .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
+            .send(rapier::prelude::CollisionEvent::Stopped(
+                context.handle1,
+                context.handle2,
+                CollisionEventFlags::all(),
+            ))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -718,7 +671,11 @@ mod tests {
 
         manager
             .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
+            .send(rapier::prelude::CollisionEvent::Started(
+                context.handle1,
+                context.handle2,
+                CollisionEventFlags::all(),
+            ))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
@@ -746,7 +703,11 @@ mod tests {
 
         manager
             .send
-            .send(rapier::prelude::CollisionEvent::Started(context.handle1, context.handle2, CollisionEventFlags::all()))
+            .send(rapier::prelude::CollisionEvent::Started(
+                context.handle1,
+                context.handle2,
+                CollisionEventFlags::all(),
+            ))
             .unwrap();
 
         let mut events = Events::<CollisionEvent>::default();
