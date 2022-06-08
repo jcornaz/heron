@@ -33,7 +33,8 @@ use heron_core::{CollisionEvent, PhysicsSystem};
 pub use pipeline::{PhysicsWorld, RayCastInfo, ShapeCastCollisionInfo, ShapeCastCollisionType};
 
 use crate::rapier::dynamics::{
-    self, CCDSolver, IntegrationParameters, IslandManager, ImpulseJointSet, MultibodyJointSet, RigidBodySet,
+    self, CCDSolver, ImpulseJointSet, IntegrationParameters, IslandManager, MultibodyJointSet,
+    RigidBodySet,
 };
 use crate::rapier::geometry::{self, BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
