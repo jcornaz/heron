@@ -202,7 +202,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
             // border radius adds to the hull, but we don't currently fill in the empty space
             // around the edges of the polygon that are also taken up by the border radius.
             } else if let Some(polygon) = shape.as_round_convex_polygon() {
-                for point in polygon.base_shape.points() {
+                for point in polygon.inner_shape.points() {
                     builder = builder.add(&shapes::Circle {
                         radius: polygon.border_radius,
                         center: point.into_bevy(),
@@ -210,7 +210,7 @@ fn base_builder(body: &CollisionShape, shape: &dyn Shape) -> GeometryBuilder {
                 }
 
                 builder = builder.add(&shapes::Polygon {
-                    points: polygon.base_shape.points().into_bevy(),
+                    points: polygon.inner_shape.points().into_bevy(),
                     closed: true,
                 });
             }
