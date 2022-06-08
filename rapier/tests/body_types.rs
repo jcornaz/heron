@@ -78,7 +78,7 @@ fn create_static_body() {
         )
         .unwrap();
 
-    assert!(body.is_static())
+    assert!(body.is_fixed())
 }
 
 #[test]
@@ -199,7 +199,7 @@ fn can_change_to_static_after_creation() {
             )
             .unwrap();
 
-        assert!(body.is_static());
+        assert!(body.is_fixed());
     }
 }
 

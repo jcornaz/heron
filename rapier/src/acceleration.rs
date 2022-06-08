@@ -39,6 +39,8 @@ fn update_acceleration(body: &mut RigidBody, acceleration: &Acceleration) {
             }
         }
     };
-    body.apply_force(linear_acceleration * body.mass(), wake_up);
-    body.apply_torque(inertia * angular_acceleration, wake_up);
+    body.reset_forces(wake_up);
+    body.reset_torques(wake_up);
+    body.add_force(linear_acceleration * body.mass(), wake_up);
+    body.add_torque(inertia * angular_acceleration, wake_up);
 }

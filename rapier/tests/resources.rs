@@ -55,6 +55,5 @@ fn rapier_world_is_registered() {
 
     assert!(app.world.contains_resource::<RigidBodySet>());
     assert!(app.world.contains_resource::<ColliderSet>());
-    assert!(app.world.contains_resource::<JointSet>());
     assert!(app.world.contains_resource::<IntegrationParameters>());
 }

@@ -5,10 +5,11 @@ use fnv::FnvHashMap;
 use heron_core::{Damping, PhysicMaterial, RigidBody, RotationConstraints, Velocity};
 
 use crate::convert::{IntoBevy, IntoRapier};
-use crate::rapier::dynamics::{
-    IslandManager, JointSet, RigidBodyBuilder, RigidBodyHandle, RigidBodySet, RigidBodyType,
-};
 use crate::rapier::geometry::ColliderSet;
+use crate::rapier::{
+    dynamics::{IslandManager, RigidBodyBuilder, RigidBodyHandle, RigidBodySet, RigidBodyType},
+    prelude::{ImpulseJointSet, MultibodyJointSet},
+};
 
 pub(crate) type HandleMap = FnvHashMap<Entity, RigidBodyHandle>;
 
@@ -79,7 +80,8 @@ pub(crate) fn remove_invalids_after_components_removed(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
+    mut impulse_joints: ResMut<'_, ImpulseJointSet>,
+    mut multibody_joints: ResMut<'_, MultibodyJointSet>,
     bodies_removed: RemovedComponents<'_, RigidBody>,
     constraints_removed: RemovedComponents<'_, RotationConstraints>,
     materials_removed: RemovedComponents<'_, PhysicMaterial>,
@@ -99,7 +101,14 @@ pub(crate) fn remove_invalids_after_components_removed(
                     &colliders,
                     handle,
                 );
-                bodies.remove(handle, &mut islands, &mut colliders, &mut joints);
+                bodies.remove(
+                    handle,
+                    &mut islands,
+                    &mut colliders,
+                    &mut impulse_joints,
+                    &mut multibody_joints,
+                    true,
+                );
                 if rb_entities.get(entity).is_ok() {
                     commands.entity(entity).remove::<super::RigidBodyHandle>();
                 }
@@ -114,7 +123,8 @@ pub(crate) fn remove_invalids_after_component_changed(
     mut bodies: ResMut<'_, RigidBodySet>,
     mut islands: ResMut<'_, IslandManager>,
     mut colliders: ResMut<'_, ColliderSet>,
-    mut joints: ResMut<'_, JointSet>,
+    mut impulse_joints: ResMut<'_, ImpulseJointSet>,
+    mut multibody_joints: ResMut<'_, MultibodyJointSet>,
     collider_entities: Query<'_, '_, Entity, With<super::ColliderHandle>>,
     rigidbody_entities: Query<'_, '_, Entity, With<super::RigidBodyHandle>>,
     changed: Query<
@@ -136,7 +146,14 @@ pub(crate) fn remove_invalids_after_component_changed(
             &colliders,
             handle.0,
         );
-        bodies.remove(handle.0, &mut islands, &mut colliders, &mut joints);
+        bodies.remove(
+            handle.0,
+            &mut islands,
+            &mut colliders,
+            &mut impulse_joints,
+            &mut multibody_joints,
+            true,
+        );
         if rigidbody_entities.get(entity).is_ok() {
             commands.entity(entity).remove::<super::RigidBodyHandle>();
         }
@@ -246,7 +263,7 @@ pub(crate) fn update_bevy_transform(
 fn body_status(body_type: RigidBody) -> RigidBodyType {
     match body_type {
         RigidBody::Dynamic => RigidBodyType::Dynamic,
-        RigidBody::Static | RigidBody::Sensor => RigidBodyType::Static,
+        RigidBody::Static | RigidBody::Sensor => RigidBodyType::Fixed,
         RigidBody::KinematicPositionBased => RigidBodyType::KinematicPositionBased,
         RigidBody::KinematicVelocityBased => RigidBodyType::KinematicVelocityBased,
     }
