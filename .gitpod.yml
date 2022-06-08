@@ -4,6 +4,7 @@ image:
 tasks:
   - name: root
     init: |
+      cp .cargo/fast_compiles_config .cargo/config.toml
       cargo update
       cargo doc --all-features --workspace --no-deps
       cargo clippy --all-features --workspace
