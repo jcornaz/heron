@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base", ":automergePatch", ":semanticCommitTypeAll(chore)"
+    "config:base", ":automergePatch", "schedule:weekends", ":semanticCommitTypeAll(chore)"
   ],
   "labels": ["dependencies"],
   "packageRules": [
