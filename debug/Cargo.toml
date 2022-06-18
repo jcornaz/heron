@@ -20,7 +20,7 @@ bevy = { version = "0.7.0", default-features = false, features = ["bevy_render"]
 bevy_prototype_lyon = { version = "0.5.0", optional = true }
 lyon_path = { version = "0.17.7", optional = true }
 fnv = "1.0"
-bevy_prototype_debug_lines = { version = "0.7.1", default-features = false, optional = true }
+bevy_prototype_debug_lines = { version = "0.7.2", default-features = false, optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
