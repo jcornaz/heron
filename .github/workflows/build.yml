@@ -149,17 +149,6 @@ jobs:
           profile: minimal
       - run: cargo install cargo-deny --locked
       - run: cargo deny check
-  unused-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions-rs/toolchain@v1.0.7
-        with:
-          toolchain: nightly
-          override: true
-          profile: minimal
-      - run: cargo install cargo-udeps --locked
-      - run: cargo udeps --workspace --all-features
 
   release:
     if: ${{ github.event_name != 'pull_request' }}
