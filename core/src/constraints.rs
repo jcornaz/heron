@@ -57,7 +57,7 @@ impl RotationConstraints {
             allow_z: true,
         }
     }
-    
+
     /// Returns true if all axes are locked
     #[must_use]
     pub fn is_lock(&self) -> bool {
@@ -98,5 +98,48 @@ impl RotationConstraints {
             allow_y: false,
             allow_z: true,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use rstest::rstest;
+
+    use super::*;
+
+    #[test]
+    fn is_lock() {
+        assert!(RotationConstraints::lock().is_lock());
+    }
+
+    #[rstest]
+    fn is_not_lock(
+        #[values(
+            RotationConstraints::allow(),
+            RotationConstraints { allow_x: false, ..RotationConstraints::allow() },
+            RotationConstraints { allow_y: false, ..RotationConstraints::allow() },
+            RotationConstraints { allow_z: false, ..RotationConstraints::allow() },
+        )]
+        constraints: RotationConstraints,
+    ) {
+        assert!(!constraints.is_lock());
+    }
+
+    #[test]
+    fn is_allow() {
+        assert!(RotationConstraints::allow().is_allow());
+    }
+
+    #[rstest]
+    fn is_not_allow(
+        #[values(
+            RotationConstraints::lock(),
+            RotationConstraints { allow_x: true, ..RotationConstraints::lock() },
+            RotationConstraints { allow_y: true, ..RotationConstraints::lock() },
+            RotationConstraints { allow_z: true, ..RotationConstraints::lock() },
+        )]
+        constraints: RotationConstraints,
+    ) {
+        assert!(!constraints.is_allow());
     }
 }
