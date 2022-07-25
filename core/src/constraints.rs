@@ -57,6 +57,18 @@ impl RotationConstraints {
             allow_z: true,
         }
     }
+    
+    /// Returns true if all axes are locked
+    #[must_use]
+    pub fn is_lock(&self) -> bool {
+        !self.allow_x && !self.allow_y && !self.allow_z
+    }
+
+    /// Returns true if all axes are nallowed
+    #[must_use]
+    pub fn is_allow(&self) -> bool {
+        self.allow_x && self.allow_y && self.allow_z
+    }
 
     /// Allow rotation around the x axis only (and prevent rotating around the other axes)
     #[must_use]
