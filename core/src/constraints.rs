@@ -64,7 +64,7 @@ impl RotationConstraints {
         !self.allow_x && !self.allow_y && !self.allow_z
     }
 
-    /// Returns true if all axes are nallowed
+    /// Returns true if all axes are allowed (not locked)
     #[must_use]
     pub fn is_allow(&self) -> bool {
         self.allow_x && self.allow_y && self.allow_z
