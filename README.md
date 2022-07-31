@@ -97,7 +97,6 @@ It *will* be increased to the latest stable version in a major release. (even if
 Here are some key differences between the two projects:
 
 * `heron` tries to provide a smaller, simpler API that is easier to use. `bevy_rapier` is more complete and powerful, but a bit more complex.
-* `heron` mostly hides the underlying physics engine, so you don't have to use [rapier] directly nor [nalgebra]. `bevy_rapier` asks the user to deal directly with `rapier` and `nalgebra`.
 * `heron` is focused on games only. `bevy_rapier` targets all kind of physics simulation applications (incl. games).
 * `bevy_rapier` is actively maintained by [dimforge], the developer of `rapier`. `heron` is also active, but cannot evolve as fast as `bevy_rapier` can. 
 
