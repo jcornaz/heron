@@ -1,10 +1,12 @@
 #![cfg(any(dim2, dim3))]
 
+use std::convert::From;
 use std::f32::consts::PI;
 use std::ops::DerefMut;
 use std::time::Duration;
 
 use bevy::core::CorePlugin;
+use bevy::math::Affine3A;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
 
@@ -38,11 +40,7 @@ fn creates_body_in_rapier_world() {
         .insert_bundle((
             RigidBody::Dynamic,
             CollisionShape::Sphere { radius: 2.0 },
-            GlobalTransform {
-                translation,
-                rotation,
-                ..Default::default()
-            },
+            GlobalTransform::from(Affine3A::from_rotation_translation(rotation, translation)),
         ))
         .id();
 
@@ -157,8 +155,12 @@ fn update_rapier_position() {
     {
         app.update();
         let mut transform = app.world.get_mut::<GlobalTransform>(entity).unwrap();
-        transform.translation = translation;
-        transform.rotation = rotation;
+        let (global_scale, _, _) = transform.to_scale_rotation_translation();
+        *transform = GlobalTransform::from(Affine3A::from_scale_rotation_translation(
+            global_scale,
+            rotation,
+            translation,
+        ));
     }
 
     app.update();

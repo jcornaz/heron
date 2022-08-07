@@ -14,10 +14,10 @@ all-features = true
 [features]
 default = []
 3d = []
-collision-from-mesh = ["bevy/bevy_render"]
+collision-from-mesh = ["bevy/bevy_render", "bevy/bevy_scene", "bevy/bevy_asset"]
 
 [dependencies]
-bevy = { version = "0.7.0", default-features = false }
+bevy = { version = "0.8.0", default-features = false }
 duplicate = "0.4.1"
 smallvec = "1.8"
 

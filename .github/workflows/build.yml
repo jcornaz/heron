@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  RUST_VERSION: 1.60.0
+  RUST_VERSION: 1.62.1
   RUSTFLAGS: "-D warnings"
   RUSTDOCFLAGS: "-D warnings"
 

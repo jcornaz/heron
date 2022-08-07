@@ -1,4 +1,7 @@
-use bevy::{ecs::component::Component, reflect::Reflect};
+use bevy::{
+    ecs::component::Component,
+    reflect::{FromReflect, Reflect},
+};
 
 /// Describes a collision layer
 ///
@@ -71,7 +74,7 @@ impl<T: PhysicsLayer> PhysicsLayer for &T {
 ///         );
 /// }
 /// ```
-#[derive(Debug, Component, Copy, Clone, Eq, PartialEq, Reflect)]
+#[derive(Debug, Component, Copy, Clone, Eq, PartialEq, Reflect, FromReflect)]
 pub struct CollisionLayers {
     groups: u32,
     masks: u32,
