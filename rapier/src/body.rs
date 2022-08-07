@@ -1,4 +1,5 @@
 use bevy::ecs::prelude::*;
+use bevy::math::Affine3A;
 use bevy::transform::prelude::*;
 use fnv::FnvHashMap;
 
@@ -33,9 +34,10 @@ pub(crate) fn create(
     >,
 ) {
     for (entity, transform, body, velocity, damping, rotation_constraints) in query.iter() {
+        let global_affine = transform.to_scale_rotation_translation();
         let mut builder = RigidBodyBuilder::new(body_status(*body))
             .user_data(entity.to_bits().into())
-            .position((transform.translation, transform.rotation).into_rapier());
+            .position((global_affine.2, global_affine.1).into_rapier());
 
         #[allow(unused_variables)]
         if let Some(RotationConstraints {
@@ -192,7 +194,9 @@ pub(crate) fn update_rapier_position(
 ) {
     for (transform, handle) in query.iter() {
         if let Some(body) = bodies.get_mut(handle.0) {
-            let isometry = (transform.translation, transform.rotation).into_rapier();
+            let global_affine = transform.to_scale_rotation_translation();
+            let isometry = (global_affine.2, global_affine.1).into_rapier();
+
             if body.is_kinematic() {
                 body.set_next_kinematic_position(isometry);
             } else {
@@ -230,33 +234,34 @@ pub(crate) fn update_bevy_transform(
         #[cfg(dim2)]
         let (mut translation, rotation) = body.position().into_bevy();
 
+        let global_affine = global.to_scale_rotation_translation();
+
         #[cfg(dim2)]
         {
             // In 2D, preserve the transform `z` component that may have been set by the user
-            translation.z = global.translation.z;
+            translation.z = global_affine.2.z;
         }
 
-        if translation == global.translation && rotation == global.rotation {
+        if translation == global_affine.2 && rotation == global_affine.1 {
             continue;
         }
 
         if let Some(local) = &mut local {
-            if local.translation == global.translation {
+            if local.translation == global_affine.2 {
                 local.translation = translation;
             } else {
-                local.translation = translation - (global.translation - local.translation);
+                local.translation = translation - (global_affine.2 - local.translation);
             }
 
-            if local.rotation == global.rotation {
+            if local.rotation == global_affine.1 {
                 local.rotation = rotation;
             } else {
                 local.rotation =
-                    rotation * (global.rotation * local.rotation.conjugate()).conjugate();
+                    rotation * (global_affine.1 * local.rotation.conjugate()).conjugate();
             }
         }
 
-        global.translation = translation;
-        global.rotation = rotation;
+        *global = GlobalTransform::from(Affine3A::from_rotation_translation(rotation, translation));
     }
 }
 

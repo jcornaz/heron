@@ -1,4 +1,7 @@
-use bevy::{ecs::component::Component, reflect::{Reflect, FromReflect}};
+use bevy::{
+    ecs::component::Component,
+    reflect::{FromReflect, Reflect},
+};
 
 /// Describes a collision layer
 ///

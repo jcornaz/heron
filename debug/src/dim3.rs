@@ -25,8 +25,10 @@ fn add_shape_outlines(
     mut lines: ResMut<'_, DebugLines>,
 ) {
     for (shape, trans, rigid_body_option, sensor_option) in shapes.iter() {
-        let origin = trans.translation;
-        let orient = trans.rotation;
+        let global_affine = trans.to_scale_rotation_translation();
+        let origin = global_affine.2;
+        let orient = global_affine.1;
+
         let color = color.for_collider_type(rigid_body_option, sensor_option.is_some());
         match shape {
             CollisionShape::Cuboid {

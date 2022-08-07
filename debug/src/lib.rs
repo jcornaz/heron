@@ -9,7 +9,7 @@
 
 //! Rendering of Heron's collision shapes for debugging purposes
 
-use bevy::prelude::*;
+use bevy::{math::Affine3A, prelude::*};
 use fnv::FnvHashMap;
 
 #[cfg(any(feature = "2d", feature = "3d"))]
@@ -135,14 +135,11 @@ fn scale_debug_entities(
             }
             // Probably not the ideal way to do this
             let current = global.to_scale_rotation_translation();
-            let affine = bevy::math::Affine3A::from_scale_rotation_translation(
+            *global = GlobalTransform::from(Affine3A::from_scale_rotation_translation(
                 Vec3::ONE,
                 current.1,
                 current.2,
-            );
-            let transform = GlobalTransform::from(affine);
-
-            *global = transform;
+            ));
         });
 }
 

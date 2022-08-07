@@ -333,7 +333,7 @@ pub struct ShapeCastCollisionInfo {
 pub(crate) fn update_integration_parameters(
     physics_steps: Res<'_, PhysicsSteps>,
     physics_time: Res<'_, PhysicsTime>,
-    bevy_time: Res<'_, bevy::core::Time>,
+    bevy_time: Res<'_, bevy::time::Time>,
     mut integration_parameters: ResMut<'_, IntegrationParameters>,
 ) {
     if matches!(

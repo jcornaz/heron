@@ -198,7 +198,10 @@ mod tests {
             app.update();
 
             assert_eq!(
-                app.world.get::<GlobalTransform>(child).unwrap().translation,
+                app.world
+                    .get::<GlobalTransform>(child)
+                    .unwrap()
+                    .translation(),
                 Vec3::X
             );
         }

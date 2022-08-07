@@ -46,7 +46,7 @@ pub(crate) fn create(
                 rigid_body_handle,
             ))
         } else if let Some((body, rigid_body_handle, material)) =
-            parent.and_then(|p| rigid_bodies.get(p.0).ok())
+            parent.and_then(|p| rigid_bodies.get(p.get()).ok())
         {
             Some((
                 shape.build(
