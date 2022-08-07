@@ -126,16 +126,23 @@ fn scale_debug_entities(
     query
         .iter_mut()
         .filter(|(_, global)| {
-            let scale = global.scale;
+            let scale = global.to_scale_rotation_translation().0;
             !is_near(scale.x, 1.0) || !is_near(scale.y, 1.0)
         })
         .for_each(|(local, mut global)| {
             if let Some(mut local) = local {
-                local.scale *= global.scale.recip();
+                local.scale *= global.to_scale_rotation_translation().0.recip();
             }
-            global.scale.x = 1.0;
-            global.scale.y = 1.0;
-            global.scale.z = 1.0;
+            // Probably not the ideal way to do this
+            let current = global.to_scale_rotation_translation();
+            let affine = bevy::math::Affine3A::from_scale_rotation_translation(
+                Vec3::ONE,
+                current.1,
+                current.2,
+            );
+            let transform = GlobalTransform::from(affine);
+
+            *global = transform;
         });
 }
 
