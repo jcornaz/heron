@@ -6,7 +6,8 @@
   "packageRules": [
     {
       "matchPackagePatterns": ["^bevy"],
-      "groupName": "bevy"
+      "groupName": "bevy",
+      "enable": false
     },
     {
       "matchPackagePatterns": ["^rapier(2|3)d$"],
