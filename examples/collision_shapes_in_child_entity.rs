@@ -64,7 +64,7 @@ fn spawn(mut commands: Commands) {
 }
 
 fn spawn_ground_and_camera(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(Camera2dBundle::default());
 
     commands.spawn_bundle((
         Transform::from_translation(Vec3::new(0.0, -300.0, 0.0)),

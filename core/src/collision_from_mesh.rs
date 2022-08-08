@@ -21,8 +21,9 @@ use crate::{CollisionLayers, CollisionShape, RigidBody};
 ///         .insert(PendingConvexCollision::default())
 ///         .insert(RigidBody::Static)
 ///         .insert(CollisionLayers::default())
-///         .with_children(|parent| {
-///             parent.spawn_scene(asset_server.load("cubes.glb#Scene0"));
+///         .insert_bundle(SceneBundle {
+///             scene: asset_server.load("cubes.glb#Scene0"),
+///             ..default()
 ///         });
 /// }
 /// ```

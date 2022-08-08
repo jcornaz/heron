@@ -129,7 +129,7 @@ fn create_shape(
         }),
         Transform {
             translation: Vec3::Z,
-            scale: transform.scale.recip(),
+            scale: transform.to_scale_rotation_translation().0.recip(),
             ..Default::default()
         },
     )

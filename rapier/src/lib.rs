@@ -23,6 +23,7 @@ pub extern crate rapier3d;
 
 use bevy::ecs::component::Component;
 use bevy::prelude::*;
+use bevy::time::TimePlugin;
 use bevy::transform::TransformSystem;
 #[cfg(dim2)]
 pub(crate) use rapier2d as rapier;
@@ -70,6 +71,7 @@ pub struct ColliderHandle(geometry::ColliderHandle);
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin)
+            .add_plugin(TimePlugin)
             .init_resource::<PhysicsPipeline>()
             .init_resource::<body::HandleMap>()
             .init_resource::<shape::HandleMap>()
@@ -198,7 +200,10 @@ mod tests {
             app.update();
 
             assert_eq!(
-                app.world.get::<GlobalTransform>(child).unwrap().translation,
+                app.world
+                    .get::<GlobalTransform>(child)
+                    .unwrap()
+                    .translation(),
                 Vec3::X
             );
         }

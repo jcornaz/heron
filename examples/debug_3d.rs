@@ -32,15 +32,13 @@ fn setup(
             ],
         });
 
-    commands
-        .spawn_bundle(PerspectiveCameraBundle::new_3d())
-        .insert(
-            Transform {
-                translation: Vec3::new(3.0, 7., -19.0),
-                ..Default::default()
-            }
-            .looking_at(Vec3::new(1., 4., 0.), Vec3::Y),
-        );
+    commands.spawn_bundle(Camera3dBundle::default()).insert(
+        Transform {
+            translation: Vec3::new(3.0, 7., -19.0),
+            ..Default::default()
+        }
+        .looking_at(Vec3::new(1., 4., 0.), Vec3::Y),
+    );
 
     // Cube (with radius)
     commands
