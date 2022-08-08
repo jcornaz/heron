@@ -7,7 +7,7 @@
     {
       "matchPackagePatterns": ["^bevy"],
       "groupName": "bevy",
-      "enable": false
+      "enabled": false
     },
     {
       "matchPackagePatterns": ["^rapier(2|3)d$"],
