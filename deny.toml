@@ -4,7 +4,7 @@ unmaintained = "deny"
 yanked = "deny"
 notice = "deny"
 ignore = [
-    "RUSTSEC-2021-0139", # from ansi_term v0.12.1 - unmaintained - https://github.com/ogham/rust-ansi-term/issues/72
+    "RUSTSEC-2021-0139", # ansi_term, used by bevy_log is unmaintained: https://github.com/ogham/rust-ansi-term/issues/72
 ]
 
 [licenses]
