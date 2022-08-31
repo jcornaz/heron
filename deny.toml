@@ -3,7 +3,9 @@ vulnerability = "deny"
 unmaintained = "deny"
 yanked = "deny"
 notice = "deny"
-ignore = []
+ignore = [
+    "RUSTSEC-2021-0139", # ansi_term (used by bevy_log) is unmaintained: https://github.com/ogham/rust-ansi-term/issues/72
+]
 
 [licenses]
 default = "deny"
