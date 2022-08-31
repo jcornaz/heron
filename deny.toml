@@ -3,7 +3,9 @@ vulnerability = "deny"
 unmaintained = "deny"
 yanked = "deny"
 notice = "deny"
-ignore = []
+ignore = [
+    "RUSTSEC-2021-0139",
+]
 
 [licenses]
 default = "deny"
