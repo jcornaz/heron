@@ -19,7 +19,7 @@ collision-from-mesh = ["bevy/bevy_render", "bevy/bevy_scene", "bevy/bevy_asset"]
 [dependencies]
 bevy = { version = "0.8.0", default-features = false }
 duplicate = "0.4.1"
-smallvec = "1.9"
+smallvec = "1.10"
 
 [dev-dependencies]
 rstest = "0.15"
