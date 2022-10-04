@@ -23,6 +23,7 @@ use crate::rapier::{
         RigidBodySet,
     },
 };
+use crate::PhysicsHooks;
 
 use crate::rapier::parry::query::{Ray, TOIStatus};
 use crate::rapier::pipeline::{EventHandler, PhysicsPipeline, QueryPipeline};
@@ -364,10 +365,15 @@ pub(crate) fn step(
     mut impulse_joints: ResMut<'_, ImpulseJointSet>,
     mut multibody_joints: ResMut<'_, MultibodyJointSet>,
     mut ccd_solver: ResMut<'_, CCDSolver>,
+    physics_hooks: Option<Res<'_, PhysicsHooks>>,
     event_manager: Local<'_, EventManager>,
     mut events: ResMut<'_, Events<CollisionEvent>>,
 ) {
     let gravity = Vec3::from(*gravity).into_rapier();
+    let physics_hooks = physics_hooks
+        .map(Res::into_inner)
+        .map(|PhysicsHooks(inner)| &**inner)
+        .unwrap_or(&());
 
     // Step the physics simulation
     pipeline.step(
@@ -381,7 +387,7 @@ pub(crate) fn step(
         &mut impulse_joints,
         &mut multibody_joints,
         &mut ccd_solver,
-        &(),
+        physics_hooks,
         &*event_manager,
     );
 

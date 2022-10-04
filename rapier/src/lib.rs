@@ -1,6 +1,7 @@
 #![deny(future_incompatible, nonstandard_style)]
 #![warn(missing_docs, rust_2018_idioms, clippy::pedantic)]
 #![allow(
+    clippy::map_unwrap_or,
     clippy::needless_pass_by_value,
     clippy::type_complexity,
     clippy::too_many_arguments
@@ -39,7 +40,7 @@ use crate::rapier::dynamics::{
 };
 use crate::rapier::geometry::{self, BroadPhase, ColliderSet, NarrowPhase};
 pub use crate::rapier::na as nalgebra;
-use crate::rapier::pipeline::{PhysicsPipeline, QueryPipeline};
+use crate::rapier::pipeline::{self as rapier_pipeline, PhysicsPipeline, QueryPipeline};
 
 mod acceleration;
 mod body;
@@ -67,6 +68,12 @@ pub struct RigidBodyHandle(dynamics::RigidBodyHandle);
 /// It is only useful for advanced, direct access to the rapier world
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Component)]
 pub struct ColliderHandle(geometry::ColliderHandle);
+
+/// Resource that holds a reference to Rapier's physics hooks, if any.
+///
+/// It is *NOT* automatically inserted or removed by heron.
+/// It is only useful for advanced, direct access to the rapier world
+pub struct PhysicsHooks(pub Box<dyn rapier_pipeline::PhysicsHooks>);
 
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut App) {
