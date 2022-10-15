@@ -11,7 +11,7 @@ jobs:
   semantic-title:
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v4
+      - uses: amannn/action-semantic-pull-request@v5
         with:
           subjectPattern: ^[a-z].+$
           subjectPatternError: |
