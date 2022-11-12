@@ -9,11 +9,12 @@
 
 An ergonomic physics API for 2d and 3d [bevy] games. (powered by [rapier])
 
-## The project is being phased out
+## ⚠ The project is discontinued!
 
-Heron is in a "maintenance mode", meaning I’ll continue to accept pull-requests and merge them (provided they come with tests and the build pass). But I am not actively working on the project. As soon as bevy 0.9 is released, heron will be immediately discontinued. This means heron will never support bevy 0.9.
+Heron is in now discontinued. No more features, fixes or support will be provided.
 
 For more details on the reasons, read the [announcement](https://github.com/jcornaz/heron/discussions/317)
+
 
 ## Design principles
 
