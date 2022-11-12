@@ -23,8 +23,6 @@ heron_rapier_v5 = { package = "heron_rapier", version = "5.0" }
 bevy = { version = "0.8.0", default-features = false }
 rapier2d = { version = "0.13.0", optional = true }
 rapier3d = { version = "0.13.0", optional = true }
-fnv = "1.0"
-crossbeam = "0.8.2"
 
 [dev-dependencies]
 rstest = "0.15"

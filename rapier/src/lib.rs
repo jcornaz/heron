@@ -13,8 +13,6 @@
 //!
 //! The following types are accepted as [`heron_core::CustomCollisionShape`]
 //! values.
-//!
-//! - [`rapier::geometry::ColliderBuilder`]
 
 #[cfg(feature = "rapier2d")]
 pub extern crate rapier2d;
