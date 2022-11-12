@@ -65,7 +65,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           profile: minimal
           override: true
-      - run: cargo test -p heron_core --no-default-features --features 3d
+      - run: cargo test -p heron_core@4.0.0 --no-default-features --features 3d
       - run: cargo test -p heron_rapier --no-default-features --features 3d
       - run: cargo test -p heron_debug --no-default-features --features 3d
       - run: cargo test --no-default-features --features 3d
@@ -113,7 +113,7 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           profile: minimal
           override: true
-      - run: cargo test -p heron_core --no-default-features --features collision-from-mesh
+      - run: cargo test -p heron_core@4.0.0 --no-default-features --features collision-from-mesh
       - run: cargo test --no-default-features --features collision-from-mesh
   code-style:
     runs-on: ubuntu-latest
