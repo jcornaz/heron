@@ -13,13 +13,12 @@ all-features = true
 
 [features]
 default = []
-3d = []
-collision-from-mesh = ["bevy/bevy_render", "bevy/bevy_scene", "bevy/bevy_asset"]
+3d = ["heron_core_v5/3d"]
+collision-from-mesh = ["heron_core_v5/collision-from-mesh", "bevy/bevy_render", "bevy/bevy_scene", "bevy/bevy_asset"]
 
 [dependencies]
+heron_core_v5 = { package = "heron_core", version = "5.0" }
 bevy = { version = "0.8.0", default-features = false }
-duplicate = "0.4.1"
-smallvec = "1.10"
 
 [dev-dependencies]
 rstest = "0.15"
