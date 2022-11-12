@@ -13,17 +13,16 @@ all-features = true
 
 [features]
 default = []
-2d = ["rapier2d"]
-3d = ["rapier3d", "heron_core/3d"]
-enhanced-determinism = ["rapier2d?/enhanced-determinism", "rapier3d?/enhanced-determinism"]
+2d = ["heron_rapier_v5/2d", "rapier2d"]
+3d = ["heron_rapier_v5/3d", "rapier3d", "heron_core/3d"]
+enhanced-determinism = ["heron_rapier_v5/enhanced-determinism", "rapier2d?/enhanced-determinism", "rapier3d?/enhanced-determinism"]
 
 [dependencies]
 heron_core = { version = "4.0.0", path = "../core" }
+heron_rapier_v5 = { package = "heron_rapier", version = "5.0" }
 bevy = { version = "0.8.0", default-features = false }
 rapier2d = { version = "0.13.0", optional = true }
 rapier3d = { version = "0.13.0", optional = true }
-fnv = "1.0"
-crossbeam = "0.8.2"
 
 [dev-dependencies]
 rstest = "0.15"
