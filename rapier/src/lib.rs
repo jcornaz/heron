@@ -23,7 +23,6 @@ pub extern crate rapier3d;
 
 use bevy::ecs::component::Component;
 use bevy::prelude::*;
-use bevy::time::TimePlugin;
 use bevy::transform::TransformSystem;
 #[cfg(dim2)]
 pub(crate) use rapier2d as rapier;
@@ -71,7 +70,6 @@ pub struct ColliderHandle(geometry::ColliderHandle);
 impl Plugin for RapierPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(heron_core::CorePlugin)
-            .add_plugin(TimePlugin)
             .init_resource::<PhysicsPipeline>()
             .init_resource::<body::HandleMap>()
             .init_resource::<shape::HandleMap>()
@@ -163,6 +161,7 @@ mod tests {
     use std::time::Duration;
 
     use bevy::core::CorePlugin;
+    use bevy::time::TimePlugin;
 
     use heron_core::{
         Acceleration, CollisionShape, PhysicsSteps, PhysicsTime, RigidBody, Velocity,
@@ -176,6 +175,7 @@ mod tests {
             let mut app = App::new();
 
             app.add_plugin(CorePlugin)
+                .add_plugin(TimePlugin)
                 .add_plugin(TransformPlugin)
                 .add_plugin(RapierPlugin::default())
                 .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)));
@@ -213,6 +213,7 @@ mod tests {
     fn does_not_update_rapier_when_paused() {
         let mut app = App::new();
         app.add_plugin(CorePlugin)
+            .add_plugin(TimePlugin)
             .add_plugin(RapierPlugin::default())
             .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)));
         let entity = app

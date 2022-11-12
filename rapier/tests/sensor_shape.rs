@@ -5,6 +5,7 @@ use std::time::Duration;
 use bevy::core::CorePlugin;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::time::TimePlugin;
 
 use heron_core::{CollisionShape, PhysicsSteps, RigidBody, SensorShape};
 use heron_rapier::convert::IntoRapier;
@@ -20,6 +21,7 @@ fn test_app() -> App {
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
+        .add_plugin(TimePlugin)
         .add_plugin(RapierPlugin);
     builder
 }

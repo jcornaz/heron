@@ -4,6 +4,7 @@ use bevy::app::prelude::*;
 use bevy::core::CorePlugin;
 use bevy::math::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::time::TimePlugin;
 
 use heron_core::Gravity;
 use heron_core::PhysicsTime;
@@ -21,6 +22,7 @@ fn can_define_gravity_before_plugin() {
             .insert_resource(Gravity::from(Vec3::Y))
             .init_resource::<TypeRegistryArc>()
             .add_plugin(CorePlugin)
+            .add_plugin(TimePlugin)
             .add_plugin(RapierPlugin::default());
 
         builder

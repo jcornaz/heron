@@ -5,6 +5,7 @@ use std::time::Duration;
 use bevy::ecs::event::ManualEventReader;
 use bevy::prelude::*;
 use bevy::reflect::TypeRegistryArc;
+use bevy::time::TimePlugin;
 use bevy::{core::CorePlugin, ecs::event::Events};
 use rstest::*;
 
@@ -20,6 +21,7 @@ fn test_app() -> App {
         .init_resource::<TypeRegistryArc>()
         .insert_resource(PhysicsSteps::every_frame(Duration::from_secs(1)))
         .add_plugin(CorePlugin)
+        .add_plugin(TimePlugin)
         .add_plugin(RapierPlugin)
         .add_system_to_stage(
             bevy::app::CoreStage::PostUpdate,
