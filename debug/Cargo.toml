@@ -10,17 +10,11 @@ repository = "https://github.com/jcornaz/heron/"
 
 [features]
 default = []
-2d = ["heron_rapier/2d", "bevy_prototype_lyon", "lyon_path"]
-3d = ["heron_rapier/3d", "bevy_prototype_debug_lines/3d"]
+2d = ["heron_debug_v5/2d"]
+3d = ["heron_debug_v5/3d"]
 
 [dependencies]
-heron_core = { version = "4.0.0", path = "../core" }
-heron_rapier = { version = "4.0.0", path = "../rapier" }
-bevy = { version = "0.8.0", default-features = false, features = ["bevy_render"] }
-bevy_prototype_lyon = { version = "0.6.0", optional = true }
-lyon_path = { version = "0.17.7", optional = true }
-fnv = "1.0"
-bevy_prototype_debug_lines = { version = "0.8.0", default-features = false, optional = true }
+heron_debug_v5 = { package = "heron_debug", version = "5.0" }
 
 [package.metadata.docs.rs]
 all-features = true
