@@ -90,9 +90,9 @@ It *will* be increased to the latest stable version in a major release. (even if
 
 | bevy | heron      |
 |------|------------|
-| 0.8  | 4          |
+| 0.8  | 4, 5       |
 | 0.7  | 3          |
-| 0.6  | 1 - 2      |
+| 0.6  | 1, 2       |
 | 0.5  | 0.4 - 0.13 |
 | 0.4  | 0.1 - 0.3  |
 
