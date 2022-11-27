@@ -22,7 +22,7 @@ duplicate = "0.4.1"
 smallvec = "1.10"
 
 [dev-dependencies]
-rstest = "0.15"
+rstest = "0.16"
 approx = "0.5.1"
 
 [build-dependencies]
